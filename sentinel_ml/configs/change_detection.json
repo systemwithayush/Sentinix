@@ -1,0 +1,27 @@
+{
+  "experiment_name": "siamese_change_detection",
+  "model": {
+    "architecture": "SiameseChangeDetector",
+    "in_channels": 3,
+    "out_channels": 1
+  },
+  "dataset": {
+    "train_source": "LEVIR-CD+",
+    "val_source": "LEVIR-CD+",
+    "resolution": 512,
+    "crop_size": 512
+  },
+  "training": {
+    "batch_size": 4,
+    "num_workers": 2,
+    "num_epochs": 6,
+    "lr": 3e-4,
+    "weight_decay": 1e-4,
+    "amp_fp16": true,
+    "seed": 42
+  },
+  "checkpoint": {
+    "dir": "checkpoints",
+    "best_filename": "best_siamese_cd.pth"
+  }
+}

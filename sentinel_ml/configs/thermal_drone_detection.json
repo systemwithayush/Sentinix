@@ -1,0 +1,30 @@
+{
+  "experiment_name": "thermal_drone_detection",
+  "modality": "THERMAL_IR_STRICT_ISOLATION",
+  "license_isolation": "STRICTLY_NON_COMMERCIAL_RESEARCH",
+  "model": {
+    "architecture": "FasterRCNN_FPN",
+    "backbone": "mobilenet_v3",
+    "num_classes": 2,
+    "pretrained_backbone": true
+  },
+  "dataset": {
+    "train_source": "Anti-UAV_IR_Train + CST_AntiUAV_IR",
+    "val_source": "Anti-UAV_IR_Val",
+    "sample_stride": 5
+  },
+  "training": {
+    "batch_size": 4,
+    "num_workers": 2,
+    "num_epochs": 5,
+    "lr": 1e-3,
+    "momentum": 0.9,
+    "weight_decay": 1e-4,
+    "amp_fp16": true,
+    "seed": 42
+  },
+  "checkpoint": {
+    "dir": "checkpoints",
+    "best_filename": "best_thermal_drone_detector.pth"
+  }
+}

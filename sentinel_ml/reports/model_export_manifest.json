@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-10-20T14:46:38Z",
+  "hardware": {
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU"
+  },
+  "exported_models": {
+    "siamese_change_detector": {
+      "torchscript": {
+        "path": "d:\\img project\\sentinel_ml\\exports\\siamese_cd.torchscript.pt",
+        "size_mb": 7.7,
+        "max_parity_delta": 0.0,
+        "parity_verified": true,
+        "latency_ms": 72.0,
+        "throughput_fps": 13.9
+      },
+      "onnx": {
+        "path": null,
+        "exported": false,
+        "size_mb": 0.0
+      }
+    },
+    "camouflage_concealment": {
+      "torchscript": {
+        "path": "d:\\img project\\sentinel_ml\\exports\\camouflage_model.torchscript.pt",
+        "size_mb": 29.52,
+        "max_parity_delta": 0.0,
+        "parity_verified": true,
+        "latency_ms": 65.27,
+        "throughput_fps": 15.3
+      },
+      "onnx": {
+        "path": null,
+        "exported": false,
+        "size_mb": 0.0
+      }
+    },
+    "visible_drone_detector": {
+      "torchscript": {
+        "path": "d:\\img project\\sentinel_ml\\exports\\visible_drone_detector.torchscript.pt",
+        "size_mb": 6.21,
+        "max_parity_delta": 0.0,
+        "parity_verified": true,
+        "latency_ms": 14.73,
+        "throughput_fps": 67.9
+      },
+      "onnx": {
+        "path": null,
+        "exported": false,
+        "size_mb": 0.0
+      }
+    },
+    "thermal_drone_detector": {
+      "architecture": "FasterRCNN_FPN (Thermal IR Isolated)",
+      "license": "STRICTLY_NON_COMMERCIAL_RESEARCH",
+      "weights_path": "d:\\img project\\sentinel_ml\\checkpoints\\best_thermal_drone_detector.pth",
+      "weights_size_mb": 144.51,
+      "inference_latency_ms": 69.94,
+      "throughput_fps": 14.3
+    },
+    "structure_detector": {
+      "architecture": "FasterRCNN_FPN (DOTA v1.5)",
+      "num_classes": 17,
+      "weights_path": "d:\\img project\\sentinel_ml\\checkpoints\\best_structure_detector.pth",
+      "weights_size_mb": 145.1,
+      "inference_latency_ms": 67.59,
+      "throughput_fps": 14.8
+    }
+  }
+}

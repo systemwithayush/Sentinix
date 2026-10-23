@@ -1,0 +1,113 @@
+{
+    "record_id": "EXP-1792488698",
+    "timestamp": 1792488698.5912378,
+    "algorithm_version": "1.1.0",
+    "input_source": "UPLOAD",
+    "processing_time_ms": 184.1292381286621,
+    "number_of_candidate_regions": 9,
+    "environment_context": "URBAN",
+    "configuration": {
+        "geometry": {
+            "edge_threshold1": 50,
+            "edge_threshold2": 150,
+            "hough_threshold": 50,
+            "min_line_length": 30,
+            "max_line_gap": 10,
+            "corner_quality": 0.01,
+            "corner_min_dist": 10,
+            "weights": {
+                "lineDensity": 0.2,
+                "parallelLineRatio": 0.3,
+                "rightAngleRatio": 0.3,
+                "rectangularity": 0.1,
+                "symmetryScore": 0.1,
+                "cornerDensity": 0.1,
+                "naturalOrientationEntropy": -0.1
+            }
+        },
+        "texture": {
+            "z_score_threshold": 1.5,
+            "patch_size": 64,
+            "step_size": 32,
+            "lbp_radius": 3,
+            "lbp_points": 24,
+            "glcm_distances": [
+                1
+            ],
+            "glcm_angles": [
+                0,
+                0.785,
+                1.57,
+                2.356
+            ]
+        },
+        "temporal": {
+            "ssim_threshold": 0.8,
+            "registration_min_matches": 10,
+            "registration_confidence_threshold": 0.7,
+            "pixel_diff_threshold": 30
+        },
+        "fusion": {
+            "iou_threshold": 0.3
+        },
+        "vegetation": {
+            "density_threshold": 0.5,
+            "continuity_threshold": 0.6,
+            "texture_deviation_threshold": 0.4
+        },
+        "shadow": {
+            "length_threshold": 20,
+            "persistence_threshold": 0.8,
+            "sharpness_threshold": 10
+        },
+        "context": {
+            "isolation_threshold": 0.7,
+            "clustering_threshold": 0.5
+        }
+    },
+    "results": [
+        {
+            "id": "ANO-GEO-d93131",
+            "sourceId": "UPLOAD",
+            "frameId": 1792488698,
+            "timestamp": 1792488698.426711,
+            "x": 49,
+            "y": 149,
+            "width": 402,
+            "height": 273,
+            "anomalyType": "GEOMETRIC_ANOMALY",
+            "confidenceScore": 0.458,
+            "evidence": {
+                "geometryScore": 0.458,
+                "textureScore": 0.0,
+                "temporalScore": 0.0,
+                "contextScore": 0.2
+            },
+            "explanation": [
+                "Line density: 0.14",
+                "Corner density: 1.00",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.085,
+            "contributions": {
+                "geometry": 69.6,
+                "texture": 0.0,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 30.4
+            }
+        },
+        {
+            "id": "ANO-TEX-f8a99c",
+            "sourceId": "UPLOAD",
+            "frameId": 1792488698,
+            "timestamp": 1792488698.4352567,
+            "x": 150,
+            "y": 150,
+            "width": 131,
+            "height": 131,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 

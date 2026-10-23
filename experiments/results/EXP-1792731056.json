@@ -1,0 +1,448 @@
+{
+    "record_id": "EXP-1792731056",
+    "timestamp": 1792731056.372455,
+    "algorithm_version": "1.1.0",
+    "input_source": "UPLOAD",
+    "processing_time_ms": 193.05014610290527,
+    "number_of_candidate_regions": 10,
+    "environment_context": "URBAN",
+    "configuration": {
+        "geometry": {
+            "edge_threshold1": 50,
+            "edge_threshold2": 150,
+            "hough_threshold": 50,
+            "min_line_length": 30,
+            "max_line_gap": 10,
+            "corner_quality": 0.01,
+            "corner_min_dist": 10,
+            "weights": {
+                "lineDensity": 0.2,
+                "parallelLineRatio": 0.3,
+                "rightAngleRatio": 0.3,
+                "rectangularity": 0.1,
+                "symmetryScore": 0.1,
+                "cornerDensity": 0.1,
+                "naturalOrientationEntropy": -0.1
+            }
+        },
+        "texture": {
+            "z_score_threshold": 1.5,
+            "patch_size": 64,
+            "step_size": 32,
+            "lbp_radius": 3,
+            "lbp_points": 24,
+            "glcm_distances": [
+                1
+            ],
+            "glcm_angles": [
+                0,
+                0.785,
+                1.57,
+                2.356
+            ]
+        },
+        "temporal": {
+            "ssim_threshold": 0.8,
+            "registration_min_matches": 10,
+            "registration_confidence_threshold": 0.7,
+            "pixel_diff_threshold": 30
+        },
+        "fusion": {
+            "iou_threshold": 0.3
+        },
+        "vegetation": {
+            "density_threshold": 0.5,
+            "continuity_threshold": 0.6,
+            "texture_deviation_threshold": 0.4
+        },
+        "shadow": {
+            "length_threshold": 20,
+            "persistence_threshold": 0.8,
+            "sharpness_threshold": 10
+        },
+        "context": {
+            "isolation_threshold": 0.7,
+            "clustering_threshold": 0.5
+        }
+    },
+    "results": [
+        {
+            "id": "ANO-GEO-1cf1f9",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2200918,
+            "x": 49,
+            "y": 149,
+            "width": 400,
+            "height": 273,
+            "anomalyType": "GEOMETRIC_ANOMALY",
+            "confidenceScore": 0.458,
+            "evidence": {
+                "geometryScore": 0.458,
+                "textureScore": 0.0,
+                "temporalScore": 0.0,
+                "contextScore": 0.2
+            },
+            "explanation": [
+                "Line density: 0.14",
+                "Corner density: 1.00",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.085,
+            "contributions": {
+                "geometry": 69.6,
+                "texture": 0.0,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 30.4
+            }
+        },
+        {
+            "id": "ANO-TEX-d17153",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.232232,
+            "x": 150,
+            "y": 150,
+            "width": 131,
+            "height": 131,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.6063584685325623,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.6063584685325623,
+                "temporalScore": 1.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0.6
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 1.82",
+                "Local variance vs Global: 0.0 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 1.82",
+                "Local variance vs Global: 0.0 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Structural difference area: 16898.0",
+                "Persistence checked: YES",
+                "Context: Contextual significance normal.",
+                "Unusual shadow geometry detected (vertices: 4)",
+                "Potential shadow anomaly",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.416,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 25.2,
+                "temporal": 41.6,
+                "vegetation": 0.0,
+                "shadow": 24.9,
+                "context": 8.3
+            }
+        },
+        {
+            "id": "ANO-TEX-f1035f",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2337449,
+            "x": 160,
+            "y": 192,
+            "width": 96,
+            "height": 64,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.6063584685325623,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.6063584685325623,
+                "temporalScore": 0.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 1.82",
+                "Local variance vs Global: 0.0 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 1.82",
+                "Local variance vs Global: 0.0 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.176,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 75.2,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 24.8
+            }
+        },
+        {
+            "id": "ANO-TEX-64c28f",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2347527,
+            "x": 288,
+            "y": 288,
+            "width": 96,
+            "height": 64,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.665775716304779,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.7967150807380676,
+                "temporalScore": 0.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 2.00",
+                "Local variance vs Global: 27.4 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 2.39",
+                "Local variance vs Global: 30.2 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.221,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 79.9,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 20.1
+            }
+        },
+        {
+            "id": "ANO-TEX-451bb0",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.235755,
+            "x": 352,
+            "y": 288,
+            "width": 64,
+            "height": 96,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.6072511076927185,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.7530974745750427,
+                "temporalScore": 0.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 1.82",
+                "Local variance vs Global: 26.1 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 2.26",
+                "Local variance vs Global: 29.3 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.211,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 79.0,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 21.0
+            }
+        },
+        {
+            "id": "ANO-TEX-2f00c6",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.235755,
+            "x": 288,
+            "y": 320,
+            "width": 96,
+            "height": 64,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.8198840022087097,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.9932759404182434,
+                "temporalScore": 0.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 2.46",
+                "Local variance vs Global: 30.7 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 2.98",
+                "Local variance vs Global: 34.4 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.268,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 83.2,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 16.8
+            }
+        },
+        {
+            "id": "ANO-TEX-b36150",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2367606,
+            "x": 288,
+            "y": 352,
+            "width": 96,
+            "height": 64,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.7036563754081726,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.8145367503166199,
+                "temporalScore": 0.0,
+                "contextScore": 0.2,
+                "vegetationScore": 0,
+                "shadowScore": 0
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 2.11",
+                "Local variance vs Global: 28.2 vs 13.1",
+                "Context: Contextual significance normal.",
+                "Texture deviation (Z-score): 2.44",
+                "Local variance vs Global: 30.6 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.225,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 80.3,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 19.7
+            }
+        },
+        {
+            "id": "ANO-TEX-425dfd",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2367606,
+            "x": 352,
+            "y": 352,
+            "width": 64,
+            "height": 64,
+            "anomalyType": "TEXTURE_ANOMALY",
+            "confidenceScore": 0.6120190620422363,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.6120190620422363,
+                "temporalScore": 0.0,
+                "contextScore": 0.2
+            },
+            "explanation": [
+                "Texture deviation (Z-score): 1.84",
+                "Local variance vs Global: 26.2 vs 13.1",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.177,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 75.4,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 24.6
+            }
+        },
+        {
+            "id": "ANO-TMP-be411f",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.2945426,
+            "x": 50,
+            "y": 397,
+            "width": 401,
+            "height": 26,
+            "anomalyType": "TEMPORAL_ANOMALY",
+            "confidenceScore": 0.4496,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.0,
+                "temporalScore": 0.4496,
+                "contextScore": 0.2
+            },
+            "explanation": [
+                "Structural difference area: 2248.0",
+                "Persistence checked: YES",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.097,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 0.0,
+                "temporal": 69.2,
+                "vegetation": 0.0,
+                "shadow": 0.0,
+                "context": 30.8
+            }
+        },
+        {
+            "id": "ANO-SHD-b59376",
+            "sourceId": "UPLOAD",
+            "frameId": 1792731056,
+            "timestamp": 1792731056.3565557,
+            "x": 301,
+            "y": 320,
+            "width": 44,
+            "height": 33,
+            "anomalyType": "SHADOW_ANOMALY",
+            "confidenceScore": 0.30000000000000004,
+            "evidence": {
+                "geometryScore": 0.0,
+                "textureScore": 0.0,
+                "temporalScore": 0.0,
+                "vegetationScore": 0.0,
+                "shadowScore": 0.30000000000000004,
+                "contextScore": 0.2
+            },
+            "explanation": [
+                "Unusual shadow geometry detected (vertices: 7)",
+                "Potential shadow anomaly",
+                "Context: Contextual significance normal."
+            ],
+            "imageCropPath": null,
+            "overallStatus": "MONITORING",
+            "finalFusionScore": 0.075,
+            "contributions": {
+                "geometry": 0.0,
+                "texture": 0.0,
+                "temporal": 0.0,
+                "vegetation": 0.0,
+                "shadow": 60.0,
+                "context": 40.0
+            }
+        }
+    ]
+}

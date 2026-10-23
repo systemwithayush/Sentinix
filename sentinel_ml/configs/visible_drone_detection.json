@@ -1,0 +1,30 @@
+{
+  "experiment_name": "visible_drone_detection",
+  "modality": "VISIBLE_RGB_STRICT_ISOLATION",
+  "license_isolation": "STANDARD_RESEARCH",
+  "model": {
+    "architecture": "FasterRCNN_FPN",
+    "backbone": "mobilenet_v3",
+    "num_classes": 5,
+    "pretrained_backbone": true
+  },
+  "dataset": {
+    "train_source": "DroneDetect_Visible_Train + Anti-UAV_Visible",
+    "val_source": "DroneDetect_Visible_Val",
+    "sample_stride": 5
+  },
+  "training": {
+    "batch_size": 4,
+    "num_workers": 2,
+    "num_epochs": 5,
+    "lr": 1e-3,
+    "momentum": 0.9,
+    "weight_decay": 1e-4,
+    "amp_fp16": true,
+    "seed": 42
+  },
+  "checkpoint": {
+    "dir": "checkpoints",
+    "best_filename": "best_visible_drone_detector.pth"
+  }
+}

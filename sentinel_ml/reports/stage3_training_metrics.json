@@ -1,0 +1,70 @@
+{
+  "siamese_change_detection": {
+    "model": "SiameseChangeDetector",
+    "dataset": "LEVIR-CD+",
+    "epochs_trained": 4,
+    "final_train_loss": 0.5123,
+    "best_val_f1": 0.5824,
+    "best_val_iou": 0.4327,
+    "final_val_precision": 0.5181,
+    "final_val_recall": 0.7519,
+    "peak_vram_mb": 4069.75,
+    "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_siamese_cd.pth"
+  },
+  "camouflage_segmentation": {
+    "model": "EdgeGuidedUNet (Edge-Supervised)",
+    "real_dataset": "COD10K + CAMO",
+    "epochs_trained": 5,
+    "final_train_loss": 0.6066,
+    "best_real_val_f1": 0.1042,
+    "best_real_val_iou": 0.067,
+    "final_val_precision": 0.3965,
+    "final_val_recall": 0.0923,
+    "peak_vram_mb": 3000.39,
+    "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_camouflage_model.pth",
+    "isolated_synthetic_evaluation": {
+      "benchmark": "SYNTHETIC_CONCEALMENT_BENCHMARK",
+      "evaluated_tiles": 120,
+      "synthetic_anomaly_mean_iou": 0.0034,
+      "hard_negative_false_positive_rate": 0.0,
+      "hard_negative_suppression_accuracy": 100.0,
+      "regulatory_notice": "Evaluated on isolated synthetic benchmark. Real and synthetic metrics permanently separated."
+    }
+  },
+  "structure_detector": {
+    "model": "FasterRCNN_FPN (MobileNetV3)",
+    "dataset": "DOTA v1.5",
+    "num_classes": 17,
+    "epochs_trained": 4,
+    "final_train_loss": 1.532,
+    "best_val_loss": 1.4032,
+    "peak_vram_mb": 3000.39,
+    "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_structure_detector.pth"
+  },
+  "thermal_drone_detector": {
+    "model": "FasterRCNN_FPN (Thermal IR Isolated)",
+    "dataset": "Anti-UAV IR (Strictly Non-Commercial)",
+    "modality": "THERMAL_IR_STRICT_ISOLATION",
+    "num_classes": 2,
+    "epochs_trained": 4,
+    "final_train_loss": 0.0512,
+    "best_val_loss": 0.1481,
+    "peak_vram_mb": 3000.39,
+    "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_thermal_drone_detector.pth"
+  },
+  "visible_drone_detector": {
+    "model": "MobileNetV3 (Visible RGB Isolated)",
+    "dataset": "DroneDetect (Visible Optical)",
+    "modality": "VISIBLE_RGB_STRICT_ISOLATION",
+    "num_classes": 4,
+    "classes": [
+      "Drone",
+      "Bird",
+      "Airplane",
+      "Helicopter"
+    ],
+    "epochs_trained": 4,
+    "best_val_accuracy": 26.32,
+    "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_visible_drone_detector.pth"
+  }
+}

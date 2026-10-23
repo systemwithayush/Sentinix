@@ -1,0 +1,230 @@
+{
+  "timestamp": "2026-10-23T04:50:51Z",
+  "phase1_to_4_regression_tests": [
+    {
+      "label": "Health Check",
+      "endpoint": "/",
+      "method": "GET",
+      "status_code": 200,
+      "latency_ms": 56.87,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.1 Geometry Engine",
+      "endpoint": "/api/analysis/geometry",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 350.26,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.2 Texture Engine",
+      "endpoint": "/api/analysis/texture",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 52.25,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.5 Temporal Engine",
+      "endpoint": "/api/analysis/temporal",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 3687.43,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.3 Vegetation Disturbance Engine",
+      "endpoint": "/api/analysis/vegetation",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 34.81,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.4 Shadow Intelligence Engine",
+      "endpoint": "/api/analysis/shadow",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 176.33,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.6 Context Intelligence Engine",
+      "endpoint": "/api/analysis/context",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 37.89,
+      "status": "PASS"
+    },
+    {
+      "label": "M4.7 Unified Camouflage Analysis",
+      "endpoint": "/api/analysis/camouflage",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 216.75,
+      "status": "PASS"
+    },
+    {
+      "label": "Evidence Logging Query",
+      "endpoint": "/api/analysis/evidence",
+      "method": "GET",
+      "status_code": 200,
+      "latency_ms": 12.14,
+      "status": "PASS"
+    },
+    {
+      "label": "Contributions Query",
+      "endpoint": "/api/analysis/contributions",
+      "method": "GET",
+      "status_code": 200,
+      "latency_ms": 6.55,
+      "status": "PASS"
+    }
+  ],
+  "phase5_deep_learning_tests": [
+    {
+      "label": "Unified Deep Threat Fusion (Single Visible Frame)",
+      "endpoint": "/api/v1/analyze/threat",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 130204.97,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "module",
+        "device",
+        "processing_time_ms",
+        "tactical_assessment",
+        "surface_change",
+        "camouflage_concealment",
+        "aerial_structures",
+        "airborne_uav"
+      ]
+    },
+    {
+      "label": "Unified Deep Threat Fusion (Dual-Temporal Optical)",
+      "endpoint": "/api/v1/analyze/threat",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 410.31,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "module",
+        "device",
+        "processing_time_ms",
+        "tactical_assessment",
+        "surface_change",
+        "camouflage_concealment",
+        "aerial_structures",
+        "airborne_uav"
+      ]
+    },
+    {
+      "label": "Unified Deep Threat Fusion (Thermal IR Drone Mode)",
+      "endpoint": "/api/v1/analyze/threat",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 297.15,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "module",
+        "device",
+        "processing_time_ms",
+        "tactical_assessment",
+        "surface_change",
+        "camouflage_concealment",
+        "aerial_structures",
+        "airborne_uav"
+      ]
+    },
+    {
+      "label": "Siamese CD (LEVIR-CD+ Deep Change Detection)",
+      "endpoint": "/api/v1/analyze/change",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 76.44,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "processing_time_ms",
+        "surface_change_ratio",
+        "change_pixel_count",
+        "changed_regions",
+        "total_regions"
+      ]
+    },
+    {
+      "label": "Edge Camo UNet (Concealment Anomaly Detection)",
+      "endpoint": "/api/v1/analyze/deep_camouflage",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 79.87,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "processing_time_ms",
+        "anomaly_ratio",
+        "concealment_suspected",
+        "detected_anomalies",
+        "count"
+      ]
+    },
+    {
+      "label": "DOTA Overhead Aerial Structure Detection (16 Classes)",
+      "endpoint": "/api/v1/analyze/structures",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 184.96,
+      "status": "PASS",
+      "response_keys": [
+        "status",
+        "processing_time_ms",
+        "detections",
+        "total_count"
+      ]
+    },
+    {
+      "label": "DroneDetect Optical Target Classifier (4 Classes)",
+      "endpoint": "/api/v1/analyze/drone",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 104.6,
+      "status": "PASS",
+      "response_keys": [
+        "modality",
+        "drone_detected",
+        "target_type",
+        "confidence",
+        "class_probabilities",
+        "processing_time_ms",
+        "status"
+      ]
+    },
+    {
+      "label": "Anti-UAV Thermal IR Drone Detector (Non-Commercial)",
+      "endpoint": "/api/v1/analyze/drone",
+      "method": "POST",
+      "status_code": 200,
+      "latency_ms": 97.6,
+      "status": "PASS",
+      "response_keys": [
+        "modality",
+        "drone_detected",
+        "target_type",
+        "confidence",
+        "class_probabilities",
+        "processing_time_ms",
+        "status"
+      ]
+    }
+  ],
+  "summary": {
+    "total_tests": 18,
+    "passed": 18,
+    "failed": 0,
+    "pass_rate_percent": 100.0
+  }
+}

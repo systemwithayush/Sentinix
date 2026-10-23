@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-10-23T04:53:21Z",
+  "results": [
+    {
+      "test": "Liveness Check (GET /)",
+      "status": "PASS",
+      "detail": "200 in 35.4ms"
+    },
+    {
+      "test": "Readiness Probe (GET /api/v1/health)",
+      "status": "PASS",
+      "detail": "Device: cuda | 5 Checkpoints Verified: True | 4038.2ms"
+    },
+    {
+      "test": "Alternative Probe (GET /health/ready)",
+      "status": "PASS",
+      "detail": "Status: INITIALIZING"
+    },
+    {
+      "test": "Failure Handling: Empty Image Payload",
+      "status": "PASS",
+      "detail": "HTTP 400 properly rejected (9.7ms)"
+    },
+    {
+      "test": "Failure Handling: Corrupt Binary Payload",
+      "status": "PASS",
+      "detail": "HTTP 400 properly rejected (11.1ms)"
+    },
+    {
+      "test": "Failure Handling: Missing Required Payload",
+      "status": "PASS",
+      "detail": "HTTP 422 Unprocessable Entity (50.7ms)"
+    },
+    {
+      "test": "Failure Handling: Missing Second Temporal Frame",
+      "status": "PASS",
+      "detail": "HTTP 422 properly rejected (11.2ms)"
+    },
+    {
+      "test": "Post-Inference Health Transition (HEALTHY)",
+      "status": "PASS",
+      "detail": "Status: HEALTHY | Models Loaded: 5/5"
+    }
+  ]
+}

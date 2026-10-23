@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-10-20T14:41:36Z",
+  "hardware": {
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU"
+  },
+  "models": {
+    "siamese_change_detection": {
+      "dataset": "LEVIR-CD+ Test Split",
+      "evaluated_pairs": 50,
+      "mean_iou": 0.2332,
+      "mean_f1": 0.3127,
+      "precision": 0.2882,
+      "recall": 0.4565,
+      "latency_ms": 13.92,
+      "throughput_fps": 71.8,
+      "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_siamese_cd.pth"
+    },
+    "camouflage_concealment": {
+      "real_dataset": "COD10K + CAMO Test Split",
+      "evaluated_samples": 50,
+      "mean_iou": 0.0569,
+      "mean_f1": 0.085,
+      "precision": 0.3885,
+      "recall": 0.1005,
+      "mae": 0.2702,
+      "latency_ms": 10.69,
+      "throughput_fps": 93.5,
+      "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_camouflage_model.pth",
+      "isolated_synthetic_benchmark": {
+        "benchmark": "SYNTHETIC_CONCEALMENT_BENCHMARK",
+        "evaluated_samples": 150,
+        "synthetic_mean_iou": 0.0038,
+        "hard_negative_false_positive_rate": 0.0,
+        "hard_negative_suppression_accuracy": 100.0,
+        "status": "Strictly Isolated. Real & Synthetic metrics must never be aggregated."
+      }
+    },
+    "structure_detector": {
+      "dataset": "DOTA v1.5 Holdout Set",
+      "num_classes": 17,
+      "mean_detection_confidence": 0.3145,
+      "latency_ms": 94.72,
+      "throughput_fps": 10.6,
+      "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_structure_detector.pth"
+    },
+    "thermal_drone_detector": {
+      "dataset": "Anti-UAV IR Validation Sequences",
+      "modality": "THERMAL_IR_STRICT_ISOLATION",
+      "license": "STRICTLY_NON_COMMERCIAL_RESEARCH",
+      "evaluated_frames": 40,
+      "detection_rate": 100.0,
+      "latency_ms": 73.96,
+      "throughput_fps": 13.5,
+      "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_thermal_drone_detector.pth"
+    },
+    "visible_drone_detector": {
+      "dataset": "DroneDetect (Visible Optical)",
+      "modality": "VISIBLE_RGB_STRICT_ISOLATION",
+      "classes": [
+        "Drone",
+        "Bird",
+        "Airplane",
+        "Helicopter"
+      ],
+      "accuracy": 17.5,
+      "latency_ms": 28.25,
+      "throughput_fps": 35.4,
+      "checkpoint": "d:\\img project\\sentinel_ml\\checkpoints\\best_visible_drone_detector.pth"
+    }
+  }
+}

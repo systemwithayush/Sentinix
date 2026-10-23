@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;800&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-tactical-dark text-tactical-light font-sans overflow-hidden;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-tactical-gray border border-tactical-olive rounded-sm p-4 relative shadow-lg;
+  }
+  
+  .panel::before {
+    content: '';
+    @apply absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-tactical-green;
+  }
+  
+  .panel::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-tactical-green;
+  }
+}

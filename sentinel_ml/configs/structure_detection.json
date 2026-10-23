@@ -1,0 +1,28 @@
+{
+  "experiment_name": "dota_structure_detection",
+  "model": {
+    "architecture": "FasterRCNN_FPN",
+    "backbone": "mobilenet_v3",
+    "num_classes": 17,
+    "pretrained_backbone": true
+  },
+  "dataset": {
+    "train_source": "DOTA_v1.5_Train",
+    "val_source": "DOTA_v1.5_Val",
+    "crop_size": 512
+  },
+  "training": {
+    "batch_size": 4,
+    "num_workers": 2,
+    "num_epochs": 5,
+    "lr": 1e-3,
+    "momentum": 0.9,
+    "weight_decay": 1e-4,
+    "amp_fp16": true,
+    "seed": 42
+  },
+  "checkpoint": {
+    "dir": "checkpoints",
+    "best_filename": "best_structure_detector.pth"
+  }
+}

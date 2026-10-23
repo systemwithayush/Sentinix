@@ -1,0 +1,79 @@
+# ==============================================================================
+# SENTINEL (Sentinix) — .gitignore
+# ==============================================================================
+
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node / Frontend Build Artifacts
+**/node_modules/
+**/dist/
+**/.vite/
+**/.vite-temp/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java / Maven Backend Build Artifacts
+**/target/
+*.class
+
+# IDE & OS Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Large Archives & Raw Downloaded Compressed Files (multi-GB datasets)
+*.zip
+*.z[0-9][0-9]
+*.bin
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# Raw Training Datasets (60+ GB of downloaded raw optical/thermal images)
+sentinel_ml/data/**
+!sentinel_ml/data/README.md
+!sentinel_ml/data/DATASET_TERMS.md
+
+# Intermediate Training Checkpoints (preserve best_*.pth in checkpoints/)
+sentinel_ml/checkpoints/latest_*.pth
+
+# Temporary backups, scratch files, and logs
+*.bak*
+*.log
+*.tmp
+.tempmediaStorage/
+scratch/

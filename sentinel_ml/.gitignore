@@ -1,0 +1,46 @@
+# ===== SENTINEL ML WORKSPACE .gitignore =====
+
+# Dataset files (large binaries)
+data/
+*.zip
+*.tar.gz
+*.tar
+*.h5
+*.hdf5
+
+# Model checkpoints and exports
+checkpoints/
+exports/
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.bin
+
+# Training runs and logs
+runs/
+*.tfevents*
+tensorboard/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary
+*.tmp
+*.bak
