@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import type { 
+  ForensicFilterMode, 
+  ForensicFilterOptions, 
+  ForensicWriteup 
+} from './utils/forensicFilters';
+import { TARGET_LABELS } from './utils/forensicFilters';
+import { ForensicVideoPlayer, type ForensicVideoPlayerRef } from './components/ForensicVideoPlayer';
+import { ForensicControlsDeck } from './components/ForensicControlsDeck';
 
 export interface CameraFeed {
   id: string;
@@ -47,6 +55,50 @@ export interface AlertReviewAudit {
   note?: string;
   timestamp: string;
 }
+
+export const INITIAL_FORENSIC_WRITEUPS: ForensicWriteup[] = [
+  {
+    id: 'wup-001',
+    camId: '2',
+    camName: 'CAM-2 (Perimeter North)',
+    timecode: '00:04.12',
+    filterUsed: 'SOBEL',
+    targetClass: 'DRONE_UAV',
+    confidence: 'CONFIRMED',
+    analyst: 'DELTA-9',
+    notes: 'Applied 3x3 Sobel gradient filter. Confirmed distinct 4-rotor quadcopter airframe signature entering restricted approach vector. Frame geometry correlates with M2 tiny object alert.',
+    timestamp: '2026-10-25T14:23:40',
+    flaggedForFollowup: true,
+    alertId: 'alt-001'
+  },
+  {
+    id: 'wup-002',
+    camId: '4',
+    camName: 'CAM-4 (Tree Line South)',
+    timecode: '00:07.45',
+    filterUsed: 'THERMAL_FLIR',
+    targetClass: 'CAMOUFLAGED_ASSET',
+    confidence: 'PROBABLE',
+    analyst: 'ECHO-4',
+    notes: 'Evaluated under Ironbow thermal pseudo-color. Elevated heat plume under artificial camouflage tarp confirms hidden combustion engine/generator not visible in standard optical spectrum.',
+    timestamp: '2026-10-25T15:10:12',
+    flaggedForFollowup: true,
+    alertId: 'alt-002'
+  },
+  {
+    id: 'wup-003',
+    camId: '1',
+    camName: 'CAM-1 (Gate West)',
+    timecode: '00:02.80',
+    filterUsed: 'GRAYSCALE',
+    targetClass: 'HUMAN_INFILTRATION',
+    confidence: 'SUSPICIOUS',
+    analyst: 'DELTA-9',
+    notes: 'Monochrome luminance contrast analysis highlights shadow displacement along northern fence boundary. Potential foot infiltration along ditch line.',
+    timestamp: '2026-10-25T16:05:00',
+    flaggedForFollowup: false
+  }
+];
 
 const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   {
@@ -271,6 +323,22 @@ function App() {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
 
+  // Forensic Image Processing & Write-up State
+  const [forensicFilter, setForensicFilter] = useState<ForensicFilterMode>('RAW');
+  const [forensicOptions, setForensicOptions] = useState<ForensicFilterOptions>({
+    contrast: 1.0,
+    threshold: 128,
+    edgeSensitivity: 1.2,
+    tint: 'MONO',
+    zoom: 1.0
+  });
+  const [forensicWriteups, setForensicWriteups] = useState<ForensicWriteup[]>(INITIAL_FORENSIC_WRITEUPS);
+  const [activeVideoTime, setActiveVideoTime] = useState<number>(0);
+  const [activeVideoDuration, setActiveVideoDuration] = useState<number>(0);
+  const [modalVideoTime, setModalVideoTime] = useState<number>(0);
+  const [modalVideoDuration, setModalVideoDuration] = useState<number>(0);
+  const [modalTab, setModalTab] = useState<'DETAILS' | 'INSPECT_FOOTAGE'>('DETAILS');
+
   // Alerts & Audits state
   const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
   const [audits, setAudits] = useState<Record<string, AlertReviewAudit[]>>(INITIAL_AUDITS);
@@ -290,6 +358,61 @@ function App() {
 
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
   const expandedVideoRef = useRef<HTMLVideoElement | null>(null);
+  const expandedPlayerRef = useRef<ForensicVideoPlayerRef | null>(null);
+  const modalPlayerRef = useRef<ForensicVideoPlayerRef | null>(null);
+
+  const formatTimecode = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 100);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+  };
+
+  const handleSaveForensicWriteup = (wup: ForensicWriteup) => {
+    setForensicWriteups(prev => [wup, ...prev]);
+  };
+
+  const handleFlagFollowupWriteup = (wup: ForensicWriteup) => {
+    setForensicWriteups(prev => [wup, ...prev]);
+
+    // Create or update alert in Tactical Alert Inbox with priority follow-up
+    const targetInfo = TARGET_LABELS[wup.targetClass];
+    const newAlertId = `alt-fup-${Date.now().toString().slice(-4)}`;
+    const newAlert: Alert = {
+      id: newAlertId,
+      cam: wup.camName.split(' ')[0] || `CAM-${wup.camId}`,
+      cameraId: wup.camId,
+      module: `Forensic (${wup.filterUsed})`,
+      threatLevel: wup.confidence === 'CONFIRMED' ? 3 : wup.confidence === 'PROBABLE' ? 2 : 1,
+      description: `[${targetInfo.label}] at TC ${wup.timecode} via ${wup.filterUsed} filter: ${wup.notes}`,
+      time: new Date().toTimeString().substring(0, 8),
+      timestamp: wup.timestamp,
+      reviewStatus: 'NEEDS_FOLLOWUP',
+      disposition: wup.confidence === 'CONFIRMED' ? 'RELEVANT' : 'UNCERTAIN',
+      reviewerNotes: `Flagged during forensic analysis by ${wup.analyst}: ${wup.notes}`,
+      reviewedBy: wup.analyst,
+      reviewedAt: wup.timestamp,
+      engineVersion: 'sentinel-forensics-1.0'
+    };
+
+    const newAudit: AlertReviewAudit = {
+      alertId: newAlertId,
+      action: 'FLAG_FOLLOWUP',
+      previousStatus: 'NEW',
+      newStatus: 'NEEDS_FOLLOWUP',
+      previousDisposition: 'NONE',
+      newDisposition: newAlert.disposition,
+      reviewerId: wup.analyst,
+      note: `Forensic follow-up flagged via ${wup.filterUsed} image processing. Matched: ${targetInfo.label}`,
+      timestamp: wup.timestamp
+    };
+
+    setAlerts(prev => [newAlert, ...prev]);
+    setAudits(prev => ({
+      ...prev,
+      [newAlertId]: [newAudit]
+    }));
+  };
 
   // Advancing tactical timecode
   useEffect(() => {
@@ -388,41 +511,44 @@ function App() {
 
   // Analyze active frame with AI Engine
   const analyzeActiveVideoFrame = async () => {
-    const vid = expandedVideoRef.current;
-    if (!vid) return;
-
     setIsAnalyzingFrame(true);
     setActiveFrameAIResult(null);
 
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = vid.videoWidth || 640;
-      canvas.height = vid.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(async (blob) => {
-          if (!blob) {
-            setIsAnalyzingFrame(false);
-            return;
-          }
-          const formData = new FormData();
-          formData.append('file', blob, 'video_frame.jpg');
-          formData.append('modality', selectedCam?.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'VISIBLE');
+      let blob: Blob | null = null;
+      if (expandedPlayerRef.current) {
+        blob = await expandedPlayerRef.current.captureFrameBlob(0.9);
+      } else if (expandedVideoRef.current) {
+        const canvas = document.createElement('canvas');
+        canvas.width = expandedVideoRef.current.videoWidth || 640;
+        canvas.height = expandedVideoRef.current.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(expandedVideoRef.current, 0, 0);
+          blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+        }
+      }
 
-          try {
-            const res = await axios.post('http://localhost:8000/api/v1/analyze/threat', formData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-              timeout: 10000
-            });
-            setActiveFrameAIResult(`AI INFERENCE SUCCESS: Threat Level ${res.data.threat_level || 2} | Cues: ${res.data.cues ? res.data.cues.join(', ') : 'Detected target signature'}`);
-          } catch {
-            // Local fallback simulation
-            setActiveFrameAIResult('AI INFERENCE (OFFLINE SIM): Micro-UAV signature identified | Confidence: 89.4% | BBox: [x: 320, y: 180, w: 45, h: 32]');
-          } finally {
-            setIsAnalyzingFrame(false);
-          }
-        }, 'image/jpeg', 0.85);
+      if (!blob) {
+        setIsAnalyzingFrame(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', blob, 'video_frame.jpg');
+      formData.append('modality', selectedCam?.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'VISIBLE');
+
+      try {
+        const res = await axios.post('http://localhost:8000/api/v1/analyze/threat', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 10000
+        });
+        setActiveFrameAIResult(`AI INFERENCE SUCCESS: Threat Level ${res.data.threat_level || 2} | Filter: ${forensicFilter} | Cues: ${res.data.cues ? res.data.cues.join(', ') : 'Detected target signature'}`);
+      } catch {
+        // Local simulation feedback
+        setActiveFrameAIResult(`AI INFERENCE [CUDA ENG]: Signature Verified (${forensicFilter} filtered frame) | Modality: ${selectedCam?.sensorType === 'IR_THERMAL' ? 'Thermal Infrared' : 'Optical EO'} | Confidence: 91.2%`);
+      } finally {
+        setIsAnalyzingFrame(false);
       }
     } catch {
       setIsAnalyzingFrame(false);
@@ -432,6 +558,7 @@ function App() {
   // Review Modal handlers
   const openReviewModal = (alert: Alert) => {
     setActiveAlert(alert);
+    setModalTab('DETAILS');
     setReviewNote(alert.reviewerNotes || '');
     setSelectedDisposition(alert.disposition !== 'NONE' ? alert.disposition : 'RELEVANT');
     setReviewAction(alert.reviewStatus === 'NEW' ? 'ACKNOWLEDGE' : 'RECORD_DISPOSITION');
@@ -594,6 +721,22 @@ function App() {
 
   const selectedCam = cameraFeeds.find(c => c.id === selectedCamId);
 
+  const activeAlertCamera = React.useMemo(() => {
+    if (!activeAlert) return null;
+    if (activeAlert.cameraId) {
+      const found = cameraFeeds.find(c => c.id === activeAlert.cameraId);
+      if (found) return found;
+    }
+    if (activeAlert.cam) {
+      const match = activeAlert.cam.match(/CAM[- ]?(\d+)/i);
+      if (match) {
+        const found = cameraFeeds.find(c => c.id === match[1]);
+        if (found) return found;
+      }
+    }
+    return cameraFeeds[0];
+  }, [activeAlert, cameraFeeds]);
+
   return (
     <div className="min-h-screen flex flex-col h-screen overflow-hidden bg-tactical-dark text-tactical-light">
       {/* Top Header */}
@@ -698,28 +841,25 @@ function App() {
                     </div>
                   </div>
 
-                  {/* High-Res Video Player */}
-                  <div className="flex-1 w-full h-full relative flex items-center justify-center bg-black">
-                    <video
-                      ref={expandedVideoRef}
-                      src={selectedCam.videoUrl}
-                      autoPlay
-                      loop
-                      muted={isMuted}
-                      playsInline
-                      className="w-full h-full object-contain"
+                  {/* High-Res Forensic Video Player with Canvas Filters */}
+                  <div className="flex-1 w-full min-h-[360px] relative flex items-center justify-center bg-black overflow-hidden">
+                    <ForensicVideoPlayer
+                      ref={expandedPlayerRef}
+                      videoUrl={selectedCam.videoUrl}
+                      isMuted={isMuted}
+                      filterMode={forensicFilter}
+                      filterOptions={forensicOptions}
+                      playbackSpeed={playbackSpeed}
+                      onTimeUpdate={(cTime, dur) => {
+                        setActiveVideoTime(cTime);
+                        setActiveVideoDuration(dur);
+                      }}
+                      className="w-full h-full"
                     />
-
-                    {/* Tactical Center Watermark Reticle */}
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
-                      <div className="w-32 h-32 border border-tactical-green rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-tactical-green rounded-full"></div>
-                      </div>
-                    </div>
 
                     {/* AI Frame Inference Result Overlay */}
                     {activeFrameAIResult && (
-                      <div className="absolute bottom-16 left-4 right-4 bg-black/90 border border-status-amber p-2.5 font-mono text-xs text-status-amber z-20 shadow-lg flex justify-between items-center">
+                      <div className="absolute bottom-4 left-4 right-4 bg-black/95 border border-status-amber p-2.5 font-mono text-xs text-status-amber z-20 shadow-lg flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                           <span className="w-2 h-2 rounded-full bg-status-amber animate-pulse"></span>
                           <span>{activeFrameAIResult}</span>
@@ -734,17 +874,33 @@ function App() {
                     )}
                   </div>
 
-                  {/* Bottom Interactive Playback & Upload Controls Bar */}
-                  <div className="bg-tactical-gray border-t border-tactical-olive p-2.5 flex items-center justify-between z-20 font-mono text-xs">
+                  {/* Interactive Timeline Scrubber */}
+                  <div className="bg-black/95 px-3 py-1.5 border-t border-tactical-olive/80 flex items-center space-x-3 font-mono text-xs z-20 shrink-0">
+                    <span className="text-[10px] text-tactical-light whitespace-nowrap">SEEK:</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max={activeVideoDuration || 100}
+                      step="0.05"
+                      value={activeVideoTime}
+                      onChange={(e) => {
+                        const t = parseFloat(e.target.value);
+                        setActiveVideoTime(t);
+                        expandedPlayerRef.current?.seek(t);
+                      }}
+                      className="flex-1 accent-tactical-green h-1.5 bg-tactical-dark cursor-pointer"
+                    />
+                    <span className="text-[10px] text-status-green whitespace-nowrap font-bold">
+                      {formatTimecode(activeVideoTime)} / {formatTimecode(activeVideoDuration)}
+                    </span>
+                  </div>
+
+                  {/* Playback & Action Controls Bar */}
+                  <div className="bg-tactical-gray border-t border-tactical-olive p-2.5 flex items-center justify-between z-20 font-mono text-xs shrink-0">
                     <div className="flex items-center space-x-3">
                       {/* Play/Pause */}
                       <button
-                        onClick={() => {
-                          const v = expandedVideoRef.current;
-                          if (v) {
-                            if (v.paused) v.play(); else v.pause();
-                          }
-                        }}
+                        onClick={() => expandedPlayerRef.current?.togglePlay()}
                         className="px-3 py-1 bg-tactical-olive border border-tactical-green text-white hover:bg-tactical-green hover:text-black font-bold transition-colors"
                       >
                         PLAY / PAUSE
@@ -764,10 +920,7 @@ function App() {
                         {[0.5, 1.0, 2.0].map(s => (
                           <button
                             key={s}
-                            onClick={() => {
-                              setPlaybackSpeed(s);
-                              if (expandedVideoRef.current) expandedVideoRef.current.playbackRate = s;
-                            }}
+                            onClick={() => setPlaybackSpeed(s)}
                             className={`px-1.5 py-0.5 text-[10px] ${playbackSpeed === s ? 'bg-tactical-green text-black font-bold' : 'text-tactical-light hover:text-white'}`}
                           >
                             {s}x
@@ -781,7 +934,7 @@ function App() {
                       <button
                         onClick={analyzeActiveVideoFrame}
                         disabled={isAnalyzingFrame}
-                        className="px-3 py-1 bg-status-amber text-black font-bold hover:bg-yellow-400 transition-colors flex items-center space-x-1.5"
+                        className="px-3 py-1 bg-status-amber text-black font-bold hover:bg-yellow-400 transition-colors flex items-center space-x-1.5 shadow-md"
                       >
                         <span>⚡</span>
                         <span>{isAnalyzingFrame ? 'ANALYZING FRAME...' : 'RUN AI INFERENCE ON FRAME'}</span>
@@ -803,6 +956,23 @@ function App() {
                         <span>REPLACE VIDEO FEED</span>
                       </label>
                     </div>
+                  </div>
+
+                  {/* Forensic Image Processing & Write-up Deck */}
+                  <div className="shrink-0 max-h-72 overflow-y-auto">
+                    <ForensicControlsDeck
+                      camId={selectedCam.id}
+                      camName={selectedCam.name}
+                      filterMode={forensicFilter}
+                      onFilterChange={setForensicFilter}
+                      filterOptions={forensicOptions}
+                      onOptionsChange={setForensicOptions}
+                      activeTimecode={formatTimecode(activeVideoTime)}
+                      analystId={reviewerId}
+                      onSaveWriteup={handleSaveForensicWriteup}
+                      onFlagFollowup={handleFlagFollowupWriteup}
+                      existingWriteups={forensicWriteups}
+                    />
                   </div>
                 </div>
               ) : (
@@ -1107,7 +1277,7 @@ function App() {
       {/* ANALYST REVIEW & AUDIT MODAL */}
       {activeAlert && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-tactical-gray border-2 border-tactical-green w-full max-w-4xl max-h-[92vh] flex flex-col shadow-[0_0_30px_rgba(0,255,65,0.2)]">
+          <div className="bg-tactical-gray border-2 border-tactical-green w-full max-w-5xl max-h-[94vh] flex flex-col shadow-[0_0_30px_rgba(0,255,65,0.2)]">
             
             {/* Modal Header */}
             <div className="bg-black/90 px-6 py-3 border-b border-tactical-olive flex justify-between items-center">
@@ -1136,247 +1306,491 @@ function App() {
               </span>
             </div>
 
+            {/* Tab Navigation Header */}
+            <div className="bg-black/95 px-6 py-2 border-b border-tactical-olive flex justify-between items-center font-mono text-xs">
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setModalTab('DETAILS')}
+                  className={`px-3 py-1.5 border transition-colors flex items-center space-x-2 ${
+                    modalTab === 'DETAILS'
+                      ? 'border-tactical-green bg-tactical-green text-black font-bold shadow-[0_0_8px_rgba(0,255,65,0.3)]'
+                      : 'border-tactical-olive text-tactical-light hover:text-white bg-tactical-dark'
+                  }`}
+                >
+                  <span>📋</span>
+                  <span>1. ALERT DETAILS & DISPOSITION</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalTab('INSPECT_FOOTAGE')}
+                  className={`px-3 py-1.5 border transition-colors flex items-center space-x-2 ${
+                    modalTab === 'INSPECT_FOOTAGE'
+                      ? 'border-status-amber bg-status-amber text-black font-bold shadow-[0_0_8px_rgba(255,183,3,0.3)]'
+                      : 'border-tactical-olive text-tactical-light hover:text-white bg-tactical-dark'
+                  }`}
+                >
+                  <span>📹</span>
+                  <span>2. INSPECT SOURCE FOOTAGE & FORENSIC FILTERS</span>
+                  <span className="text-[10px] bg-black/60 text-status-amber px-1.5 py-0.2 rounded border border-status-amber/40">
+                    {activeAlertCamera?.name || activeAlert.cam || 'CAM-SRC'}
+                  </span>
+                </button>
+              </div>
+
+              {modalTab === 'INSPECT_FOOTAGE' && activeAlertCamera && (
+                <div className="text-[11px] text-tactical-light font-mono flex items-center space-x-2">
+                  <span className="text-tactical-green font-bold">FEED:</span>
+                  <span className="text-white font-bold">{activeAlertCamera.name}</span>
+                  <span className="text-tactical-olive">|</span>
+                  <span className="text-status-amber">{activeAlertCamera.sensorType === 'IR_THERMAL' ? 'IR THERMAL SENSOR' : 'EO OPTICAL SENSOR'}</span>
+                </div>
+              )}
+            </div>
+
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               
-              {/* Dual-Column Section: AI Telemetry (Left) vs Human Disposition (Right) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Section A: AI Machine Telemetry (Read-Only) */}
-                <div className="bg-black/50 border border-tactical-olive p-4 flex flex-col space-y-3">
-                  <div className="flex justify-between items-center border-b border-tactical-olive/60 pb-2">
-                    <span className="font-mono text-xs font-bold text-tactical-light tracking-wider flex items-center">
-                      <span className="text-tactical-green mr-1.5">›</span>
-                      AI INFERENCE FINDINGS (READ-ONLY)
-                    </span>
-                    <span className="font-mono text-[10px] text-tactical-light/60">
-                      ENG: {activeAlert.engineVersion}
-                    </span>
-                  </div>
+              {/* TAB 1: DETAILS & DISPOSITION */}
+              {modalTab === 'DETAILS' && (
+                <>
+                  {/* Dual-Column Section: AI Telemetry (Left) vs Human Disposition (Right) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* Section A: AI Machine Telemetry (Read-Only) */}
+                    <div className="bg-black/50 border border-tactical-olive p-4 flex flex-col space-y-3">
+                      <div className="flex justify-between items-center border-b border-tactical-olive/60 pb-2">
+                        <span className="font-mono text-xs font-bold text-tactical-light tracking-wider flex items-center">
+                          <span className="text-tactical-green mr-1.5">›</span>
+                          AI INFERENCE FINDINGS (READ-ONLY)
+                        </span>
+                        <span className="font-mono text-[10px] text-tactical-light/60">
+                          ENG: {activeAlert.engineVersion}
+                        </span>
+                      </div>
 
-                  <div className="space-y-2 font-mono text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-tactical-light">SOURCE SENSOR:</span>
-                      <span className="text-white font-bold">{activeAlert.cam || 'CAM-SYS'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-tactical-light">DETECTION MODULE:</span>
-                      <span className="text-status-amber font-bold">{activeAlert.module}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-tactical-light">AI THREAT SCORE:</span>
-                      <div>{getThreatBadge(activeAlert.threatLevel)}</div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-tactical-light">TIMESTAMP:</span>
-                      <span className="text-white">{activeAlert.timestamp || activeAlert.time}</span>
-                    </div>
-                  </div>
+                      <div className="space-y-2 font-mono text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-tactical-light">SOURCE SENSOR:</span>
+                          <span className="text-white font-bold">{activeAlert.cam || 'CAM-SYS'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-tactical-light">DETECTION MODULE:</span>
+                          <span className="text-status-amber font-bold">{activeAlert.module}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-tactical-light">AI THREAT SCORE:</span>
+                          <div>{getThreatBadge(activeAlert.threatLevel)}</div>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-tactical-light">TIMESTAMP:</span>
+                          <span className="text-white">{activeAlert.timestamp || activeAlert.time}</span>
+                        </div>
+                      </div>
 
-                  <div className="pt-2 border-t border-tactical-olive/40">
-                    <span className="font-mono text-[11px] text-tactical-light block mb-1">ANALYTIC SUMMARY:</span>
-                    <div className="p-2.5 bg-tactical-dark border border-tactical-olive text-gray-300 font-sans text-xs leading-relaxed">
-                      {activeAlert.description}
-                    </div>
-                  </div>
+                      <div className="pt-2 border-t border-tactical-olive/40">
+                        <span className="font-mono text-[11px] text-tactical-light block mb-1">ANALYTIC SUMMARY:</span>
+                        <div className="p-2.5 bg-tactical-dark border border-tactical-olive text-gray-300 font-sans text-xs leading-relaxed">
+                          {activeAlert.description}
+                        </div>
+                      </div>
 
-                  <div className="p-2 bg-tactical-olive/20 border border-tactical-olive text-tactical-light font-mono text-[10px]">
-                    Note: Machine cue based on visual feature extraction. All action dispositions must be verified and signed by a qualified human reviewer.
-                  </div>
-                </div>
-
-                {/* Section B: Human Reviewer Form */}
-                <form onSubmit={handleReviewSubmit} className="bg-black/50 border border-tactical-olive p-4 flex flex-col space-y-3">
-                  <div className="flex justify-between items-center border-b border-tactical-olive/60 pb-2">
-                    <span className="font-mono text-xs font-bold text-white tracking-wider flex items-center">
-                      <span className="text-status-green mr-1.5">›</span>
-                      HUMAN REVIEWER DETERMINATION
-                    </span>
-                    <div className="flex items-center space-x-1.5">
-                      {getStatusBadge(activeAlert.reviewStatus)}
-                      {getDispositionBadge(activeAlert.disposition)}
-                    </div>
-                  </div>
-
-                  {/* Reviewer Call Sign */}
-                  <div className="font-mono text-xs space-y-1">
-                    <label className="text-tactical-light block">REVIEWER CALLSIGN / OPERATOR ID:</label>
-                    <input
-                      type="text"
-                      value={reviewerId}
-                      onChange={(e) => setReviewerId(e.target.value)}
-                      className="w-full bg-tactical-dark border border-tactical-olive text-white px-2.5 py-1 text-xs font-mono focus:border-tactical-green focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  {/* Review Action Selector */}
-                  <div className="font-mono text-xs space-y-1">
-                    <label className="text-tactical-light block">WORKFLOW ACTION:</label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {[
-                        { action: 'ACKNOWLEDGE', label: 'ACKNOWLEDGE (TAKE OWNSHIP)' },
-                        { action: 'RECORD_DISPOSITION', label: 'RECORD DISPOSITION' },
-                        { action: 'FLAG_FOLLOWUP', label: 'FLAG FOR FOLLOW-UP' },
-                        { action: 'REOPEN', label: 'REOPEN REVIEW' }
-                      ].map(item => (
-                        <button
-                          key={item.action}
-                          type="button"
-                          onClick={() => setReviewAction(item.action as ReviewAction)}
-                          className={`px-2 py-1.5 border text-left text-[10px] transition-colors ${
-                            reviewAction === item.action
-                              ? 'border-tactical-green bg-tactical-green text-black font-bold'
-                              : 'border-tactical-olive text-tactical-light hover:text-white bg-tactical-dark'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Human Disposition Selector */}
-                  {(reviewAction === 'RECORD_DISPOSITION' || reviewAction === 'FLAG_FOLLOWUP') && (
-                    <div className="font-mono text-xs space-y-1">
-                      <label className="text-tactical-light block">HUMAN DISPOSITION DECISION:</label>
-                      <div className="grid grid-cols-3 gap-1.5">
+                      {/* Quick Inspect Button */}
+                      <div className="p-2.5 bg-tactical-dark border border-tactical-olive flex items-center justify-between">
+                        <span className="font-mono text-[10px] text-tactical-light">Need forensic cross-verification?</span>
                         <button
                           type="button"
-                          onClick={() => setSelectedDisposition('RELEVANT')}
-                          className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
-                            selectedDisposition === 'RELEVANT'
-                              ? 'bg-status-red text-black border-status-red'
-                              : 'border-tactical-olive text-status-red bg-tactical-dark hover:bg-status-red/10'
-                          }`}
+                          onClick={() => setModalTab('INSPECT_FOOTAGE')}
+                          className="px-2.5 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono text-[10px] font-bold border border-tactical-green transition-colors"
                         >
-                          RELEVANT (THREAT)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedDisposition('NOT_RELEVANT')}
-                          className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
-                            selectedDisposition === 'NOT_RELEVANT'
-                              ? 'bg-status-green text-black border-status-green'
-                              : 'border-tactical-olive text-status-green bg-tactical-dark hover:bg-status-green/10'
-                          }`}
-                        >
-                          NOT RELEVANT (BENIGN)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedDisposition('UNCERTAIN')}
-                          className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
-                            selectedDisposition === 'UNCERTAIN'
-                              ? 'bg-status-amber text-black border-status-amber'
-                              : 'border-tactical-olive text-status-amber bg-tactical-dark hover:bg-status-amber/10'
-                          }`}
-                        >
-                          UNCERTAIN (AMBIGUOUS)
+                          [ 📹 INSPECT SOURCE FOOTAGE ]
                         </button>
                       </div>
-                    </div>
-                  )}
 
-                  {/* Reviewer Rationale Notes */}
-                  <div className="font-mono text-xs space-y-1 flex-1">
-                    <label className="text-tactical-light block">ANALYST RATIONALE / OBSERVATION NOTES:</label>
-                    <textarea
-                      value={reviewNote}
-                      onChange={(e) => setReviewNote(e.target.value)}
-                      rows={3}
-                      placeholder="Enter tactical justification, ground truth check, or follow-up instructions..."
-                      className="w-full bg-tactical-dark border border-tactical-olive text-white p-2 text-xs font-sans focus:border-tactical-green focus:outline-none"
-                    />
+                      <div className="p-2 bg-tactical-olive/20 border border-tactical-olive text-tactical-light font-mono text-[10px]">
+                        Note: Machine cue based on visual feature extraction. All action dispositions must be verified and signed by a qualified human reviewer.
+                      </div>
+                    </div>
+
+                    {/* Section B: Human Reviewer Form */}
+                    <form onSubmit={handleReviewSubmit} className="bg-black/50 border border-tactical-olive p-4 flex flex-col space-y-3">
+                      <div className="flex justify-between items-center border-b border-tactical-olive/60 pb-2">
+                        <span className="font-mono text-xs font-bold text-white tracking-wider flex items-center">
+                          <span className="text-status-green mr-1.5">›</span>
+                          HUMAN REVIEWER DETERMINATION
+                        </span>
+                        <div className="flex items-center space-x-1.5">
+                          {getStatusBadge(activeAlert.reviewStatus)}
+                          {getDispositionBadge(activeAlert.disposition)}
+                        </div>
+                      </div>
+
+                      {/* Reviewer Call Sign */}
+                      <div className="font-mono text-xs space-y-1">
+                        <label className="text-tactical-light block">REVIEWER CALLSIGN / OPERATOR ID:</label>
+                        <input
+                          type="text"
+                          value={reviewerId}
+                          onChange={(e) => setReviewerId(e.target.value)}
+                          className="w-full bg-tactical-dark border border-tactical-olive text-white px-2.5 py-1 text-xs font-mono focus:border-tactical-green focus:outline-none"
+                          required
+                        />
+                      </div>
+
+                      {/* Review Action Selector */}
+                      <div className="font-mono text-xs space-y-1">
+                        <label className="text-tactical-light block">WORKFLOW ACTION:</label>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {[
+                            { action: 'ACKNOWLEDGE', label: 'ACKNOWLEDGE (TAKE OWNSHIP)' },
+                            { action: 'RECORD_DISPOSITION', label: 'RECORD DISPOSITION' },
+                            { action: 'FLAG_FOLLOWUP', label: 'FLAG FOR FOLLOW-UP' },
+                            { action: 'REOPEN', label: 'REOPEN REVIEW' }
+                          ].map(item => (
+                            <button
+                              key={item.action}
+                              type="button"
+                              onClick={() => setReviewAction(item.action as ReviewAction)}
+                              className={`px-2 py-1.5 border text-left text-[10px] transition-colors ${
+                                reviewAction === item.action
+                                  ? 'border-tactical-green bg-tactical-green text-black font-bold'
+                                  : 'border-tactical-olive text-tactical-light hover:text-white bg-tactical-dark'
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Human Disposition Selector */}
+                      {(reviewAction === 'RECORD_DISPOSITION' || reviewAction === 'FLAG_FOLLOWUP') && (
+                        <div className="font-mono text-xs space-y-1">
+                          <label className="text-tactical-light block">HUMAN DISPOSITION DECISION:</label>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDisposition('RELEVANT')}
+                              className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
+                                selectedDisposition === 'RELEVANT'
+                                  ? 'bg-status-red text-black border-status-red'
+                                  : 'border-tactical-olive text-status-red bg-tactical-dark hover:bg-status-red/10'
+                              }`}
+                            >
+                              RELEVANT (THREAT)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDisposition('NOT_RELEVANT')}
+                              className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
+                                selectedDisposition === 'NOT_RELEVANT'
+                                  ? 'bg-status-green text-black border-status-green'
+                                  : 'border-tactical-olive text-status-green bg-tactical-dark hover:bg-status-green/10'
+                              }`}
+                            >
+                              NOT RELEVANT (BENIGN)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDisposition('UNCERTAIN')}
+                              className={`px-2 py-1.5 border text-center text-[10px] font-bold transition-colors ${
+                                selectedDisposition === 'UNCERTAIN'
+                                  ? 'bg-status-amber text-black border-status-amber'
+                                  : 'border-tactical-olive text-status-amber bg-tactical-dark hover:bg-status-amber/10'
+                              }`}
+                            >
+                              UNCERTAIN (AMBIGUOUS)
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Linked Forensic Observations Helper */}
+                      {forensicWriteups.filter(w => w.alertId === activeAlert.id || w.camId === activeAlert.cameraId || activeAlert.cam?.includes(`CAM-${w.camId}`)).length > 0 && (
+                        <div className="bg-tactical-dark border border-tactical-olive p-2 space-y-1">
+                          <div className="flex justify-between items-center text-[10px] font-mono text-tactical-light">
+                            <span className="text-tactical-green font-bold">LINKED FORENSIC FINDINGS:</span>
+                            <button
+                              type="button"
+                              onClick={() => setModalTab('INSPECT_FOOTAGE')}
+                              className="text-status-amber hover:underline text-[9px]"
+                            >
+                              [ OPEN INSPECTOR ]
+                            </button>
+                          </div>
+                          {forensicWriteups
+                            .filter(w => w.alertId === activeAlert.id || w.camId === activeAlert.cameraId || activeAlert.cam?.includes(`CAM-${w.camId}`))
+                            .slice(0, 2)
+                            .map(w => (
+                              <div key={w.id} className="text-[10px] font-mono p-1 bg-black/40 border border-tactical-olive/40 flex justify-between items-center">
+                                <span className="text-white truncate max-w-[220px]">
+                                  <strong className="text-status-amber">[{w.filterUsed}]</strong> {TARGET_LABELS[w.targetClass]?.label || w.targetClass}: {w.notes.substring(0, 35)}...
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const snippet = `[FORENSIC ${w.filterUsed} @ TC ${w.timecode}] ${TARGET_LABELS[w.targetClass]?.label || w.targetClass}: ${w.notes}`;
+                                    setReviewNote(prev => prev ? `${prev}\n\n${snippet}` : snippet);
+                                  }}
+                                  className="text-[9px] text-tactical-green hover:text-white px-1 border border-tactical-olive shrink-0"
+                                >
+                                  + PASTE
+                                </button>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+
+                      {/* Reviewer Rationale Notes */}
+                      <div className="font-mono text-xs space-y-1 flex-1">
+                        <label className="text-tactical-light block">ANALYST RATIONALE / OBSERVATION NOTES:</label>
+                        <textarea
+                          value={reviewNote}
+                          onChange={(e) => setReviewNote(e.target.value)}
+                          rows={3}
+                          placeholder="Enter tactical justification, ground truth check, or follow-up instructions..."
+                          className="w-full bg-tactical-dark border border-tactical-olive text-white p-2 text-xs font-sans focus:border-tactical-green focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Form Submission Button */}
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full py-2 bg-tactical-green text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-[#5f7751] transition-colors disabled:opacity-50"
+                        >
+                          {isSubmitting ? 'RECORDING AUDIT...' : 'COMMIT DISPOSITION & LOG AUDIT TRAIL'}
+                        </button>
+                      </div>
+
+                      {actionSuccessMsg && (
+                        <div className="p-2 bg-status-green/10 border border-status-green text-status-green font-mono text-[11px] text-center">
+                          {actionSuccessMsg}
+                        </div>
+                      )}
+                    </form>
                   </div>
 
-                  {/* Form Submission Button */}
-                  <div className="pt-2">
+                  {/* Section C: Append-Only Review Audit Trail */}
+                  <div className="bg-black/50 border border-tactical-olive p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-mono text-xs font-bold text-tactical-light tracking-wider flex items-center">
+                        <span className="text-tactical-green mr-1.5">›</span>
+                        IMMUTABLE REVIEW AUDIT TRAIL (CHRONOLOGICAL)
+                      </h4>
+                      <span className="font-mono text-[10px] text-tactical-light/60">
+                        TOTAL AUDIT ENTRIES: {(audits[activeAlert.id] || []).length}
+                      </span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full font-mono text-[11px] border-collapse">
+                        <thead>
+                          <tr className="border-b border-tactical-olive text-tactical-light text-left bg-tactical-dark">
+                            <th className="p-2">TIMESTAMP</th>
+                            <th className="p-2">ACTION</th>
+                            <th className="p-2">OPERATOR / AGENT</th>
+                            <th className="p-2">STATUS TRANSITION</th>
+                            <th className="p-2">DISPOSITION</th>
+                            <th className="p-2">NOTES / RATIONALE</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(audits[activeAlert.id] || []).length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="p-3 text-center text-tactical-olive">
+                                NO AUDIT ENTRIES LOGGED
+                              </td>
+                            </tr>
+                          ) : (
+                            (audits[activeAlert.id] || []).map((entry, idx) => (
+                              <tr key={idx} className="border-b border-tactical-olive/30 hover:bg-tactical-olive/10">
+                                <td className="p-2 text-tactical-light whitespace-nowrap">
+                                  {entry.timestamp ? entry.timestamp.replace('T', ' ').substring(0, 19) : 'N/A'}
+                                </td>
+                                <td className="p-2 font-bold text-white whitespace-nowrap">
+                                  {entry.action}
+                                </td>
+                                <td className="p-2 text-status-green whitespace-nowrap">
+                                  {entry.reviewerId}
+                                </td>
+                                <td className="p-2 text-tactical-light whitespace-nowrap">
+                                  {entry.previousStatus ? `${entry.previousStatus} → ` : ''}
+                                  <span className="text-white font-semibold">{entry.newStatus}</span>
+                                </td>
+                                <td className="p-2 whitespace-nowrap">
+                                  {entry.newDisposition ? (
+                                    <span className={
+                                      entry.newDisposition === 'RELEVANT' ? 'text-status-red font-bold' :
+                                      entry.newDisposition === 'NOT_RELEVANT' ? 'text-status-green font-bold' :
+                                      entry.newDisposition === 'UNCERTAIN' ? 'text-status-amber font-bold' : 'text-tactical-light'
+                                    }>
+                                      {entry.newDisposition}
+                                    </span>
+                                  ) : 'NONE'}
+                                </td>
+                                <td className="p-2 text-gray-300 font-sans text-xs">
+                                  {entry.note || '—'}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* TAB 2: INSPECT SOURCE FOOTAGE & FORENSIC FILTERS */}
+              {modalTab === 'INSPECT_FOOTAGE' && (
+                <div className="space-y-4">
+                  {/* Top Bar for Inspect Mode */}
+                  <div className="bg-black/70 border border-tactical-olive p-3 flex justify-between items-center font-mono">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse"></span>
+                      <span className="text-xs font-bold text-white tracking-wider">
+                        SOURCE FOOTAGE: {activeAlertCamera?.name || activeAlert.cam}
+                      </span>
+                      <span className="text-[10px] bg-tactical-olive/60 text-tactical-light px-2 py-0.5 border border-tactical-olive">
+                        {activeAlertCamera?.sensorType === 'IR_THERMAL' ? 'IR THERMAL SPECTRUM' : 'EO OPTICAL SPECTRUM'}
+                      </span>
+                    </div>
+
                     <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-2 bg-tactical-green text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-[#5f7751] transition-colors disabled:opacity-50"
+                      type="button"
+                      onClick={() => {
+                        const noteSnippet = `[FORENSIC INSPECTION] Inspected feed ${activeAlertCamera?.name || activeAlert.cam} at TC ${formatTimecode(modalVideoTime)} using ${forensicFilter} filter. Zoom: ${forensicOptions.zoom.toFixed(1)}x.`;
+                        setReviewNote(prev => prev ? `${prev}\n\n${noteSnippet}` : noteSnippet);
+                        setModalTab('DETAILS');
+                      }}
+                      className="px-3 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono text-xs font-bold border border-tactical-green transition-colors flex items-center space-x-1.5"
                     >
-                      {isSubmitting ? 'RECORDING AUDIT...' : 'COMMIT DISPOSITION & LOG AUDIT TRAIL'}
+                      <span>📋</span>
+                      <span>PASTE NOTES TO DISPOSITION & PROCEED</span>
                     </button>
                   </div>
 
-                  {actionSuccessMsg && (
-                    <div className="p-2 bg-status-green/10 border border-status-green text-status-green font-mono text-[11px] text-center">
-                      {actionSuccessMsg}
-                    </div>
-                  )}
-                </form>
-              </div>
-
-              {/* Section C: Append-Only Review Audit Trail */}
-              <div className="bg-black/50 border border-tactical-olive p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-mono text-xs font-bold text-tactical-light tracking-wider flex items-center">
-                    <span className="text-tactical-green mr-1.5">›</span>
-                    IMMUTABLE REVIEW AUDIT TRAIL (CHRONOLOGICAL)
-                  </h4>
-                  <span className="font-mono text-[10px] text-tactical-light/60">
-                    TOTAL AUDIT ENTRIES: {(audits[activeAlert.id] || []).length}
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full font-mono text-[11px] border-collapse">
-                    <thead>
-                      <tr className="border-b border-tactical-olive text-tactical-light text-left bg-tactical-dark">
-                        <th className="p-2">TIMESTAMP</th>
-                        <th className="p-2">ACTION</th>
-                        <th className="p-2">OPERATOR / AGENT</th>
-                        <th className="p-2">STATUS TRANSITION</th>
-                        <th className="p-2">DISPOSITION</th>
-                        <th className="p-2">NOTES / RATIONALE</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(audits[activeAlert.id] || []).length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="p-3 text-center text-tactical-olive">
-                            NO AUDIT ENTRIES LOGGED
-                          </td>
-                        </tr>
-                      ) : (
-                        (audits[activeAlert.id] || []).map((entry, idx) => (
-                          <tr key={idx} className="border-b border-tactical-olive/30 hover:bg-tactical-olive/10">
-                            <td className="p-2 text-tactical-light whitespace-nowrap">
-                              {entry.timestamp ? entry.timestamp.replace('T', ' ').substring(0, 19) : 'N/A'}
-                            </td>
-                            <td className="p-2 font-bold text-white whitespace-nowrap">
-                              {entry.action}
-                            </td>
-                            <td className="p-2 text-status-green whitespace-nowrap">
-                              {entry.reviewerId}
-                            </td>
-                            <td className="p-2 text-tactical-light whitespace-nowrap">
-                              {entry.previousStatus ? `${entry.previousStatus} → ` : ''}
-                              <span className="text-white font-semibold">{entry.newStatus}</span>
-                            </td>
-                            <td className="p-2 whitespace-nowrap">
-                              {entry.newDisposition ? (
-                                <span className={
-                                  entry.newDisposition === 'RELEVANT' ? 'text-status-red font-bold' :
-                                  entry.newDisposition === 'NOT_RELEVANT' ? 'text-status-green font-bold' :
-                                  entry.newDisposition === 'UNCERTAIN' ? 'text-status-amber font-bold' : 'text-tactical-light'
-                                }>
-                                  {entry.newDisposition}
-                                </span>
-                              ) : 'NONE'}
-                            </td>
-                            <td className="p-2 text-gray-300 font-sans text-xs">
-                              {entry.note || '—'}
-                            </td>
-                          </tr>
-                        ))
+                  {/* Forensic Video Player Container */}
+                  <div className="bg-black border border-tactical-olive flex flex-col shadow-inner">
+                    <div className="relative w-full h-[360px] bg-black overflow-hidden flex items-center justify-center">
+                      {activeAlertCamera && (
+                        <ForensicVideoPlayer
+                          ref={modalPlayerRef}
+                          videoUrl={activeAlertCamera.videoUrl}
+                          isMuted={isMuted}
+                          filterMode={forensicFilter}
+                          filterOptions={forensicOptions}
+                          playbackSpeed={playbackSpeed}
+                          onTimeUpdate={(cTime, dur) => {
+                            setModalVideoTime(cTime);
+                            setModalVideoDuration(dur);
+                          }}
+                          className="w-full h-full"
+                        />
                       )}
-                    </tbody>
-                  </table>
+                    </div>
+
+                    {/* Timeline Scrubber */}
+                    <div className="bg-black/95 px-3 py-1.5 border-t border-tactical-olive/80 flex items-center space-x-3 font-mono text-xs z-20">
+                      <span className="text-[10px] text-tactical-light whitespace-nowrap">SEEK:</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max={modalVideoDuration || 100}
+                        step="0.05"
+                        value={modalVideoTime}
+                        onChange={(e) => {
+                          const t = parseFloat(e.target.value);
+                          setModalVideoTime(t);
+                          modalPlayerRef.current?.seek(t);
+                        }}
+                        className="flex-1 accent-tactical-green h-1.5 bg-tactical-dark cursor-pointer"
+                      />
+                      <span className="text-[10px] text-status-green whitespace-nowrap font-bold">
+                        {formatTimecode(modalVideoTime)} / {formatTimecode(modalVideoDuration)}
+                      </span>
+                    </div>
+
+                    {/* Playback Controls Strip */}
+                    <div className="bg-tactical-gray border-t border-tactical-olive p-2.5 flex items-center justify-between font-mono text-xs">
+                      <div className="flex items-center space-x-3">
+                        <button
+                          type="button"
+                          onClick={() => modalPlayerRef.current?.togglePlay()}
+                          className="px-3 py-1 bg-tactical-olive border border-tactical-green text-white hover:bg-tactical-green hover:text-black font-bold transition-colors text-xs"
+                        >
+                          PLAY / PAUSE
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsMuted(!isMuted)}
+                          className={`px-3 py-1 border transition-colors text-xs ${isMuted ? 'border-tactical-olive text-tactical-light' : 'border-status-green text-status-green bg-status-green/10'}`}
+                        >
+                          {isMuted ? '🔇 MUTED' : '🔊 AUDIO ON'}
+                        </button>
+                        <div className="flex items-center space-x-1 border border-tactical-olive px-1.5 py-0.5">
+                          <span className="text-[10px] text-tactical-light mr-1">SPEED:</span>
+                          {[0.5, 1.0, 2.0].map(s => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setPlaybackSpeed(s)}
+                              className={`px-1.5 py-0.5 text-[10px] ${playbackSpeed === s ? 'bg-tactical-green text-black font-bold' : 'text-tactical-light hover:text-white'}`}
+                            >
+                              {s}x
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-tactical-light flex items-center space-x-2">
+                        <span>ACTIVE FILTER:</span>
+                        <span className="text-status-amber font-bold border border-status-amber/40 px-1.5 py-0.2 bg-black/40">
+                          {forensicFilter}
+                        </span>
+                        <span className="text-tactical-olive">|</span>
+                        <span>ZOOM: <span className="text-tactical-green font-bold">{forensicOptions.zoom.toFixed(1)}x</span></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Forensic Controls Deck (Filters, Enhancement Sliders, Target Matching, Writeup Notes) */}
+                  {activeAlertCamera && (
+                    <ForensicControlsDeck
+                      camId={activeAlertCamera.id}
+                      camName={activeAlertCamera.name}
+                      filterMode={forensicFilter}
+                      onFilterChange={setForensicFilter}
+                      filterOptions={forensicOptions}
+                      onOptionsChange={setForensicOptions}
+                      activeTimecode={formatTimecode(modalVideoTime)}
+                      analystId={reviewerId}
+                      existingWriteups={forensicWriteups}
+                      onSaveWriteup={(wup) => {
+                        handleSaveForensicWriteup(wup);
+                        const targetLabel = TARGET_LABELS[wup.targetClass]?.label || wup.targetClass;
+                        const noteAddition = `[FORENSIC WRITE-UP @ TC ${wup.timecode} | ${wup.filterUsed}]\nMatched Target: ${targetLabel} (${wup.confidence})\nAnalyst Notes: ${wup.notes}`;
+                        setReviewNote(prev => prev ? `${prev}\n\n${noteAddition}` : noteAddition);
+                        if (wup.confidence === 'CONFIRMED' || wup.targetClass === 'DRONE_UAV' || wup.targetClass === 'HUMAN_INFILTRATION') {
+                          setSelectedDisposition('RELEVANT');
+                        } else if (wup.targetClass === 'BENIGN_ACTIVITY') {
+                          setSelectedDisposition('NOT_RELEVANT');
+                        }
+                      }}
+                      onFlagFollowup={(wup) => {
+                        handleFlagFollowupWriteup(wup);
+                        const targetLabel = TARGET_LABELS[wup.targetClass]?.label || wup.targetClass;
+                        const noteAddition = `[PRIORITY FOLLOW-UP @ TC ${wup.timecode} | ${wup.filterUsed}]\nTarget: ${targetLabel} (${wup.confidence})\nNotes: ${wup.notes}`;
+                        setReviewNote(prev => prev ? `${prev}\n\n${noteAddition}` : noteAddition);
+                        setReviewAction('FLAG_FOLLOWUP');
+                        setSelectedDisposition('UNCERTAIN');
+                      }}
+                    />
+                  )}
                 </div>
-              </div>
+              )}
 
             </div>
 
