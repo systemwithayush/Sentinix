@@ -100,6 +100,20 @@ export const INITIAL_FORENSIC_WRITEUPS: ForensicWriteup[] = [
     notes: 'Monochrome luminance contrast analysis highlights shadow displacement along northern fence boundary. Potential foot infiltration along ditch line.',
     timestamp: '2026-10-25T16:05:00',
     flaggedForFollowup: false
+  },
+  {
+    id: 'wup-005',
+    camId: '5',
+    camName: 'CAM-5 (High-Speed Thermal Ingress)',
+    timecode: '00:03.20',
+    filterUsed: 'THERMAL_FLIR',
+    targetClass: 'DRONE_UAV',
+    confidence: 'CONFIRMED',
+    analyst: 'DELTA-9',
+    notes: 'Thermal radiometric analysis isolates intense concentrated heat core (>650°C) with persistent linear exhaust plume wake traveling at high velocity (~140 m/s) across Sector Echo airspace. Confirmed high-speed aerial projectile / rocket-assisted UAV ingress.',
+    timestamp: '2026-10-25T15:20:15',
+    flaggedForFollowup: true,
+    alertId: 'alt-005'
   }
 ];
 
@@ -146,7 +160,7 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   },
   {
     id: '5',
-    name: 'CAM-5 (Thermal Drone Relay)',
+    name: 'CAM-5 (High-Speed Thermal Ingress)',
     sensorType: 'IR_THERMAL',
     status: 'LIVE_STREAM',
     videoUrl: '/videos/cam5.mp4',
@@ -243,6 +257,19 @@ const INITIAL_ALERTS: Alert[] = [
     reviewedAt: '2026-10-20T09:55:40',
     reviewerNotes: 'Thermal hotspot requires tactical reconnaissance drone flyover.',
     engineVersion: 'ai-engine-1.2.0-m5'
+  },
+  {
+    id: 'alt-005',
+    cam: 'CAM-5',
+    cameraId: '5',
+    module: 'M2 Aerial Threat (High-Speed Thermal)',
+    threatLevel: 3,
+    description: 'CRITICAL FLAGGED: High-speed aerial target with intense infrared thermal signature descending through Sector Echo (Velocity: ~140 m/s, Bearing 215° SW, Elevated FLIR Emission >650°C, Exhaust Plume Active)',
+    time: '15:18:04',
+    timestamp: '2026-10-25T15:18:04',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
+    engineVersion: 'ai-engine-1.3.0-m5'
   },
   {
     id: 'alt-007',
@@ -1063,6 +1090,65 @@ function App() {
                       </div>
                     )}
 
+                    {/* Single Cam Expanded Overlays for CAM-5 (High-Speed Thermal Target) */}
+                    {showDetectionOverlays && selectedCam.id === '5' && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* Top Critical Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                            <span className="font-bold text-status-red tracking-wider">
+                              CRITICAL THREAT: HIGH-SPEED INFRARED TARGET DETECTED
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 text-[11px]">
+                            <span className="text-yellow-300 font-bold">VELOCITY: ~140 m/s</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="text-white">BEARING: 215° SW</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">FLIR &gt;650°C</span>
+                          </div>
+                        </div>
+
+                        {/* High-Speed Target Lock Reticle over Thermal Hotspot */}
+                        <div className="absolute top-[50%] left-[34%] w-[18%] h-[20%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
+                          {/* Corner brackets */}
+                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
+
+                          {/* Top Label */}
+                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
+                            <span>🚀 TGT-FAST-01</span>
+                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.96</span>
+                          </div>
+
+                          {/* Bottom Label */}
+                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
+                            IR CORE: PEAK // EXHAUST PLUME ACTIVE
+                          </div>
+                        </div>
+
+                        {/* Exhaust Trail Line Vector (from top-right to target) */}
+                        <div className="absolute top-[38%] left-[44%] w-[24%] h-0 border-t-2 border-dashed border-status-amber rotate-[-42deg] shadow-[0_0_8px_rgba(255,183,3,0.5)]">
+                          <span className="absolute -top-3.5 left-4 bg-black/90 text-status-amber px-1 text-[7px] font-mono border border-status-amber whitespace-nowrap">
+                            ⫽ THERMAL EXHAUST PLUME WAKE (TRAIL: 28m)
+                          </span>
+                        </div>
+
+                        {/* Bottom Air Defense Telemetry Badge */}
+                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
+                          <div className="text-status-red font-bold flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
+                            IMMEDIATE AIR DEFENSE INTERCEPT QUEUED
+                          </div>
+                          <div className="text-[10px] text-gray-300">Descent trajectory: 32° dive angle // Sector Echo</div>
+                          <div className="text-[10px] text-yellow-300">Target Type: High-Speed Rocket/Jet-Assisted UAV or Munition</div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* AI Frame Inference Result Overlay */}
                     {activeFrameAIResult && (
                       <div className="absolute bottom-4 left-4 right-4 bg-black/95 border border-status-amber p-2.5 font-mono text-xs text-status-amber z-20 shadow-lg flex justify-between items-center">
@@ -1258,6 +1344,33 @@ function App() {
                           <span className="bg-black/80 text-white px-1 border border-status-green text-[8px]">
                             0 TARGETS
                           </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Detection Banner for CAM-5 (High-Speed Thermal Target) */}
+                      {showDetectionOverlays && cam.id === '5' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                          <span className="font-bold text-status-red flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                            CRITICAL: HIGH-SPEED THERMAL TARGET
+                          </span>
+                          <span className="bg-black/80 text-yellow-300 px-1 border border-status-red text-[7px] font-bold">
+                            VEL: ~140 m/s
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Target Reticle & Plume Overlay on CAM-5 in Grid */}
+                      {showDetectionOverlays && cam.id === '5' && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          {/* Target Bounding Reticle */}
+                          <div className="absolute top-[52%] left-[34%] w-[16%] h-[18%] border border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.6)]">
+                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🚀 TGT-FAST-01 (0.96)
+                            </span>
+                          </div>
+                          {/* Plume Trail Line */}
+                          <div className="absolute top-[40%] left-[42%] w-[20%] h-0 border-t border-dashed border-status-amber rotate-[-42deg]"></div>
                         </div>
                       )}
 

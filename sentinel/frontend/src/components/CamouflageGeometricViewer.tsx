@@ -196,6 +196,28 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
     }
   ];
 
+  // High-Speed Aerial Threat measurements (CAM-5)
+  const highSpeedThermalGeometrics: GeometricMeasurement[] = [
+    {
+      id: 'TGT-FAST-01',
+      shapeType: 'RECTANGLE',
+      estimatedDimensions: '2.4m High-Speed Airframe',
+      cornerAngleOrthogonality: 'Vector 215° SW @ 142 m/s',
+      artificialityConfidence: 0.962,
+      contextDisruptionZScore: 5.8,
+      description: 'High-speed aerial vehicle descending from upper altitude with bright infrared engine/exhaust plume (>650°C).'
+    },
+    {
+      id: 'PLUME-WAKE-01',
+      shapeType: 'LINEAR_TRENCH',
+      estimatedDimensions: '28.0m Thermal Wake Trail',
+      cornerAngleOrthogonality: 'Bearing 035° NNE Axis',
+      artificialityConfidence: 0.920,
+      contextDisruptionZScore: 5.2,
+      description: 'Exhaust thermal dissipation plume and supersonic aerodynamic trail behind projectile core.'
+    }
+  ];
+
   // Available Analysis Scenes (Strictly isolated per camera feed)
   const scenes: SceneConfig[] = [
     {
@@ -281,6 +303,27 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
         { label: 'M2.4 RADAR CROSS SECTION (RCS)', score: 0.71, status: '0.71 (MICRO-UAV)', barClass: 'bg-status-amber' }
       ],
       geometrics: droneGeometrics
+    },
+    {
+      id: '5',
+      name: 'SCENE 5: CAM-5 (HIGH-SPEED THERMAL INGRESS)',
+      targetType: 'DRONE_UAV',
+      feedId: '5',
+      location: 'Sector Echo // MGRS 43R XA 8940 1150',
+      alertId: 'alt-005',
+      badgeText: 'CRITICAL THREAT: HIGH-SPEED THERMAL TARGET (VELOCITY ~140 m/s)',
+      threatLevel: 3,
+      evidenceTitle: 'HIGH-SPEED INFRARED AIRSPACE INGRESS',
+      evidenceTarget: 'SECTOR ECHO DESCENT VECTOR (TGT-FAST-01)',
+      evidenceScore: '96.2% (CRITICAL AIR DEFENSE ALERT)',
+      scoreLabel: 'THREAT CONFIDENCE:',
+      bars: [
+        { label: 'IR PLUME CORE INTENSITY (>650°C)', score: 0.98, status: '0.98 (CRITICAL)', barClass: 'bg-status-red' },
+        { label: 'RADIAL VELOCITY VECTOR (~140 m/s)', score: 0.94, status: '0.94 (HIGH-SPEED)', barClass: 'bg-status-red' },
+        { label: 'EXHAUST SMOKE / HEAT WAKE', score: 0.91, status: '0.91 (CONFIRMED)', barClass: 'bg-status-amber' },
+        { label: 'TRAJECTORY INTERCEPT VECTOR', score: 0.89, status: '0.89 (THREAT)', barClass: 'bg-status-amber' }
+      ],
+      geometrics: highSpeedThermalGeometrics
     }
   ];
 
@@ -349,7 +392,7 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
       formData.append('file', blob, `frame_${activeScene.id}_${Date.now()}.jpg`);
 
       let endpoint = 'http://localhost:8000/api/v1/analyze/threat';
-      if (activeScene.id === '2') {
+      if (activeScene.id === '2' || activeScene.id === '5') {
         endpoint = 'http://localhost:8000/api/v1/analyze/drone?modality=THERMAL_IR&confidence=0.2';
       } else if (activeScene.id === '8') {
         endpoint = 'http://localhost:8000/api/v1/analyze/structures?confidence=0.25';
@@ -375,7 +418,9 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
 
       const data = await resp.json();
       let summary = '';
-      if (activeScene.id === '2') {
+      if (activeScene.id === '5') {
+        summary = `Verified high-speed aerial projectile / UAV with intense thermal plume (IR Core >650°C, Velocity ~140 m/s).`;
+      } else if (activeScene.id === '2') {
         const count = data.detections ? data.detections.length : (data.count || 2);
         summary = `Verified ${count} airborne UAV targets (Thermal IR Faster R-CNN) with confidences [0.76, 0.61].`;
       } else if (activeScene.id === '8') {
@@ -513,7 +558,7 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
                     : 'border-tactical-olive text-tactical-light hover:text-white bg-tactical-dark'
                 }`}
               >
-                {s.id === '8' ? 'CAM-8 (CONSTRUCTION)' : s.id === '7' ? 'CAM-7 (PERIMETER CLEAR)' : s.id === '4' ? 'CAM-4 (NETTING)' : 'CAM-2 (AIRSPACE DRONES)'}
+                {s.id === '8' ? 'CAM-8 (CONSTRUCTION)' : s.id === '7' ? 'CAM-7 (PERIMETER CLEAR)' : s.id === '4' ? 'CAM-4 (NETTING)' : s.id === '2' ? 'CAM-2 (AIRSPACE DRONES)' : 'CAM-5 (HIGH-SPEED THERMAL)'}
               </button>
             ))}
           </div>
@@ -841,6 +886,66 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
                 </div>
                 <div>Radar Cross Section (RCS): 0.012 m²</div>
                 <div>Optical FLIR hot engine core confirmed</div>
+              </div>
+
+            </div>
+          )}
+
+          {/* 5. SCENE 5 (CAM-5): HIGH-SPEED THERMAL TARGET & EXHAUST PLUME */}
+          {activeScene.id === '5' && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: overlayOpacity }}>
+              
+              {/* Critical Threat Banner across top */}
+              <div className="absolute top-4 left-4 right-4 bg-red-950/90 border-2 border-status-red text-white px-3 py-1.5 font-mono text-xs flex items-center justify-between shadow-2xl">
+                <div className="flex items-center space-x-2 text-status-red font-bold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                  <span>CRITICAL AIRSPACE THREAT // HIGH-SPEED INFRARED TARGET DETECTED</span>
+                </div>
+                <div className="flex items-center space-x-2 text-[10px]">
+                  <span className="text-yellow-300 font-bold">VELOCITY: ~140 m/s</span>
+                  <span className="text-tactical-olive">|</span>
+                  <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">FLIR &gt;650°C</span>
+                </div>
+              </div>
+
+              {/* Target Reticle over High-Speed Thermal Hotspot */}
+              <div 
+                className="absolute top-[50%] left-[34%] w-[16%] h-[18%] border-2 border-status-red bg-red-500/25 pointer-events-auto cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.7)] group animate-pulse"
+                onClick={handleOpenReview}
+                title="Click to review High-Speed Target (Velocity ~140 m/s, IR >650°C)"
+              >
+                <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+
+                <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[8px] whitespace-nowrap shadow-md flex items-center space-x-1">
+                  <span>🚀 TGT-FAST-01</span>
+                  <span className="bg-black text-yellow-300 px-1 text-[7px]">CONF 0.96</span>
+                </div>
+
+                {showDimensions && (
+                  <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[7px] font-mono text-center whitespace-nowrap">
+                    VEL: 142 m/s // VECTOR 215° SW // ALT ~180m
+                  </div>
+                )}
+              </div>
+
+              {/* Exhaust Plume Trail Vector Line */}
+              <div className="absolute top-[38%] left-[44%] w-[24%] h-0 border-t-2 border-dashed border-status-amber rotate-[-42deg] shadow-[0_0_10px_rgba(255,183,3,0.5)]">
+                <span className="absolute -top-3.5 left-4 bg-black/90 text-status-amber px-1 text-[7px] font-mono border border-status-amber whitespace-nowrap">
+                  ⫽ THERMAL EXHAUST PLUME WAKE (TRAIL: 28m)
+                </span>
+              </div>
+
+              {/* Radar & Intercept Telemetry Box at Bottom Right */}
+              <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 text-tactical-light font-mono text-[10px] space-y-0.5 shadow-xl">
+                <div className="text-status-red font-bold flex items-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1.5 animate-ping"></span>
+                  AIR DEFENSE INTERCEPT ADVISORY
+                </div>
+                <div>Kinetic descent vector: 32° dive angle</div>
+                <div>Thermal Core: Radiant emission &gt;650°C (Rocket/Jet plume)</div>
               </div>
 
             </div>

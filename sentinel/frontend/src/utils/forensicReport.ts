@@ -219,6 +219,27 @@ export function createForensicDossier(params: {
           description: 'Micro-quadcopter loitering above northern perimeter restricted airspace (~52m AGL altitude).'
         }
       ]
+    : params.sensorId === '5'
+    ? [
+        {
+          id: 'TGT-FAST-01',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '2.4m High-Speed Airframe',
+          cornerAngleOrthogonality: 'Vector 215° SW @ 142 m/s',
+          artificialityConfidence: 0.962,
+          contextDisruptionZScore: 5.8,
+          description: 'High-speed aerial vehicle descending from upper altitude with bright infrared engine/exhaust plume (>650°C).'
+        },
+        {
+          id: 'PLUME-WAKE-01',
+          shapeType: 'LINEAR_TRENCH',
+          estimatedDimensions: '28.0m Thermal Wake Trail',
+          cornerAngleOrthogonality: 'Bearing 035° NNE Axis',
+          artificialityConfidence: 0.920,
+          contextDisruptionZScore: 5.2,
+          description: 'Exhaust thermal dissipation plume and supersonic aerodynamic trail behind projectile core.'
+        }
+      ]
     : params.targetClass === 'BENIGN_ACTIVITY' || params.sensorId === '7'
     ? [
         {
