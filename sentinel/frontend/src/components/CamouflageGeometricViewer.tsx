@@ -70,40 +70,94 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
 
   const geometricItems: GeometricMeasurement[] = [
     {
-      id: 'ANO-GEO-SQ01',
-      shapeType: 'SQUARE',
-      estimatedDimensions: '5.2m × 5.2m (27.0 m²)',
-      cornerAngleOrthogonality: '90.0° ± 0.3°',
-      artificialityConfidence: 0.984,
-      contextDisruptionZScore: 5.2,
-      description: 'Reinforced underground bunker shaft entrance. 90-degree orthogonal corner geometry strictly contradicts natural terrain fractures.'
-    },
-    {
       id: 'ANO-GEO-REC01',
       shapeType: 'RECTANGLE',
-      estimatedDimensions: '16.4m × 7.2m (118.1 m²)',
-      cornerAngleOrthogonality: '89.7° ± 0.5°',
-      artificialityConfidence: 0.968,
-      contextDisruptionZScore: 4.8,
-      description: 'Concealed excavation staging platform. High aspect-ratio boundary masked by modular synthetic camouflage tarp.'
+      estimatedDimensions: '24.5m × 12.0m (294.0 m²)',
+      cornerAngleOrthogonality: '89.8° ± 0.3°',
+      artificialityConfidence: 0.988,
+      contextDisruptionZScore: 5.4,
+      description: 'Reinforced concrete foundation slab with internal footing partition grid. Strict 90° corners contradict natural terrain fractures.'
+    },
+    {
+      id: 'ANO-GEO-SQ01',
+      shapeType: 'SQUARE',
+      estimatedDimensions: '6.2m × 6.2m (38.4 m²)',
+      cornerAngleOrthogonality: '90.0° ± 0.2°',
+      artificialityConfidence: 0.992,
+      contextDisruptionZScore: 5.6,
+      description: 'Subterranean elevator core / utility shaft. Strict 1.00 square aspect ratio with reinforced concrete walls.'
     },
     {
       id: 'ANO-GEO-REC02',
       shapeType: 'RECTANGLE',
-      estimatedDimensions: '8.5m × 3.8m (32.3 m²)',
+      estimatedDimensions: '18.5m × 9.2m (170.2 m²)',
+      cornerAngleOrthogonality: '89.5° ± 0.5°',
+      artificialityConfidence: 0.974,
+      contextDisruptionZScore: 4.9,
+      description: 'Central heavy machinery earthmoving pad and leveled soil grading platform.'
+    },
+    {
+      id: 'ANO-GEO-SQ02',
+      shapeType: 'SQUARE',
+      estimatedDimensions: '8.5m × 8.5m (72.3 m²)',
+      cornerAngleOrthogonality: '90.1° ± 0.4°',
+      artificialityConfidence: 0.968,
+      contextDisruptionZScore: 4.7,
+      description: 'Central structural excavation footing pit with vertical mechanical cut edges.'
+    },
+    {
+      id: 'ANO-GEO-SQ03',
+      shapeType: 'SQUARE',
+      estimatedDimensions: '7.8m × 7.8m (60.8 m²)',
+      cornerAngleOrthogonality: '89.9° ± 0.3°',
+      artificialityConfidence: 0.972,
+      contextDisruptionZScore: 4.8,
+      description: 'Upper residential perimeter building plot A structural footing.'
+    },
+    {
+      id: 'ANO-GEO-REC03',
+      shapeType: 'RECTANGLE',
+      estimatedDimensions: '11.2m × 6.8m (76.2 m²)',
       cornerAngleOrthogonality: '90.2° ± 0.4°',
-      artificialityConfidence: 0.942,
-      contextDisruptionZScore: 4.1,
-      description: 'Prefabricated reinforced equipment foundation with linear parallel containment curb.'
+      artificialityConfidence: 0.965,
+      contextDisruptionZScore: 4.6,
+      description: 'Upper residential perimeter building plot B ground floor slab.'
+    },
+    {
+      id: 'ANO-GEO-REC04',
+      shapeType: 'RECTANGLE',
+      estimatedDimensions: '8.0m × 3.5m (28.0 m²)',
+      cornerAngleOrthogonality: '89.6° ± 0.5°',
+      artificialityConfidence: 0.958,
+      contextDisruptionZScore: 4.3,
+      description: 'Prefabricated concrete blocks and construction material staging platform.'
+    },
+    {
+      id: 'ANO-GEO-REC05',
+      shapeType: 'RECTANGLE',
+      estimatedDimensions: '16.0m × 7.0m (112.0 m²)',
+      cornerAngleOrthogonality: '89.4° ± 0.6°',
+      artificialityConfidence: 0.962,
+      contextDisruptionZScore: 4.5,
+      description: 'Southern retention drainage basin excavation and foundation trench cut.'
+    },
+    {
+      id: 'ANO-GEO-SQ04',
+      shapeType: 'SQUARE',
+      estimatedDimensions: '5.4m × 5.4m (29.2 m²)',
+      cornerAngleOrthogonality: '90.0° ± 0.3°',
+      artificialityConfidence: 0.981,
+      contextDisruptionZScore: 5.1,
+      description: 'Southern pump station / sump vault concrete footing.'
     },
     {
       id: 'ANO-GEO-LN01',
       shapeType: 'LINEAR_TRENCH',
-      estimatedDimensions: '32.0m length × 1.8m width',
-      cornerAngleOrthogonality: 'Bearing 014.5° NNE',
-      artificialityConfidence: 0.935,
-      contextDisruptionZScore: 3.9,
-      description: 'Mechanical linear ditch connecting active bunker coordinates to perimeter fence.'
+      estimatedDimensions: '36.0m length × 2.0m width',
+      cornerAngleOrthogonality: 'Bearing 348.0° NNW',
+      artificialityConfidence: 0.952,
+      contextDisruptionZScore: 4.2,
+      description: 'Main linear utility conduit trench traversing across active earthworks.'
     }
   ];
 
@@ -239,111 +293,185 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
             </div>
           </div>
 
-          {/* GEOMETRIC PATTERN OVERLAYS (SQUARES & RECTANGLES) */}
+          {/* GEOMETRIC PATTERN OVERLAYS (FULL ACTIVE CONSTRUCTION COMPLEX: 10 SITES) */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: overlayOpacity }}>
             
-            {/* 1. SQUARE ANOMALY (ANO-GEO-SQ01) */}
-            {(activeLayer === 'ALL' || activeLayer === 'SQUARES') && (
-              <div 
-                className="absolute top-[28%] left-[58%] w-[160px] h-[160px] border-2 border-yellow-400 bg-yellow-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-yellow-500/25 group shadow-[0_0_15px_rgba(250,204,21,0.3)]"
-                onClick={handleOpenReview}
-                title="Click to review square bunker anomaly"
-              >
-                {/* 4 Corner Orthogonal 90° Ticks */}
-                <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-yellow-300"></div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-yellow-300"></div>
-                <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-yellow-300"></div>
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-yellow-300"></div>
-
-                {/* Top Badge */}
-                <div className="absolute -top-6 left-0 bg-yellow-400 text-black px-1.5 py-0.2 font-mono font-black text-[9px] flex items-center space-x-1 whitespace-nowrap shadow-md">
-                  <span>◼ SQUARE #1: 5.2m × 5.2m</span>
-                  <span className="bg-black text-yellow-400 px-1 text-[8px]">90.0° ORTHO</span>
-                </div>
-
-                {/* Center Cross */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                  <div className="w-6 h-0.5 bg-yellow-400"></div>
-                  <div className="h-6 w-0.5 bg-yellow-400 absolute"></div>
-                </div>
-
-                {/* Bottom Detail on Hover */}
-                {showDimensions && (
-                  <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-yellow-400/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center">
-                    REINFORCED BUNKER SHAFT // 98.4% ARTIFICIAL
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 2. RECTANGLE ANOMALY (ANO-GEO-REC01) */}
+            {/* 1. LARGE CONCRETE FOUNDATION SLAB (ANO-GEO-REC01) */}
             {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
               <div 
-                className="absolute top-[42%] left-[18%] w-[240px] h-[110px] border-2 border-cyan-400 bg-cyan-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-cyan-500/25 group shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+                className="absolute top-[26%] left-[8%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-cyan-500/25 group shadow-[0_0_15px_rgba(34,211,238,0.3)]"
                 onClick={handleOpenReview}
-                title="Click to review rectangular excavation platform"
+                title="Click to review reinforced foundation slab (24.5m × 12.0m)"
               >
-                {/* 4 Corner Ticks */}
                 <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-300"></div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-300"></div>
                 <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-300"></div>
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-300"></div>
 
-                {/* Top Badge */}
-                <div className="absolute -top-6 left-0 bg-cyan-400 text-black px-1.5 py-0.2 font-mono font-black text-[9px] flex items-center space-x-1 whitespace-nowrap shadow-md">
-                  <span>▬ RECTANGLE #1: 16.4m × 7.2m</span>
-                  <span className="bg-black text-cyan-400 px-1 text-[8px]">89.7°</span>
+                <div className="absolute -top-5 left-0 bg-cyan-400 text-black px-1.5 py-0.2 font-mono font-black text-[8px] flex items-center space-x-1 whitespace-nowrap shadow-md">
+                  <span>■ RECT #1: 24.5m × 12.0m</span>
+                  <span className="bg-black text-cyan-400 px-1 text-[7px]">89.8° ORTHO</span>
                 </div>
 
-                {/* Dimension calipers */}
                 {showDimensions && (
-                  <>
-                    <div className="absolute -right-7 top-1/2 -translate-y-1/2 text-[8px] font-mono text-cyan-300 bg-black/80 px-1 border border-cyan-500">
-                      7.2m
-                    </div>
-                    <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-cyan-400/80 text-cyan-300 px-1 py-0.2 text-[8px] font-mono text-center">
-                      CONCEALED EXCAVATION PLATFORM // CAMOUFLAGE NETTING
-                    </div>
-                  </>
+                  <div className="absolute -bottom-4 left-0 right-0 bg-black/90 border border-cyan-400/80 text-cyan-300 px-1 py-0.2 text-[7px] font-mono text-center">
+                    CONCRETE FOUNDATION SLAB & FOOTING GRID // 294 m²
+                  </div>
                 )}
               </div>
             )}
 
-            {/* 3. SECOND RECTANGLE (ANO-GEO-REC02) */}
-            {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
+            {/* 2. ELEVATOR / CORE SHAFT (ANO-GEO-SQ01) */}
+            {(activeLayer === 'ALL' || activeLayer === 'SQUARES') && (
               <div 
-                className="absolute top-[68%] left-[44%] w-[150px] h-[75px] border-2 border-emerald-400 bg-emerald-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-emerald-500/25 shadow-[0_0_12px_rgba(52,211,153,0.3)]"
+                className="absolute top-[30%] left-[16%] w-[11%] h-[13%] border-2 border-yellow-400 bg-yellow-500/25 pointer-events-auto cursor-pointer transition-all hover:bg-yellow-500/35 group shadow-[0_0_15px_rgba(250,204,21,0.4)]"
                 onClick={handleOpenReview}
-                title="Click to review equipment foundation"
+                title="Click to review reinforced core shaft (6.2m × 6.2m)"
               >
-                <div className="absolute -top-5 left-0 bg-emerald-400 text-black px-1.5 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
-                  RECT #2: 8.5m × 3.8m [FOUNDATION]
+                <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-yellow-300"></div>
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-yellow-300"></div>
+                <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-yellow-300"></div>
+                <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-yellow-300"></div>
+
+                <div className="absolute -top-5 left-0 bg-yellow-400 text-black px-1 py-0.2 font-mono font-black text-[8px] flex items-center space-x-1 whitespace-nowrap shadow-md">
+                  <span>◼ SQUARE #1: 6.2m</span>
+                  <span className="bg-black text-yellow-400 px-1 text-[7px]">90.0°</span>
                 </div>
               </div>
             )}
 
-            {/* 4. LINEAR TRENCH VECTORS */}
+            {/* 3. CENTRAL EARTHMOVING & GRADING PAD (ANO-GEO-REC02) */}
+            {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
+              <div 
+                className="absolute top-[46%] left-[36%] w-[26%] h-[20%] border-2 border-amber-400 bg-amber-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
+                onClick={handleOpenReview}
+                title="Click to review heavy machinery earthmoving pad (18.5m × 9.2m)"
+              >
+                <div className="absolute -top-5 left-0 bg-amber-400 text-black px-1.5 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
+                  ■ RECT #2: 18.5m × 9.2m [GRADING PAD]
+                </div>
+                {showDimensions && (
+                  <div className="absolute -bottom-4 left-0 right-0 bg-black/90 border border-amber-400/80 text-amber-300 px-1 py-0.2 text-[7px] font-mono text-center">
+                    LEVELED SOIL WORKSTATION // 170.2 m²
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 4. CENTRAL FOOTING EXCAVATION PIT (ANO-GEO-SQ02) */}
+            {(activeLayer === 'ALL' || activeLayer === 'SQUARES') && (
+              <div 
+                className="absolute top-[50%] left-[56%] w-[13%] h-[14%] border-2 border-yellow-400 bg-yellow-500/20 pointer-events-auto cursor-pointer transition-all hover:bg-yellow-500/30"
+                onClick={handleOpenReview}
+                title="Click to review central structural footing pit (8.5m × 8.5m)"
+              >
+                <div className="absolute -top-5 left-0 bg-yellow-400 text-black px-1 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
+                  ◼ SQ #2: 8.5m [FOOTING]
+                </div>
+              </div>
+            )}
+
+            {/* 5. UPPER RESIDENTIAL LOT A FOOTING (ANO-GEO-SQ03) */}
+            {(activeLayer === 'ALL' || activeLayer === 'SQUARES') && (
+              <div 
+                className="absolute top-[14%] left-[56%] w-[14%] h-[13%] border-2 border-yellow-400 bg-yellow-500/20 pointer-events-auto cursor-pointer transition-all hover:bg-yellow-500/30"
+                onClick={handleOpenReview}
+                title="Click to review residential lot A footing (7.8m × 7.8m)"
+              >
+                <div className="absolute -top-5 left-0 bg-yellow-400 text-black px-1 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
+                  ◼ SQ #3: 7.8m [LOT A]
+                </div>
+              </div>
+            )}
+
+            {/* 6. UPPER RESIDENTIAL LOT B SLAB (ANO-GEO-REC03) */}
+            {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
+              <div 
+                className="absolute top-[16%] left-[73%] w-[16%] h-[12%] border border-cyan-400 bg-cyan-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-cyan-500/25"
+                onClick={handleOpenReview}
+                title="Click to review residential lot B slab (11.2m × 6.8m)"
+              >
+                <div className="absolute -top-5 left-0 bg-cyan-400 text-black px-1 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
+                  ■ RECT #3: 11.2m [LOT B]
+                </div>
+              </div>
+            )}
+
+            {/* 7. PREFABRICATED MATERIAL STAGING (ANO-GEO-REC04) */}
+            {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
+              <div 
+                className="absolute top-[36%] left-[68%] w-[15%] h-[8%] border border-emerald-400 bg-emerald-500/20 pointer-events-auto cursor-pointer transition-all hover:bg-emerald-500/30"
+                onClick={handleOpenReview}
+                title="Click to review prefab material staging (8.0m × 3.5m)"
+              >
+                <div className="absolute -top-5 left-0 bg-emerald-400 text-black px-1 py-0.2 font-mono font-black text-[7px] whitespace-nowrap">
+                  ■ RECT #4: 8.0m [STAGING]
+                </div>
+              </div>
+            )}
+
+            {/* 8. SOUTHERN RETENTION BASIN DRAINAGE TRENCH (ANO-GEO-REC05) */}
+            {(activeLayer === 'ALL' || activeLayer === 'RECTANGLES') && (
+              <div 
+                className="absolute top-[66%] left-[50%] w-[26%] h-[17%] border border-cyan-400 bg-cyan-500/15 pointer-events-auto cursor-pointer transition-all hover:bg-cyan-500/25"
+                onClick={handleOpenReview}
+                title="Click to review retention drainage cut (16.0m × 7.0m)"
+              >
+                <div className="absolute -top-5 left-0 bg-cyan-400 text-black px-1 py-0.2 font-mono font-black text-[8px] whitespace-nowrap">
+                  ■ RECT #5: 16.0m [DRAINAGE CUT]
+                </div>
+              </div>
+            )}
+
+            {/* 9. SOUTHERN PUMP STATION / SUMP VAULT (ANO-GEO-SQ04) */}
+            {(activeLayer === 'ALL' || activeLayer === 'SQUARES') && (
+              <div 
+                className="absolute top-[70%] left-[80%] w-[10%] h-[10%] border-2 border-yellow-400 bg-yellow-500/20 pointer-events-auto cursor-pointer transition-all hover:bg-yellow-500/30"
+                onClick={handleOpenReview}
+                title="Click to review sump vault footing (5.4m × 5.4m)"
+              >
+                <div className="absolute -top-5 left-0 bg-yellow-400 text-black px-1 py-0.2 font-mono font-black text-[7px] whitespace-nowrap">
+                  ◼ SQ #4: 5.4m [VAULT]
+                </div>
+              </div>
+            )}
+
+            {/* 10. MAIN LINEAR UTILITY CONDUIT TRENCH (ANO-GEO-LN01) */}
             {(activeLayer === 'ALL' || activeLayer === 'TRENCHES') && (
-              <div className="absolute top-[52%] left-[34%] w-[200px] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-15deg]">
-                <span className="absolute -top-4 left-6 bg-fuchsia-950/90 text-fuchsia-300 px-1 text-[8px] font-mono border border-fuchsia-500">
-                  ANO-TRENCH: 32m RUN @ 14.5°
+              <div className="absolute top-[48%] left-[20%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
+                <span className="absolute -top-4 left-8 bg-fuchsia-950/90 text-fuchsia-300 px-1 text-[8px] font-mono border border-fuchsia-500 whitespace-nowrap">
+                  ⫽ PIPELINE TRENCH: 36.0m RUN @ 348°
                 </span>
               </div>
             )}
 
             {/* Infiltration Specific Overlay (When Scene 2 / CAM-7 is active) */}
             {activeScene.id === '7' && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="p-3 bg-red-950/80 border-2 border-status-red text-white font-mono text-center space-y-1 animate-pulse shadow-lg">
-                  <div className="text-sm font-bold text-status-red">⚠️ BORDER INFILTRATION DETECTED</div>
-                  <div className="text-[11px] text-gray-200">
-                    4 DISMOUNTED PERSONNEL CROSSING BORDER DITCH LINE // SECTOR BRAVO
-                  </div>
-                  <div className="text-[10px] text-status-amber">
-                    GAIT & GAUSSIAN SHADOW TRACK VERIFIED (Z-SCORE: +4.9σ)
+              !activeFeed.fileName ? (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="p-3 bg-red-950/80 border-2 border-status-red text-white font-mono text-center space-y-1 animate-pulse shadow-lg">
+                    <div className="text-sm font-bold text-status-red">⚠️ BORDER INFILTRATION DETECTED</div>
+                    <div className="text-[11px] text-gray-200">
+                      4 DISMOUNTED PERSONNEL CROSSING BORDER DITCH LINE // SECTOR BRAVO
+                    </div>
+                    <div className="text-[10px] text-status-amber">
+                      GAIT & GAUSSIAN SHADOW TRACK VERIFIED (Z-SCORE: +4.9σ)
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="p-3 bg-emerald-950/80 border-2 border-status-green text-white font-mono text-center space-y-1 shadow-lg">
+                    <div className="text-sm font-bold text-status-green">✓ BORDER PERIMETER SECURE</div>
+                    <div className="text-[11px] text-gray-200">
+                      CUSTOM FOOTAGE LOADED ({activeFeed.fileName}): ZERO INFILTRATION DETECTED
+                    </div>
+                    <div className="text-[10px] text-tactical-light">
+                      NO PERSONS, VEHICLES, OR BOUNDARY VIOLATIONS PRESENT
+                    </div>
+                  </div>
+                </div>
+              )
             )}
 
           </div>
@@ -531,18 +659,25 @@ export const CamouflageGeometricViewer: React.FC<CamouflageGeometricViewerProps>
 
           {/* Identified Shape Measurements Summary */}
           <div className="pt-2 border-t border-tactical-olive/60 space-y-1.5">
-            <span className="text-[10px] text-tactical-light block font-bold">EXTRACTED SHAPES & FOOTPRINTS:</span>
-            {geometricItems.slice(0, 3).map((g, idx) => (
-              <div key={idx} className="p-1.5 bg-black/40 border border-tactical-olive/50 text-[10px] space-y-0.5">
-                <div className="flex justify-between items-center font-bold">
-                  <span className="text-status-amber">{g.shapeType}: {g.estimatedDimensions}</span>
-                  <span className="text-tactical-green">{g.cornerAngleOrthogonality.split(' ')[0]}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] text-tactical-light font-bold">EXTRACTED SITES & FOOTPRINTS:</span>
+              <span className="text-[9px] bg-status-amber/20 text-status-amber border border-status-amber/60 px-1 font-bold">
+                {geometricItems.length} STRUCTURES
+              </span>
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1 pr-0.5">
+              {geometricItems.map((g, idx) => (
+                <div key={idx} className="p-1.5 bg-black/40 border border-tactical-olive/50 text-[10px] space-y-0.5 hover:border-status-amber transition-colors">
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-status-amber">{g.shapeType}: {g.estimatedDimensions.split(' ')[0]} {g.estimatedDimensions.split(' ')[1] || ''}</span>
+                    <span className="text-tactical-green">{g.cornerAngleOrthogonality.split(' ')[0]}</span>
+                  </div>
+                  <div className="text-gray-300 font-sans text-[9px] leading-tight">
+                    {g.description.substring(0, 75)}...
+                  </div>
                 </div>
-                <div className="text-gray-300 font-sans text-[10px] leading-tight">
-                  {g.description.substring(0, 75)}...
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Operator Action Buttons */}

@@ -108,31 +108,94 @@ export function createForensicDossier(params: {
   const defaultGeometrics: GeometricMeasurement[] = params.targetClass === 'CAMOUFLAGED_ASSET' || params.sensorId === '8'
     ? [
         {
-          id: 'GEO-SQ-01',
-          shapeType: 'SQUARE',
-          estimatedDimensions: '5.2m × 5.2m (27.0 m²)',
-          cornerAngleOrthogonality: '90.0° ± 0.4° (4 corners confirmed)',
-          artificialityConfidence: 0.984,
-          contextDisruptionZScore: 5.2,
-          description: 'Subterranean reinforced shaft / command bunker perimeter. Orthogonal 90° corners strictly reject natural fractal terrain geometry.'
-        },
-        {
           id: 'GEO-REC-01',
           shapeType: 'RECTANGLE',
-          estimatedDimensions: '16.4m × 7.2m (118.1 m²)',
-          cornerAngleOrthogonality: '89.7° ± 0.6°',
+          estimatedDimensions: '24.5m × 12.0m (294.0 m²)',
+          cornerAngleOrthogonality: '89.8° ± 0.3° (4 corners confirmed)',
+          artificialityConfidence: 0.988,
+          contextDisruptionZScore: 5.4,
+          description: 'Reinforced concrete foundation slab with partitioned internal footing grid. Orthogonal 90° corners strictly reject natural terrain fractals.'
+        },
+        {
+          id: 'GEO-SQ-01',
+          shapeType: 'SQUARE',
+          estimatedDimensions: '6.2m × 6.2m (38.4 m²)',
+          cornerAngleOrthogonality: '90.0° ± 0.2° (4 corners confirmed)',
+          artificialityConfidence: 0.992,
+          contextDisruptionZScore: 5.6,
+          description: 'Subterranean elevator core / reinforced utility shaft. Strict 1.00 aspect ratio and orthogonal walls.'
+        },
+        {
+          id: 'GEO-REC-02',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '18.5m × 9.2m (170.2 m²)',
+          cornerAngleOrthogonality: '89.5° ± 0.5°',
+          artificialityConfidence: 0.974,
+          contextDisruptionZScore: 4.9,
+          description: 'Central heavy machinery earthmoving and leveled soil grading pad. Sharp geometric cuts in red clay matrix.'
+        },
+        {
+          id: 'GEO-SQ-02',
+          shapeType: 'SQUARE',
+          estimatedDimensions: '8.5m × 8.5m (72.3 m²)',
+          cornerAngleOrthogonality: '90.1° ± 0.4°',
           artificialityConfidence: 0.968,
           contextDisruptionZScore: 4.7,
-          description: 'Concealed excavation platform / prefabricated equipment shelter masked with modular foliage netting weave.'
+          description: 'Central structural excavation footing pit with excavated vertical trench walls.'
+        },
+        {
+          id: 'GEO-SQ-03',
+          shapeType: 'SQUARE',
+          estimatedDimensions: '7.8m × 7.8m (60.8 m²)',
+          cornerAngleOrthogonality: '89.9° ± 0.3°',
+          artificialityConfidence: 0.972,
+          contextDisruptionZScore: 4.8,
+          description: 'Upper residential perimeter building plot A structural footing.'
+        },
+        {
+          id: 'GEO-REC-03',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '11.2m × 6.8m (76.2 m²)',
+          cornerAngleOrthogonality: '90.2° ± 0.4°',
+          artificialityConfidence: 0.965,
+          contextDisruptionZScore: 4.6,
+          description: 'Upper residential perimeter building plot B ground floor slab.'
+        },
+        {
+          id: 'GEO-REC-04',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '8.0m × 3.5m (28.0 m²)',
+          cornerAngleOrthogonality: '89.6° ± 0.5°',
+          artificialityConfidence: 0.958,
+          contextDisruptionZScore: 4.3,
+          description: 'Prefabricated concrete blocks and construction material staging platform.'
+        },
+        {
+          id: 'GEO-REC-05',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '16.0m × 7.0m (112.0 m²)',
+          cornerAngleOrthogonality: '89.4° ± 0.6°',
+          artificialityConfidence: 0.962,
+          contextDisruptionZScore: 4.5,
+          description: 'Southern retention drainage basin excavation and foundation trench cut.'
+        },
+        {
+          id: 'GEO-SQ-04',
+          shapeType: 'SQUARE',
+          estimatedDimensions: '5.4m × 5.4m (29.2 m²)',
+          cornerAngleOrthogonality: '90.0° ± 0.3°',
+          artificialityConfidence: 0.981,
+          contextDisruptionZScore: 5.1,
+          description: 'Southern pump station / sump vault concrete footing.'
         },
         {
           id: 'GEO-LN-01',
           shapeType: 'LINEAR_TRENCH',
-          estimatedDimensions: '32.0m length × 1.8m width',
-          cornerAngleOrthogonality: 'Parallel offset 14.5° NNE',
-          artificialityConfidence: 0.945,
-          contextDisruptionZScore: 4.1,
-          description: 'Linear mechanical trenching connecting excavation zones. Man-made ditch gradient verified under spatial gradient filter.'
+          estimatedDimensions: '36.0m length × 2.0m width',
+          cornerAngleOrthogonality: 'Bearing 348.0° NNW (Linear Run)',
+          artificialityConfidence: 0.952,
+          contextDisruptionZScore: 4.2,
+          description: 'Main linear utility conduit trench traversing across active earthworks.'
         }
       ]
     : params.targetClass === 'HUMAN_INFILTRATION' || params.sensorId === '7'

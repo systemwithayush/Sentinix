@@ -428,6 +428,7 @@ function App() {
   const [reviewNote, setReviewNote] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+  const [showDetectionOverlays, setShowDetectionOverlays] = useState<boolean>(true);
 
   // Video Refs & Time formatting
 
@@ -546,6 +547,31 @@ function App() {
       }
       return c;
     }));
+
+    // If custom video uploaded on CAM-7 without humans, update alert alt-007
+    if (camId === '7') {
+      setAlerts(prev => prev.map(a => {
+        if (a.id === 'alt-007') {
+          return {
+            ...a,
+            reviewStatus: 'REVIEWED',
+            disposition: 'NOT_RELEVANT',
+            description: `Custom footage uploaded (${file.name}): Sector boundary scanned. Zero infiltration or human movement detected. Demarcation line clear.`
+          };
+        }
+        return a;
+      }));
+    } else if (camId === '8') {
+      setAlerts(prev => prev.map(a => {
+        if (a.id === 'alt-008') {
+          return {
+            ...a,
+            description: `Custom drone footage uploaded (${file.name}): Active construction complex identified with 8+ geometric structures (foundations, excavation pits, grading pads).`
+          };
+        }
+        return a;
+      }));
+    }
   };
 
   // Toggle single camera playback
@@ -866,6 +892,17 @@ function App() {
               
               <div className="flex items-center space-x-2 font-mono text-[10px]">
                 <button
+                  onClick={() => setShowDetectionOverlays(!showDetectionOverlays)}
+                  className={`px-2 py-1 border transition-colors ${
+                    showDetectionOverlays
+                      ? 'bg-status-amber/20 border-status-amber text-status-amber hover:bg-status-amber hover:text-black font-bold'
+                      : 'bg-black/50 border-tactical-olive text-tactical-light hover:text-white'
+                  }`}
+                  title="Toggle tactical AI detection overlays on all feeds"
+                >
+                  👁️ {showDetectionOverlays ? 'DETECTIONS ON' : 'DETECTIONS HIDDEN'}
+                </button>
+                <button
                   onClick={togglePlayAll}
                   className="px-2 py-1 bg-tactical-olive/50 border border-tactical-green hover:bg-tactical-green hover:text-black text-white transition-colors"
                 >
@@ -914,7 +951,7 @@ function App() {
                         onClick={() => setSelectedCamId(null)}
                         className="px-3 py-1 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-xs transition-colors"
                       >
-                        [ ✖ MINIMIZE TO 6 FEEDS ]
+                        [ ✖ MINIMIZE TO 8 FEEDS ]
                       </button>
                     </div>
                   </div>
@@ -934,6 +971,118 @@ function App() {
                       }}
                       className="w-full h-full"
                     />
+
+                    {/* Single Cam Expanded Overlays for CAM-8 (Construction) */}
+                    {showDetectionOverlays && selectedCam.id === '8' && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* 1. Large Concrete Foundation Slab */}
+                        <div className="absolute top-[26%] left-[8%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.3)]">
+                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ■ RECT #1: 24.5m × 12.0m [FOUNDATION SLAB // 294 m²]
+                          </span>
+                        </div>
+
+                        {/* 2. Reinforced Core Shaft */}
+                        <div className="absolute top-[30%] left-[16%] w-[11%] h-[13%] border-2 border-yellow-400 bg-yellow-500/25 shadow-[0_0_10px_rgba(250,204,21,0.4)]">
+                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ◼ SQ #1: 6.2m × 6.2m [CORE SHAFT]
+                          </span>
+                        </div>
+
+                        {/* 3. Central Grading Pad */}
+                        <div className="absolute top-[46%] left-[36%] w-[26%] h-[20%] border-2 border-amber-400 bg-amber-500/15 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                          <span className="absolute -top-3.5 left-0 bg-amber-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ■ RECT #2: 18.5m × 9.2m [GRADING PAD]
+                          </span>
+                        </div>
+
+                        {/* 4. Central Excavation Pit */}
+                        <div className="absolute top-[50%] left-[56%] w-[13%] h-[14%] border-2 border-yellow-400 bg-yellow-500/20">
+                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ◼ SQ #2: 8.5m [FOOTING]
+                          </span>
+                        </div>
+
+                        {/* 5. Residential Lot A */}
+                        <div className="absolute top-[14%] left-[56%] w-[14%] h-[13%] border-2 border-yellow-400 bg-yellow-500/20">
+                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ◼ SQ #3: 7.8m [LOT A]
+                          </span>
+                        </div>
+
+                        {/* 6. Residential Lot B */}
+                        <div className="absolute top-[16%] left-[73%] w-[16%] h-[12%] border border-cyan-400 bg-cyan-500/15">
+                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ■ RECT #3: 11.2m [LOT B]
+                          </span>
+                        </div>
+
+                        {/* 7. Material Staging */}
+                        <div className="absolute top-[36%] left-[68%] w-[15%] h-[8%] border border-emerald-400 bg-emerald-500/20">
+                          <span className="absolute -top-3.5 left-0 bg-emerald-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ■ RECT #4: 8.0m [STAGING]
+                          </span>
+                        </div>
+
+                        {/* 8. Southern Retention Basin */}
+                        <div className="absolute top-[66%] left-[50%] w-[26%] h-[17%] border border-cyan-400 bg-cyan-500/15">
+                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ■ RECT #5: 16.0m [DRAINAGE CUT]
+                          </span>
+                        </div>
+
+                        {/* 9. Sump Vault */}
+                        <div className="absolute top-[70%] left-[80%] w-[10%] h-[10%] border-2 border-yellow-400 bg-yellow-500/20">
+                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                            ◼ SQ #4: 5.4m [VAULT]
+                          </span>
+                        </div>
+
+                        {/* 10. Pipeline Trench */}
+                        <div className="absolute top-[48%] left-[20%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
+                          <span className="absolute -top-4 left-10 bg-fuchsia-950/90 text-fuchsia-300 px-1 text-[7px] font-mono border border-fuchsia-500 whitespace-nowrap">
+                            ⫽ PIPELINE TRENCH: 36.0m RUN @ 348°
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Single Cam Expanded Overlays for CAM-7 (Infiltration vs Clear Check) */}
+                    {showDetectionOverlays && selectedCam.id === '7' && (
+                      !selectedCam.fileName ? (
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                          <div className="absolute top-4 left-4 right-4 bg-red-950/95 border border-status-red text-white p-2 font-mono text-xs flex justify-between items-center shadow-lg">
+                            <span className="font-bold text-status-red flex items-center">
+                              <span className="w-2 h-2 rounded-full bg-status-red mr-2 animate-ping"></span>
+                              FLAGGED: BORDER INFILTRATION DETECTED
+                            </span>
+                            <span className="bg-black text-white px-2 py-0.5 border border-status-red text-[10px]">
+                              4 DISMOUNTED PERSONNEL // CULVERT CROSSING
+                            </span>
+                          </div>
+                          <div className="w-24 h-32 border-2 border-status-red bg-status-red/20 relative -translate-x-12 translate-y-4">
+                            <span className="absolute -top-4 left-0 bg-status-red text-black text-[9px] font-bold px-1">
+                              PERS-01 (0.94)
+                            </span>
+                          </div>
+                          <div className="w-20 h-28 border-2 border-status-red bg-status-red/20 relative translate-x-12 -translate-y-4">
+                            <span className="absolute -top-4 left-0 bg-status-red text-black text-[9px] font-bold px-1">
+                              PERS-02 (0.91)
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border border-status-green text-status-green p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
+                          <span className="font-bold flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-status-green mr-2"></span>
+                            BORDER DEMARCATION LINE CLEAR // NO HUMAN INFILTRATION DETECTED
+                          </span>
+                          <span className="bg-black text-white px-2 py-0.5 border border-status-green text-[10px]">
+                            0 TARGETS // INTACT PERIMETER
+                          </span>
+                        </div>
+                      )
+                    )}
 
                     {/* AI Frame Inference Result Overlay */}
                     {activeFrameAIResult && (
@@ -1121,20 +1270,32 @@ function App() {
                       </div>
 
                       {/* Tactical Detection Banner for CAM-7 (Human Infiltration) */}
-                      {cam.id === '7' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                          <span className="font-bold text-status-red flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            FLAGGED: HUMAN INFILTRATION
-                          </span>
-                          <span className="bg-black/80 text-white px-1 border border-status-red text-[8px]">
-                            4 DISMOUNTED
-                          </span>
-                        </div>
+                      {showDetectionOverlays && cam.id === '7' && (
+                        !cam.fileName ? (
+                          <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                            <span className="font-bold text-status-red flex items-center">
+                              <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                              FLAGGED: HUMAN INFILTRATION
+                            </span>
+                            <span className="bg-black/80 text-white px-1 border border-status-red text-[8px]">
+                              4 DISMOUNTED
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/90 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                            <span className="font-bold flex items-center">
+                              <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1"></span>
+                              SECTOR CLEAR // NO INFILTRATION DETECTED
+                            </span>
+                            <span className="bg-black/80 text-white px-1 border border-status-green text-[8px]">
+                              0 TARGETS
+                            </span>
+                          </div>
+                        )
                       )}
 
-                      {/* Tactical Dynamic Bounding Boxes for CAM-7 in Grid */}
-                      {cam.id === '7' && (
+                      {/* Tactical Dynamic Bounding Boxes for CAM-7 in Grid - ONLY when NOT a custom clear video */}
+                      {showDetectionOverlays && cam.id === '7' && !cam.fileName && (
                         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                           <div className="w-16 h-20 border border-status-red/90 bg-status-red/15 relative -translate-x-5 translate-y-2">
                             <span className="absolute -top-3.5 left-0 bg-status-red text-black text-[7px] font-bold px-0.5">
@@ -1149,32 +1310,96 @@ function App() {
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-8 (Camouflaged Construction) */}
-                      {cam.id === '8' && (
+                      {/* Tactical Detection Banner for CAM-8 (Active Construction Complex) */}
+                      {showDetectionOverlays && cam.id === '8' && (
                         <div className="absolute top-7 left-1.5 right-1.5 bg-amber-950/95 border border-status-amber text-status-amber px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
                           <span className="font-bold flex items-center">
                             <span className="w-1.5 h-1.5 rounded-full bg-status-amber mr-1 animate-ping"></span>
-                            FLAGGED: CONCEALED CONSTRUCTION
+                            FLAGGED: CONSTRUCTION COMPLEX
                           </span>
                           <span className="bg-black/80 text-yellow-300 px-1 border border-status-amber text-[8px]">
-                            SQUARE + RECT
+                            8+ SITES (SQUARES & RECTS)
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical Geometric Shapes Overlaid on CAM-8 in Grid */}
-                      {cam.id === '8' && (
-                        <div className="absolute inset-0 pointer-events-none">
-                          {/* Square Excavation Shaft */}
-                          <div className="absolute top-[32%] right-[14%] w-12 h-12 border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_8px_rgba(250,204,21,0.4)]">
-                            <span className="absolute -top-3 left-0 bg-yellow-400 text-black text-[7px] font-bold px-0.5">
-                              ◼ SQUARE 5.2m
+                      {/* Tactical Geometric Shapes Overlaid on CAM-8 in Grid (Full Multi-Structure Mapping) */}
+                      {showDetectionOverlays && cam.id === '8' && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          {/* 1. Large Concrete Foundation Slab (Upper-Left Main Structure) */}
+                          <div className="absolute top-[26%] left-[8%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 24.5m [SLAB]
                             </span>
                           </div>
-                          {/* Rectangle Excavation Platform */}
-                          <div className="absolute bottom-[20%] left-[12%] w-20 h-10 border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
-                            <span className="absolute -top-3 left-0 bg-cyan-400 text-black text-[7px] font-bold px-0.5">
-                              ▬ RECT 16.4m
+
+                          {/* 2. Reinforced Elevator / Utility Core Shaft */}
+                          <div className="absolute top-[30%] left-[16%] w-[11%] h-[13%] border-2 border-yellow-400 bg-yellow-500/25 shadow-[0_0_6px_rgba(250,204,21,0.4)]">
+                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ◼ SQ 6.2m
+                            </span>
+                          </div>
+
+                          {/* 3. East Building Footing Trench */}
+                          <div className="absolute top-[38%] left-[26%] w-[13%] h-[10%] border border-cyan-400 bg-cyan-500/15">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 9.8m
+                            </span>
+                          </div>
+
+                          {/* 4. Central Heavy Earthmoving & Soil Grading Pad */}
+                          <div className="absolute top-[46%] left-[36%] w-[26%] h-[20%] border-2 border-amber-400 bg-amber-500/15 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
+                            <span className="absolute -top-2.5 left-0 bg-amber-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 18.5m [GRADING PAD]
+                            </span>
+                          </div>
+
+                          {/* 5. Central Footing Excavation Pit */}
+                          <div className="absolute top-[50%] left-[56%] w-[13%] h-[14%] border-2 border-yellow-400 bg-yellow-500/20">
+                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ◼ SQ 8.5m [FOOTING]
+                            </span>
+                          </div>
+
+                          {/* 6. Upper Residential Lot A Structural Footing */}
+                          <div className="absolute top-[14%] left-[56%] w-[14%] h-[13%] border-2 border-yellow-400 bg-yellow-500/20">
+                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ◼ SQ 7.8m [LOT A]
+                            </span>
+                          </div>
+
+                          {/* 7. Upper Residential Lot B Perimeter Slab */}
+                          <div className="absolute top-[16%] left-[73%] w-[16%] h-[12%] border border-cyan-400 bg-cyan-500/15">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 11.2m [LOT B]
+                            </span>
+                          </div>
+
+                          {/* 8. Prefabricated Material Blocks & Staging Zone */}
+                          <div className="absolute top-[36%] left-[68%] w-[15%] h-[8%] border border-emerald-400 bg-emerald-500/20">
+                            <span className="absolute -top-2.5 left-0 bg-emerald-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 8.0m [STAGING]
+                            </span>
+                          </div>
+
+                          {/* 9. Southern Retention Drainage Trench */}
+                          <div className="absolute top-[66%] left-[50%] w-[26%] h-[17%] border border-cyan-400 bg-cyan-500/15">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ■ RECT 16.0m [DRAINAGE CUT]
+                            </span>
+                          </div>
+
+                          {/* 10. Southern Pump Station / Sump Vault */}
+                          <div className="absolute top-[70%] left-[80%] w-[10%] h-[10%] border-2 border-yellow-400 bg-yellow-500/20">
+                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ◼ SQ 5.4m [VAULT]
+                            </span>
+                          </div>
+
+                          {/* 11. Main Utility Conduit Trench Line */}
+                          <div className="absolute top-[48%] left-[20%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
+                            <span className="absolute -top-3 left-6 bg-fuchsia-950/90 text-fuchsia-300 px-0.5 text-[5px] font-mono border border-fuchsia-500 whitespace-nowrap">
+                              ⫽ PIPELINE TRENCH: 36.0m
                             </span>
                           </div>
                         </div>
