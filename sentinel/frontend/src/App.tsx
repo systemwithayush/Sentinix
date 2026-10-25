@@ -248,13 +248,16 @@ const INITIAL_ALERTS: Alert[] = [
     id: 'alt-007',
     cam: 'CAM-7',
     cameraId: '7',
-    module: 'Boundary Infiltration',
-    threatLevel: 3,
-    description: 'FLAGGED: 4 dismounted personnel traversing international boundary line at culvert breach (Sector Bravo MGRS 43R XA 8995 1230)',
+    module: 'Boundary Perimeter',
+    threatLevel: 1,
+    description: 'AUDITED: Border Watchtower Demarcation Line verified clear. Zero human infiltrations detected (Sector Bravo MGRS 43R XA 8995 1230)',
     time: '15:10:22',
     timestamp: '2026-10-25T15:10:22',
-    reviewStatus: 'NEW',
-    disposition: 'NONE',
+    reviewStatus: 'REVIEWED',
+    disposition: 'NOT_RELEVANT',
+    reviewedBy: 'AUTO-AI',
+    reviewedAt: '2026-10-26T02:00:00',
+    reviewerNotes: 'Watchtower sector verified clear. Demarcation line intact, zero human or vehicular boundary breaches.',
     engineVersion: 'ai-engine-1.3.0'
   },
   {
@@ -1047,41 +1050,17 @@ function App() {
                       </div>
                     )}
 
-                    {/* Single Cam Expanded Overlays for CAM-7 (Infiltration vs Clear Check) */}
+                    {/* Single Cam Expanded Overlays for CAM-7 (Perimeter Verified Clear) */}
                     {showDetectionOverlays && selectedCam.id === '7' && (
-                      !selectedCam.fileName ? (
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                          <div className="absolute top-4 left-4 right-4 bg-red-950/95 border border-status-red text-white p-2 font-mono text-xs flex justify-between items-center shadow-lg">
-                            <span className="font-bold text-status-red flex items-center">
-                              <span className="w-2 h-2 rounded-full bg-status-red mr-2 animate-ping"></span>
-                              FLAGGED: BORDER INFILTRATION DETECTED
-                            </span>
-                            <span className="bg-black text-white px-2 py-0.5 border border-status-red text-[10px]">
-                              4 DISMOUNTED PERSONNEL // CULVERT CROSSING
-                            </span>
-                          </div>
-                          <div className="w-24 h-32 border-2 border-status-red bg-status-red/20 relative -translate-x-12 translate-y-4">
-                            <span className="absolute -top-4 left-0 bg-status-red text-black text-[9px] font-bold px-1">
-                              PERS-01 (0.94)
-                            </span>
-                          </div>
-                          <div className="w-20 h-28 border-2 border-status-red bg-status-red/20 relative translate-x-12 -translate-y-4">
-                            <span className="absolute -top-4 left-0 bg-status-red text-black text-[9px] font-bold px-1">
-                              PERS-02 (0.91)
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border border-status-green text-status-green p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
-                          <span className="font-bold flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-status-green mr-2"></span>
-                            BORDER DEMARCATION LINE CLEAR // NO HUMAN INFILTRATION DETECTED
-                          </span>
-                          <span className="bg-black text-white px-2 py-0.5 border border-status-green text-[10px]">
-                            0 TARGETS // INTACT PERIMETER
-                          </span>
-                        </div>
-                      )
+                      <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border border-status-green text-status-green p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
+                        <span className="font-bold flex items-center">
+                          <span className="w-2 h-2 rounded-full bg-status-green mr-2"></span>
+                          BORDER DEMARCATION LINE CLEAR // ZERO HUMAN INFILTRATION DETECTED
+                        </span>
+                        <span className="bg-black text-white px-2 py-0.5 border border-status-green text-[10px]">
+                          0 TARGETS // INTACT PERIMETER
+                        </span>
+                      </div>
                     )}
 
                     {/* AI Frame Inference Result Overlay */}
@@ -1269,44 +1248,16 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Tactical Detection Banner for CAM-7 (Human Infiltration) */}
+                      {/* Tactical Detection Banner for CAM-7 (Border Perimeter Verified Clear) */}
                       {showDetectionOverlays && cam.id === '7' && (
-                        !cam.fileName ? (
-                          <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                            <span className="font-bold text-status-red flex items-center">
-                              <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                              FLAGGED: HUMAN INFILTRATION
-                            </span>
-                            <span className="bg-black/80 text-white px-1 border border-status-red text-[8px]">
-                              4 DISMOUNTED
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/90 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                            <span className="font-bold flex items-center">
-                              <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1"></span>
-                              SECTOR CLEAR // NO INFILTRATION DETECTED
-                            </span>
-                            <span className="bg-black/80 text-white px-1 border border-status-green text-[8px]">
-                              0 TARGETS
-                            </span>
-                          </div>
-                        )
-                      )}
-
-                      {/* Tactical Dynamic Bounding Boxes for CAM-7 in Grid - ONLY when NOT a custom clear video */}
-                      {showDetectionOverlays && cam.id === '7' && !cam.fileName && (
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                          <div className="w-16 h-20 border border-status-red/90 bg-status-red/15 relative -translate-x-5 translate-y-2">
-                            <span className="absolute -top-3.5 left-0 bg-status-red text-black text-[7px] font-bold px-0.5">
-                              PERS-01 (0.94)
-                            </span>
-                          </div>
-                          <div className="w-14 h-18 border border-status-red/90 bg-status-red/15 relative translate-x-6 -translate-y-2">
-                            <span className="absolute -top-3.5 left-0 bg-status-red text-black text-[7px] font-bold px-0.5">
-                              PERS-02 (0.91)
-                            </span>
-                          </div>
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/90 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                          <span className="font-bold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1"></span>
+                            SECTOR CLEAR // ZERO INFILTRATION DETECTED
+                          </span>
+                          <span className="bg-black/80 text-white px-1 border border-status-green text-[8px]">
+                            0 TARGETS
+                          </span>
                         </div>
                       )}
 

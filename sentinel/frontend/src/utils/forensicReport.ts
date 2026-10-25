@@ -198,16 +198,37 @@ export function createForensicDossier(params: {
           description: 'Main linear utility conduit trench traversing across active earthworks.'
         }
       ]
-    : params.targetClass === 'HUMAN_INFILTRATION' || params.sensorId === '7'
+    : params.targetClass === 'DRONE_UAV' || params.sensorId === '2'
     ? [
         {
-          id: 'INFIL-VEC-01',
-          shapeType: 'POLYGONAL_GRID',
-          estimatedDimensions: '4 dismounted personnel track',
-          cornerAngleOrthogonality: 'Bearing 242° (Border Crossing Vector)',
-          artificialityConfidence: 0.972,
-          contextDisruptionZScore: 4.9,
-          description: 'Human gait and boundary intrusion vector detected traversing demarcation culvert. Shadow and thermal footfall displacements match tactical infiltration.'
+          id: 'DRONE-TGT-01',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '1.2m wingspan / rotor diameter',
+          cornerAngleOrthogonality: 'Heading 042° NE @ 12.4 m/s',
+          artificialityConfidence: 0.760,
+          contextDisruptionZScore: 4.8,
+          description: 'Rotorcraft UAV with elevated thermal engine heat signature (~45m AGL altitude).'
+        },
+        {
+          id: 'DRONE-TGT-02',
+          shapeType: 'RECTANGLE',
+          estimatedDimensions: '0.8m quadcopter airframe',
+          cornerAngleOrthogonality: 'Heading 315° NW @ 8.1 m/s',
+          artificialityConfidence: 0.610,
+          contextDisruptionZScore: 3.9,
+          description: 'Micro-quadcopter loitering above northern perimeter restricted airspace (~52m AGL altitude).'
+        }
+      ]
+    : params.targetClass === 'BENIGN_ACTIVITY' || params.sensorId === '7'
+    ? [
+        {
+          id: 'PERIMETER-AUDIT-01',
+          shapeType: 'LINEAR_TRENCH',
+          estimatedDimensions: '120.0m Demarcation Line',
+          cornerAngleOrthogonality: 'Bearing 270° Due West (Demarcation Axis)',
+          artificialityConfidence: 0.010,
+          contextDisruptionZScore: 0.1,
+          description: 'Border Demarcation Line and Watchtower Bravo perimeter verified intact. Zero dismounted human targets or boundary breaches detected.'
         }
       ]
     : [];
