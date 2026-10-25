@@ -8,6 +8,9 @@ import type {
 import { TARGET_LABELS } from './utils/forensicFilters';
 import { ForensicVideoPlayer, type ForensicVideoPlayerRef } from './components/ForensicVideoPlayer';
 import { ForensicControlsDeck } from './components/ForensicControlsDeck';
+import { CamouflageGeometricViewer } from './components/CamouflageGeometricViewer';
+import { ForensicReportModal } from './components/ForensicReportModal';
+import { createForensicDossier, type ForensicDossier } from './utils/forensicReport';
 
 export interface CameraFeed {
   id: string;
@@ -160,6 +163,26 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
     resolution: '1920x1080',
     fps: 30,
     isPlaying: true
+  },
+  {
+    id: '7',
+    name: 'CAM-7 (Border Infiltration Line)',
+    sensorType: 'IR_THERMAL',
+    status: 'LIVE_STREAM',
+    videoUrl: '/videos/cam7.mp4',
+    resolution: '1920x1080',
+    fps: 30,
+    isPlaying: true
+  },
+  {
+    id: '8',
+    name: 'CAM-8 (Border Construction Zone)',
+    sensorType: 'EO_OPTICAL',
+    status: 'LIVE_STREAM',
+    videoUrl: '/videos/cam8.mp4',
+    resolution: '1920x1080',
+    fps: 30,
+    isPlaying: true
   }
 ];
 
@@ -220,6 +243,32 @@ const INITIAL_ALERTS: Alert[] = [
     reviewedAt: '2026-10-20T09:55:40',
     reviewerNotes: 'Thermal hotspot requires tactical reconnaissance drone flyover.',
     engineVersion: 'ai-engine-1.2.0-m5'
+  },
+  {
+    id: 'alt-007',
+    cam: 'CAM-7',
+    cameraId: '7',
+    module: 'Boundary Infiltration',
+    threatLevel: 3,
+    description: 'FLAGGED: 4 dismounted personnel traversing international boundary line at culvert breach (Sector Bravo MGRS 43R XA 8995 1230)',
+    time: '15:10:22',
+    timestamp: '2026-10-25T15:10:22',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
+    engineVersion: 'ai-engine-1.3.0'
+  },
+  {
+    id: 'alt-008',
+    cam: 'CAM-8',
+    cameraId: '8',
+    module: 'M4 Camouflage (Rigid Geometry)',
+    threatLevel: 3,
+    description: 'FLAGGED: Clandestine border construction detected under camouflage netting. Unnatural square (5.2m x 5.2m) and rectangular (16.4m x 7.2m) foundations identified.',
+    time: '15:04:10',
+    timestamp: '2026-10-25T15:04:10',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
+    engineVersion: 'ai-engine-1.3.0'
   }
 ];
 
@@ -308,6 +357,32 @@ const INITIAL_AUDITS: Record<string, AlertReviewAudit[]> = {
       note: 'Thermal hotspot requires tactical reconnaissance drone flyover.',
       timestamp: '2026-10-20T09:55:40'
     }
+  ],
+  'alt-007': [
+    {
+      alertId: 'alt-007',
+      action: 'EMIT_ALERT',
+      previousStatus: undefined,
+      newStatus: 'NEW',
+      previousDisposition: undefined,
+      newDisposition: 'NONE',
+      reviewerId: 'ai-engine-1.3.0',
+      note: 'Thermal footprint and boundary crossing trajectory detected in Sector Bravo',
+      timestamp: '2026-10-25T15:10:22'
+    }
+  ],
+  'alt-008': [
+    {
+      alertId: 'alt-008',
+      action: 'EMIT_ALERT',
+      previousStatus: undefined,
+      newStatus: 'NEW',
+      previousDisposition: undefined,
+      newDisposition: 'NONE',
+      reviewerId: 'ai-engine-1.3.0',
+      note: 'M4 Camouflage analysis detected rigid orthogonal squares and rectangles beneath camouflage netting',
+      timestamp: '2026-10-25T15:04:10'
+    }
   ]
 };
 
@@ -338,6 +413,7 @@ function App() {
   const [modalVideoTime, setModalVideoTime] = useState<number>(0);
   const [modalVideoDuration, setModalVideoDuration] = useState<number>(0);
   const [modalTab, setModalTab] = useState<'DETAILS' | 'INSPECT_FOOTAGE'>('DETAILS');
+  const [activeReportDossier, setActiveReportDossier] = useState<ForensicDossier | null>(null);
 
   // Alerts & Audits state
   const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
@@ -353,8 +429,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
 
-  // M4 Mock State
-  const [anomalyScore] = useState(0.85);
+  // Video Refs & Time formatting
 
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
   const expandedVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -763,7 +838,10 @@ function App() {
           </div>
         </div>
         <div className="font-mono text-xs tracking-wide text-tactical-light flex items-center space-x-5">
-          <span className="text-status-green flex items-center"><span className="w-2 h-2 rounded-full bg-status-green mr-2 animate-pulse"></span>FEEDS: 6/6 PLAYING</span>
+          <span className="text-status-green flex items-center">
+            <span className="w-2 h-2 rounded-full bg-status-green mr-2 animate-pulse"></span>
+            FEEDS: {cameraFeeds.filter(c => c.isPlaying).length}/{cameraFeeds.length} PLAYING
+          </span>
           <span className="border-l border-tactical-olive pl-4">ROLE: ANALYST</span>
           <span className="text-white font-bold bg-tactical-olive/40 px-2 py-0.5 border border-tactical-olive">OPR: {reviewerId}</span>
         </div>
@@ -772,7 +850,7 @@ function App() {
       {/* DASHBOARD VIEW */}
       {view === 'DASHBOARD' && (
         <main className="flex-1 flex overflow-hidden p-4 space-x-4 min-h-0">
-          {/* Left: 6 Video Streams Grid */}
+          {/* Left: 8 Video Streams Grid */}
           <div className="flex-[3] flex flex-col space-y-2 min-w-0">
             {/* Toolbar above feeds */}
             <div className="flex justify-between items-center bg-tactical-gray/60 px-3 py-1.5 border border-tactical-olive">
@@ -782,7 +860,7 @@ function App() {
                   MULTI-SOURCE VIDEO INTELLIGENCE (M1)
                 </h2>
                 <span className="text-[10px] font-mono text-status-green bg-black/60 px-2 py-0.5 border border-tactical-green/50">
-                  6 LIVE VIDEO CHANNELS
+                  {cameraFeeds.length} LIVE VIDEO CHANNELS
                 </span>
               </div>
               
@@ -929,7 +1007,34 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2">
+                      {/* Generate ISO/IEC 27037 Forensic Evidence Dossier */}
+                      <button
+                        onClick={() => {
+                          if (selectedCam) {
+                            const d = createForensicDossier({
+                              sensorId: selectedCam.id,
+                              sensorName: selectedCam.name,
+                              sensorModality: selectedCam.sensorType,
+                              targetClass: selectedCam.id === '7' ? 'HUMAN_INFILTRATION' : selectedCam.id === '8' ? 'CAMOUFLAGED_ASSET' : 'DRONE_UAV',
+                              confidence: 'CONFIRMED',
+                              filterMode: forensicFilter,
+                              filterOptions: forensicOptions,
+                              timecode: formatTimecode(activeVideoTime),
+                              analystId: reviewerId,
+                              analystNotes: `Forensic standard evaluation conducted on ${selectedCam.name} at timecode ${formatTimecode(activeVideoTime)}. Filter: ${forensicFilter}. Zoom: ${forensicOptions.zoom.toFixed(1)}x.`,
+                              disposition: 'RELEVANT'
+                            });
+                            setActiveReportDossier(d);
+                          }
+                        }}
+                        className="px-3 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono font-bold text-xs border border-tactical-green transition-colors flex items-center space-x-1"
+                        title="Generate ISO/IEC 27037 Digital Forensics Evidence Dossier"
+                      >
+                        <span>📄</span>
+                        <span>FORENSIC DOSSIER</span>
+                      </button>
+
                       {/* Run AI Analysis on current video frame */}
                       <button
                         onClick={analyzeActiveVideoFrame}
@@ -976,12 +1081,16 @@ function App() {
                   </div>
                 </div>
               ) : (
-                /* 3x2 Video Channels Grid */
-                <div className="grid grid-cols-3 grid-rows-2 gap-2.5 h-full w-full">
+                /* 4x2 Video Channels Grid (8 Feeds) */
+                <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-2 h-full w-full">
                   {cameraFeeds.map((cam) => (
                     <div
                       key={cam.id}
-                      className="bg-black border border-tactical-olive hover:border-tactical-green relative group overflow-hidden flex flex-col transition-all shadow-md"
+                      className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
+                        cam.id === '7' ? 'border-status-red shadow-[0_0_12px_rgba(255,0,51,0.25)]' :
+                        cam.id === '8' ? 'border-status-amber shadow-[0_0_12px_rgba(255,183,3,0.25)]' :
+                        'border-tactical-olive hover:border-tactical-green'
+                      }`}
                     >
                       {/* Live Video Player */}
                       <video
@@ -996,20 +1105,80 @@ function App() {
                       />
 
                       {/* Top HUD Overlay */}
-                      <div className="absolute top-0 inset-x-0 p-2 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
-                        <div className="flex items-center space-x-1.5">
-                          <span className="w-2 h-2 rounded-full bg-status-green animate-pulse"></span>
-                          <span className="text-white bg-black/80 px-1.5 py-0.5 border border-tactical-olive text-[11px] font-bold">
+                      <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
+                        <div className="flex items-center space-x-1">
+                          <span className={`w-2 h-2 rounded-full ${cam.id === '7' ? 'bg-status-red' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
+                          <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
                             {cam.name}
                           </span>
-                          <span className={cam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500/80 text-orange-400 text-[9px] px-1 font-mono' : 'bg-emerald-950/80 border border-status-green/80 text-status-green text-[9px] px-1 font-mono'}>
+                          <span className={cam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500/80 text-orange-400 text-[8px] px-1 font-mono' : 'bg-emerald-950/80 border border-status-green/80 text-status-green text-[8px] px-1 font-mono'}>
                             {cam.sensorType === 'IR_THERMAL' ? 'IR' : 'EO'}
                           </span>
                         </div>
-                        <div className="text-[10px] text-tactical-light bg-black/80 px-1 border border-tactical-olive">
+                        <div className="text-[9px] text-tactical-light bg-black/80 px-1 border border-tactical-olive">
                           {cam.resolution}
                         </div>
                       </div>
+
+                      {/* Tactical Detection Banner for CAM-7 (Human Infiltration) */}
+                      {cam.id === '7' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                          <span className="font-bold text-status-red flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                            FLAGGED: HUMAN INFILTRATION
+                          </span>
+                          <span className="bg-black/80 text-white px-1 border border-status-red text-[8px]">
+                            4 DISMOUNTED
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Dynamic Bounding Boxes for CAM-7 in Grid */}
+                      {cam.id === '7' && (
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                          <div className="w-16 h-20 border border-status-red/90 bg-status-red/15 relative -translate-x-5 translate-y-2">
+                            <span className="absolute -top-3.5 left-0 bg-status-red text-black text-[7px] font-bold px-0.5">
+                              PERS-01 (0.94)
+                            </span>
+                          </div>
+                          <div className="w-14 h-18 border border-status-red/90 bg-status-red/15 relative translate-x-6 -translate-y-2">
+                            <span className="absolute -top-3.5 left-0 bg-status-red text-black text-[7px] font-bold px-0.5">
+                              PERS-02 (0.91)
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tactical Detection Banner for CAM-8 (Camouflaged Construction) */}
+                      {cam.id === '8' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-amber-950/95 border border-status-amber text-status-amber px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                          <span className="font-bold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-amber mr-1 animate-ping"></span>
+                            FLAGGED: CONCEALED CONSTRUCTION
+                          </span>
+                          <span className="bg-black/80 text-yellow-300 px-1 border border-status-amber text-[8px]">
+                            SQUARE + RECT
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Geometric Shapes Overlaid on CAM-8 in Grid */}
+                      {cam.id === '8' && (
+                        <div className="absolute inset-0 pointer-events-none">
+                          {/* Square Excavation Shaft */}
+                          <div className="absolute top-[32%] right-[14%] w-12 h-12 border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_8px_rgba(250,204,21,0.4)]">
+                            <span className="absolute -top-3 left-0 bg-yellow-400 text-black text-[7px] font-bold px-0.5">
+                              ◼ SQUARE 5.2m
+                            </span>
+                          </div>
+                          {/* Rectangle Excavation Platform */}
+                          <div className="absolute bottom-[20%] left-[12%] w-20 h-10 border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
+                            <span className="absolute -top-3 left-0 bg-cyan-400 text-black text-[7px] font-bold px-0.5">
+                              ▬ RECT 16.4m
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Custom Upload Badge */}
                       {cam.fileName && (
@@ -1155,123 +1324,14 @@ function App() {
         </main>
       )}
 
-      {/* M4 CAMOUFLAGE VIEW */}
+      {/* M4 CAMOUFLAGE & GEOMETRIC ANALYSIS SUITE */}
       {view === 'M4_CAMOUFLAGE' && (
-        <main className="flex-1 flex overflow-hidden p-4 space-x-4 min-h-0 bg-tactical-dark">
-          {/* Left: Source Imagery */}
-          <div className="flex-1 flex flex-col space-y-2">
-            <h2 className="font-mono text-tactical-light tracking-widest text-sm font-bold flex items-center">
-              <span className="text-tactical-green mr-2">›</span>
-              SOURCE IMAGERY (T1/T2)
-            </h2>
-            <div className="panel flex-1 flex flex-col bg-black">
-              <div className="flex-1 border border-tactical-olive flex items-center justify-center text-tactical-olive font-mono text-xs mb-2">
-                [ HISTORICAL T1 REFERENCE FRAME ]
-              </div>
-              <div className="flex-1 border border-tactical-olive flex items-center justify-center text-tactical-olive font-mono text-xs">
-                [ CURRENT T2 SURVEILLANCE FRAME ]
-              </div>
-            </div>
-          </div>
-
-          {/* Center: Interactive Anomaly Overlay */}
-          <div className="flex-[2] flex flex-col space-y-2">
-            <h2 className="font-mono text-tactical-light tracking-widest text-sm font-bold flex justify-between">
-              <span>M4 CONCEALMENT FUSION OVERLAY</span>
-              <span className="space-x-1 text-xs">
-                {['GEO', 'TEX', 'VEG', 'SHD', 'CTX', 'ALL'].map((layer) => (
-                  <button key={layer} className="px-2 py-1 bg-tactical-gray border border-tactical-olive hover:text-white font-mono text-[10px]">
-                    {layer}
-                  </button>
-                ))}
-              </span>
-            </h2>
-            <div className="panel flex-1 bg-black relative flex items-center justify-center">
-              <div className="absolute inset-4 border border-dashed border-tactical-olive opacity-30"></div>
-              {/* Anomaly Bounding Box */}
-              <div
-                onClick={() => {
-                  const m4Alert = alerts.find(a => a.id === 'alt-002') || alerts[0];
-                  if (m4Alert) openReviewModal(m4Alert);
-                }}
-                className="absolute top-1/3 left-1/3 w-56 h-36 border-2 border-status-amber bg-status-amber/10 flex flex-col cursor-pointer transition-all hover:bg-status-amber/20 hover:scale-[1.02]"
-              >
-                <div className="flex justify-between items-center bg-status-amber px-1.5 py-0.5">
-                  <span className="text-black font-mono font-bold text-[10px]">ANO-GEO-4B9F</span>
-                  <span className="text-black font-mono text-[9px] font-bold">CLICK TO REVIEW</span>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full border border-status-red/50 grid grid-cols-2 grid-rows-2">
-                    <div className="bg-status-red/40"></div><div className="bg-status-amber/40"></div>
-                    <div className="bg-transparent"></div><div className="bg-status-red/60"></div>
-                  </div>
-                </div>
-              </div>
-              <span className="font-mono text-tactical-olive opacity-50 tracking-widest text-sm">[ LIVE CONCEALMENT RENDER ]</span>
-            </div>
-          </div>
-
-          {/* Right: Evidence Panel with Workflow Link */}
-          <div className="flex-1 flex flex-col space-y-2">
-            <h2 className="font-mono text-tactical-light tracking-widest text-sm font-bold flex items-center">
-              <span className="text-tactical-green mr-2">›</span>
-              EVIDENCE BREAKDOWN
-            </h2>
-            <div className="panel flex-1 bg-tactical-gray overflow-y-auto space-y-4">
-              <div className="border-b border-tactical-olive pb-3">
-                <div className="font-mono text-lg font-bold text-status-amber mb-1">Potential contextual anomaly</div>
-                <div className="font-mono text-xs text-tactical-light mb-2">TARGET ID: ANO-GEO-4B9F</div>
-                <div className="bg-black/50 p-2 font-mono text-xs flex justify-between border border-tactical-olive">
-                  <span>AI FUSION SCORE:</span>
-                  <span className="text-status-amber font-bold">{(anomalyScore * 100).toFixed(1)}%</span>
-                </div>
-              </div>
-
-              {/* Sub-module scores */}
-              <div className="space-y-2 font-mono text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-tactical-light">M4.1 GEOMETRY</span>
-                  <span className="text-status-red">0.92</span>
-                </div>
-                <div className="w-full bg-black h-1"><div className="bg-status-red h-1 w-[92%]"></div></div>
-
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-tactical-light">M4.2 TEXTURE</span>
-                  <span className="text-status-amber">0.65</span>
-                </div>
-                <div className="w-full bg-black h-1"><div className="bg-status-amber h-1 w-[65%]"></div></div>
-
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-tactical-light">M4.3 VEGETATION</span>
-                  <span className="text-status-amber">0.70</span>
-                </div>
-                <div className="w-full bg-black h-1"><div className="bg-status-amber h-1 w-[70%]"></div></div>
-
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-tactical-light">M4.6 CONTEXT</span>
-                  <span className="text-status-red">0.95</span>
-                </div>
-                <div className="w-full bg-black h-1"><div className="bg-status-red h-1 w-[95%]"></div></div>
-              </div>
-
-              {/* Operator Action Button */}
-              <div className="pt-2">
-                <button
-                  onClick={() => {
-                    const m4Alert = alerts.find(a => a.id === 'alt-002') || alerts[0];
-                    if (m4Alert) openReviewModal(m4Alert);
-                  }}
-                  className="w-full py-2 bg-status-amber text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-yellow-400 transition-colors shadow-md"
-                >
-                  OPEN ANALYST REVIEW WORKFLOW
-                </button>
-                <div className="text-[10px] font-mono text-tactical-light/60 mt-1.5 text-center">
-                  Audit trail maintained for all operator determinations
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+        <CamouflageGeometricViewer
+          cameraFeeds={cameraFeeds}
+          onOpenReviewModal={openReviewModal}
+          onGenerateReport={(dossier) => setActiveReportDossier(dossier)}
+          reviewerId={reviewerId}
+        />
       )}
 
       {/* ANALYST REVIEW & AUDIT MODAL */}
@@ -1553,14 +1613,45 @@ function App() {
                         />
                       </div>
 
-                      {/* Form Submission Button */}
-                      <div className="pt-2">
+                      {/* Form Submission Button & Forensic Report Link */}
+                      <div className="pt-2 flex space-x-2">
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="w-full py-2 bg-tactical-green text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-[#5f7751] transition-colors disabled:opacity-50"
+                          className="flex-1 py-2 bg-tactical-green text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-[#5f7751] transition-colors disabled:opacity-50"
                         >
                           {isSubmitting ? 'RECORDING AUDIT...' : 'COMMIT DISPOSITION & LOG AUDIT TRAIL'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (activeAlert) {
+                              const camName = activeAlert.cam || (activeAlert.cameraId ? `CAM-${activeAlert.cameraId}` : 'CAM-1');
+                              const camId = activeAlert.cameraId || (activeAlert.cam ? activeAlert.cam.replace('CAM-', '') : '1');
+                              const cam = cameraFeeds.find(c => c.name === camName || c.id === camId) || cameraFeeds[0];
+                              const dossier = createForensicDossier({
+                                alertId: activeAlert.id,
+                                sensorId: cam.id,
+                                sensorName: cam.name,
+                                sensorModality: cam.sensorType,
+                                targetClass: cam.id === '7' ? 'HUMAN_INFILTRATION' : cam.id === '8' ? 'CAMOUFLAGED_ASSET' : 'DRONE_UAV',
+                                confidence: 'CONFIRMED',
+                                filterMode: forensicFilter,
+                                filterOptions: forensicOptions,
+                                timecode: formatTimecode(modalVideoTime),
+                                analystId: reviewerId,
+                                analystNotes: reviewNote || `Formal ISO/IEC 27037 forensic documentation for ${activeAlert.description}. Disposition: ${selectedDisposition || activeAlert.disposition}.`,
+                                disposition: selectedDisposition || activeAlert.disposition,
+                                dispositionRationale: reviewNote || undefined
+                              });
+                              setActiveReportDossier(dossier);
+                            }
+                          }}
+                          className="px-3 py-2 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono font-bold text-xs uppercase border border-tactical-green transition-colors flex items-center space-x-1.5 shrink-0"
+                          title="Generate ISO/IEC 27037 Digital Evidence Forensics Dossier"
+                        >
+                          <span>📄</span>
+                          <span>FORENSIC DOSSIER</span>
                         </button>
                       </div>
 
@@ -1802,6 +1893,14 @@ function App() {
 
           </div>
         </div>
+      )}
+
+      {/* FORENSIC DIGITAL EVIDENCE REPORT MODAL (ISO/IEC 27037:2012) */}
+      {activeReportDossier && (
+        <ForensicReportModal
+          dossier={activeReportDossier}
+          onClose={() => setActiveReportDossier(null)}
+        />
       )}
 
     </div>
