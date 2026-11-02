@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import type { ForensicFilterMode, ForensicFilterOptions } from '../utils/forensicFilters';
-import { processFrameBuffer } from '../utils/forensicFilters';
+import { processFrameBuffer, renderTacticalOverlay } from '../utils/forensicFilters';
 
 export interface ForensicVideoPlayerProps {
   videoUrl: string;
+  camId?: string;
   isMuted?: boolean;
   filterMode: ForensicFilterMode;
   filterOptions: ForensicFilterOptions;
@@ -22,6 +23,7 @@ export interface ForensicVideoPlayerRef {
 
 export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVideoPlayerProps>(({
   videoUrl,
+  camId,
   isMuted = true,
   filterMode,
   filterOptions,
@@ -32,6 +34,11 @@ export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVi
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameId = useRef<number | null>(null);
+
+  const prevLumRef = useRef<Uint8ClampedArray | null>(null);
+  const bgModelRef = useRef<Float32Array | null>(null);
+  const mhiRef = useRef<Float32Array | null>(null);
+  const frameIndexRef = useRef<number>(0);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -89,6 +96,14 @@ export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVi
     }
   }, [playbackSpeed]);
 
+  // Reset temporal buffers when changing videoUrl
+  useEffect(() => {
+    prevLumRef.current = null;
+    bgModelRef.current = null;
+    mhiRef.current = null;
+    frameIndexRef.current = 0;
+  }, [videoUrl]);
+
   // Main real-time video processing loop
   useEffect(() => {
     const video = videoRef.current;
@@ -138,16 +153,46 @@ export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVi
         procCtx.drawImage(video, 0, 0, targetW, targetH);
         procCtx.restore();
 
+        const totalPixels = targetW * targetH;
+        if (!prevLumRef.current || prevLumRef.current.length !== totalPixels) {
+          prevLumRef.current = new Uint8ClampedArray(totalPixels);
+        }
+        if (!bgModelRef.current || bgModelRef.current.length !== totalPixels) {
+          bgModelRef.current = new Float32Array(totalPixels);
+        }
+        if (!mhiRef.current || mhiRef.current.length !== totalPixels) {
+          mhiRef.current = new Float32Array(totalPixels);
+        }
+        frameIndexRef.current++;
+
+        const temporal = {
+          prevLum: prevLumRef.current,
+          bgModel: bgModelRef.current,
+          mhi: mhiRef.current,
+          frameIndex: frameIndexRef.current
+        };
+
         if (filterMode === 'RAW') {
           // Fast blit
           mainCtx.drawImage(procCanvas, 0, 0);
         } else {
-          // Read pixel buffer, execute spatial convolution / thermal LUT, write back
+          // Read pixel buffer, execute spatial/temporal convolution / LUT, write back
           const srcData = procCtx.getImageData(0, 0, targetW, targetH);
           const dstData = mainCtx.createImageData(targetW, targetH);
 
-          processFrameBuffer(srcData, dstData, filterMode, filterOptions);
+          processFrameBuffer(srcData, dstData, filterMode, filterOptions, temporal);
           mainCtx.putImageData(dstData, 0, 0);
+        }
+
+        // Render AI operator HUD overlays if active
+        if ([
+          'TARGET_TRACKING',
+          'PERSON_DETECTION',
+          'VEHICLE_DETECTION',
+          'THREAT_HIGHLIGHT',
+          'DRONE_DETECTION'
+        ].includes(filterMode)) {
+          renderTacticalOverlay(mainCtx, targetW, targetH, filterMode, frameIndexRef.current, camId);
         }
 
         // FPS counter calculation
@@ -169,7 +214,7 @@ export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVi
       isMounted = false;
       if (animFrameId.current) cancelAnimationFrame(animFrameId.current);
     };
-  }, [filterMode, filterOptions, pan]);
+  }, [filterMode, filterOptions, pan, videoUrl, camId]);
 
   // Video Time updates
   const handleTimeUpdate = () => {
@@ -239,40 +284,31 @@ export const ForensicVideoPlayer = forwardRef<ForensicVideoPlayerRef, ForensicVi
       {/* Primary hardware-accelerated filtered output canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full object-contain pointer-events-none"
+        className="max-w-full max-h-full object-contain pointer-events-none"
       />
 
-      {/* Tactical Reticle Watermark */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-25">
-        <div className="w-24 h-24 border border-tactical-green rounded-full flex items-center justify-center">
-          <div className="w-1.5 h-1.5 bg-tactical-green rounded-full"></div>
-          <div className="absolute w-36 h-0.5 bg-tactical-green/40"></div>
-          <div className="absolute h-36 w-0.5 bg-tactical-green/40"></div>
-        </div>
-      </div>
-
-      {/* Tactical Top-Left Filter Status Badge */}
-      <div className="absolute top-3 left-3 flex items-center space-x-2 font-mono text-[10px] z-10 pointer-events-none">
-        <span className="bg-black/85 border border-tactical-green px-2 py-0.5 text-status-green font-bold shadow-md">
-          FILTER: {filterMode}
+      {/* HUD Telemetry Overlay */}
+      <div className="absolute top-2 left-2 bg-black/80 border border-tactical-olive px-2 py-0.5 text-[10px] font-mono text-tactical-light flex items-center space-x-2 pointer-events-none z-10">
+        <span className={isPlaying ? 'text-status-green font-bold' : 'text-status-amber font-bold'}>
+          {isPlaying ? '● PLAYING' : '❚❚ PAUSED'}
         </span>
+        <span className="text-tactical-olive">|</span>
+        <span className="text-status-green font-bold">{renderFps} FPS</span>
+        <span className="text-tactical-olive">|</span>
+        <span>FILTER: <strong className="text-white">{filterMode}</strong></span>
         {filterOptions.zoom > 1.0 && (
-          <span className="bg-yellow-950/80 border border-status-amber text-status-amber px-1.5 py-0.5 font-bold">
-            ZOOM: {filterOptions.zoom}x (DRAG TO PAN)
-          </span>
+          <>
+            <span className="text-tactical-olive">|</span>
+            <span className="text-status-amber font-bold">{filterOptions.zoom.toFixed(1)}x ZOOM</span>
+          </>
         )}
-        <span className="bg-black/70 border border-tactical-olive text-tactical-light px-1.5 py-0.5">
-          {renderFps} FPS
-        </span>
-        <span className={`px-1.5 py-0.5 border ${isPlaying ? 'bg-status-green/20 border-status-green text-status-green font-bold' : 'bg-status-amber/20 border-status-amber text-status-amber font-bold'}`}>
-          {isPlaying ? 'PLAYING' : 'PAUSED'}
-        </span>
       </div>
 
-      {/* Tactical Timecode Overlay (Bottom Right) */}
-      <div className="absolute bottom-3 right-3 bg-black/85 border border-tactical-olive px-2 py-0.5 font-mono text-[11px] text-white pointer-events-none z-10 flex items-center space-x-2">
-        <span className="text-status-green font-bold">TIMECODE:</span>
-        <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
+      {/* Timecode overlay */}
+      <div className="absolute bottom-2 left-2 bg-black/80 border border-tactical-olive px-2 py-0.5 text-[10px] font-mono text-tactical-light pointer-events-none z-10">
+        <span className="text-status-green font-bold">TC: {formatTime(currentTime)}</span>
+        <span className="text-tactical-olive mx-1.5">/</span>
+        <span>{formatTime(duration)}</span>
       </div>
     </div>
   );

@@ -449,6 +449,7 @@ function App() {
   const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
   const [audits, setAudits] = useState<Record<string, AlertReviewAudit[]>>(INITIAL_AUDITS);
   const [activeAlert, setActiveAlert] = useState<Alert | null>(null);
+  const [modalCameraOverrideId, setModalCameraOverrideId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   // Review Form state
@@ -689,6 +690,7 @@ function App() {
   // Review Modal handlers
   const openReviewModal = (alert: Alert) => {
     setActiveAlert(alert);
+    setModalCameraOverrideId(null);
     setModalTab('DETAILS');
     setReviewNote(alert.reviewerNotes || '');
     setSelectedDisposition(alert.disposition !== 'NONE' ? alert.disposition : 'RELEVANT');
@@ -853,6 +855,10 @@ function App() {
   const selectedCam = cameraFeeds.find(c => c.id === selectedCamId);
 
   const activeAlertCamera = React.useMemo(() => {
+    if (modalCameraOverrideId) {
+      const found = cameraFeeds.find(c => c.id === modalCameraOverrideId);
+      if (found) return found;
+    }
     if (!activeAlert) return null;
     if (activeAlert.cameraId) {
       const found = cameraFeeds.find(c => c.id === activeAlert.cameraId);
@@ -866,7 +872,7 @@ function App() {
       }
     }
     return cameraFeeds[0];
-  }, [activeAlert, cameraFeeds]);
+  }, [activeAlert, cameraFeeds, modalCameraOverrideId]);
 
   return (
     <div className="min-h-screen flex flex-col h-screen overflow-hidden bg-tactical-dark text-tactical-light">
@@ -974,6 +980,24 @@ function App() {
                     </div>
 
                     <div className="flex items-center space-x-2">
+                      {/* Live Camera Feed Quick Switcher */}
+                      <div className="hidden lg:flex items-center space-x-1 bg-black/80 p-1 border border-tactical-olive">
+                        <span className="text-[10px] text-tactical-light mr-1 font-bold">FEEDS:</span>
+                        {cameraFeeds.map(feed => (
+                          <button
+                            key={feed.id}
+                            onClick={() => setSelectedCamId(feed.id)}
+                            className={`px-2 py-0.5 text-[10px] font-mono border transition-all ${
+                              feed.id === selectedCam.id
+                                ? 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_8px_rgba(255,183,3,0.3)]'
+                                : 'bg-black/60 text-tactical-light border-tactical-olive hover:text-white hover:border-tactical-green'
+                            }`}
+                          >
+                            {feed.name.split(' ')[0]}
+                          </button>
+                        ))}
+                      </div>
+
                       <span className="text-status-green text-xs font-bold bg-black/80 px-2 py-1 border border-tactical-green">
                         {tacticalTime}
                       </span>
@@ -990,6 +1014,7 @@ function App() {
                   <div className="flex-1 w-full min-h-[360px] relative flex items-center justify-center bg-black overflow-hidden">
                     <ForensicVideoPlayer
                       ref={expandedPlayerRef}
+                      camId={selectedCam.id}
                       videoUrl={selectedCam.videoUrl}
                       isMuted={isMuted}
                       filterMode={forensicFilter}
@@ -1288,6 +1313,8 @@ function App() {
                       onOptionsChange={setForensicOptions}
                       activeTimecode={formatTimecode(activeVideoTime)}
                       analystId={reviewerId}
+                      cameraFeeds={cameraFeeds}
+                      onSelectCamera={(id) => setSelectedCamId(id)}
                       onSaveWriteup={handleSaveForensicWriteup}
                       onFlagFollowup={handleFlagFollowupWriteup}
                       existingWriteups={forensicWriteups}
@@ -2027,7 +2054,7 @@ function App() {
               {modalTab === 'INSPECT_FOOTAGE' && (
                 <div className="space-y-4">
                   {/* Top Bar for Inspect Mode */}
-                  <div className="bg-black/70 border border-tactical-olive p-3 flex justify-between items-center font-mono">
+                  <div className="bg-black/70 border border-tactical-olive p-3 flex flex-wrap gap-2 justify-between items-center font-mono">
                     <div className="flex items-center space-x-3">
                       <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse"></span>
                       <span className="text-xs font-bold text-white tracking-wider">
@@ -2036,20 +2063,46 @@ function App() {
                       <span className="text-[10px] bg-tactical-olive/60 text-tactical-light px-2 py-0.5 border border-tactical-olive">
                         {activeAlertCamera?.sensorType === 'IR_THERMAL' ? 'IR THERMAL SPECTRUM' : 'EO OPTICAL SPECTRUM'}
                       </span>
+                      {modalCameraOverrideId && (
+                        <span className="text-[10px] bg-status-amber/20 text-status-amber border border-status-amber px-2 py-0.5 font-bold">
+                          FEED OVERRIDE: CAM-{modalCameraOverrideId}
+                        </span>
+                      )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const noteSnippet = `[FORENSIC INSPECTION] Inspected feed ${activeAlertCamera?.name || activeAlert.cam} at TC ${formatTimecode(modalVideoTime)} using ${forensicFilter} filter. Zoom: ${forensicOptions.zoom.toFixed(1)}x.`;
-                        setReviewNote(prev => prev ? `${prev}\n\n${noteSnippet}` : noteSnippet);
-                        setModalTab('DETAILS');
-                      }}
-                      className="px-3 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono text-xs font-bold border border-tactical-green transition-colors flex items-center space-x-1.5"
-                    >
-                      <span>📋</span>
-                      <span>PASTE NOTES TO DISPOSITION & PROCEED</span>
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      {/* Live Camera Feed Quick Switcher */}
+                      <div className="flex items-center space-x-1 bg-black/80 p-1 border border-tactical-olive">
+                        <span className="text-[9px] text-tactical-light mr-1 font-bold">FEEDS:</span>
+                        {cameraFeeds.map(feed => (
+                          <button
+                            key={feed.id}
+                            type="button"
+                            onClick={() => setModalCameraOverrideId(feed.id)}
+                            className={`px-1.5 py-0.5 text-[9px] font-mono border transition-all ${
+                              activeAlertCamera?.id === feed.id
+                                ? 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_8px_rgba(255,183,3,0.3)]'
+                                : 'bg-black/60 text-tactical-light border-tactical-olive hover:text-white hover:border-tactical-green'
+                            }`}
+                          >
+                            {feed.name.split(' ')[0]}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const noteSnippet = `[FORENSIC INSPECTION] Inspected feed ${activeAlertCamera?.name || activeAlert.cam} at TC ${formatTimecode(modalVideoTime)} using ${forensicFilter} filter. Zoom: ${forensicOptions.zoom.toFixed(1)}x.`;
+                          setReviewNote(prev => prev ? `${prev}\n\n${noteSnippet}` : noteSnippet);
+                          setModalTab('DETAILS');
+                        }}
+                        className="px-3 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-mono text-xs font-bold border border-tactical-green transition-colors flex items-center space-x-1.5"
+                      >
+                        <span>📋</span>
+                        <span>PASTE NOTES & RETURN</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Forensic Video Player Container */}
@@ -2058,6 +2111,7 @@ function App() {
                       {activeAlertCamera && (
                         <ForensicVideoPlayer
                           ref={modalPlayerRef}
+                          camId={activeAlertCamera.id}
                           videoUrl={activeAlertCamera.videoUrl}
                           isMuted={isMuted}
                           filterMode={forensicFilter}
@@ -2147,6 +2201,8 @@ function App() {
                       onOptionsChange={setForensicOptions}
                       activeTimecode={formatTimecode(modalVideoTime)}
                       analystId={reviewerId}
+                      cameraFeeds={cameraFeeds}
+                      onSelectCamera={(id) => setModalCameraOverrideId(id)}
                       existingWriteups={forensicWriteups}
                       onSaveWriteup={(wup) => {
                         handleSaveForensicWriteup(wup);
