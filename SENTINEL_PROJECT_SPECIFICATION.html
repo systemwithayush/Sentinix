@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SENTINIX (SENTINEL) — Master Project Specification</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 1.6cm 1.4cm 1.8cm 1.4cm;
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 8pt;
+      color: #64748b;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.55;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1 {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 2.5px solid #2563eb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  h4 {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    page-break-after: avoid;
+  }
+
+  p, li {
+    color: #334155;
+    font-size: 9.5pt;
+  }
+
+  p {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  ul, ol {
+    margin-top: 4px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  strong {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+    text-align: left;
+    padding: 7px 9px;
+    border: 1px solid #cbd5e1;
+    font-size: 8.5pt;
+  }
+
+  td {
+    padding: 6px 9px;
+    border: 1px solid #e2e8f0;
+    vertical-align: top;
+    color: #334155;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+
+  code {
+    font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+    font-size: 8.5pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1.5px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 10px 14px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 8pt;
+    font-family: "JetBrains Mono", Consolas, monospace;
+    line-height: 1.45;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+  }
+
+  pre code {
+    background-color: transparent;
+    color: #f8fafc;
+    padding: 0;
+    border: none;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 18px 0;
+  }
+
+  blockquote {
+    margin: 10px 0;
+    padding: 8px 14px;
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+    font-size: 9pt;
+  }
+
+  .header-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    background: #e0f2fe;
+    color: #0369a1;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+  <h1 id="sentinix-sentinel-master-project-specification-technical-blueprint">SENTINIX (SENTINEL) — MASTER PROJECT SPECIFICATION &amp; TECHNICAL BLUEPRINT</h1>
+<p><strong>Platform:</strong> SENTINEL — Multi-Source Visual Intelligence, Target Tracking &amp; Defense-AI Platform<br />
+<strong>Repository:</strong> <a href="https://github.com/systemwithayush/Sentinix">https://github.com/systemwithayush/Sentinix</a><br />
+<strong>Target Architecture:</strong> Multi-Spectral Computer Vision, Deep Learning Threat Detection, Omni-Channel Surveillance Video Operations, and ISO/IEC 27037 Forensic Analyst Review Workflow<br />
+<strong>Document Classification:</strong> Master Project Technical Specification (Full-Spectrum Capability Baseline)<br />
+<strong>Date:</strong> November 2026  </p>
+<hr />
+<h2 id="1-repository-project-metadata">🔗 1. Repository &amp; Project Metadata</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Attribute</th>
+<th style="text-align: left;">Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Official Repository URL</strong></td>
+<td style="text-align: left;"><a href="https://github.com/systemwithayush/Sentinix">https://github.com/systemwithayush/Sentinix</a></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Active Production Branch</strong></td>
+<td style="text-align: left;"><code>main</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>License</strong></td>
+<td style="text-align: left;">MIT License (Commercial and Open-Source permissive; Anti-UAV strictly isolated for research compliance)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Primary Programming Languages</strong></td>
+<td style="text-align: left;">TypeScript (React 19), Python 3.10+ (PyTorch / FastAPI), Java 21/25 (Spring Boot), SQL (T-SQL / MSSQL)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Deployment Footprint</strong></td>
+<td style="text-align: left;">Local Workstation, Edge Defense Server, or Air-Gapped High-Security Operations Center</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Operational Mandate</strong></td>
+<td style="text-align: left;"><strong>Strictly Advisory Human-in-the-Loop Intelligence Triage.</strong> Does not perform automated kinetic engagements or autonomous lethal determinations. All dispositions require certified operator authorization.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-high-level-system-architecture-topology">🏛️ 2. High-Level System Architecture &amp; Topology</h2>
+<p>SENTINEL operates as an integrated 4-tier tactical visual intelligence platform:</p>
+<pre><code>+---------------------------------------------------------------------------------------------------+
+| 1. TACTICAL OPERATOR CONSOLE (Port 5173)                                                          |
+|    React 19 + TypeScript + Vite SPA + Tailwind CSS                                                |
+|    - 8-Channel Omni-Capable Video Surveillance Grid (EO Optical &amp; Thermal IR Streams)             |
+|    - Universal Target Tracking: Humans, Vehicles, UAVs/Drones, Roads, &amp; Structural Construction   |
+|    - Single-Camera Vertical Split Inspection Deck (50/50 Video &amp; Forensic Tooling)                |
+|    - Real-Time 38-Filter Computer Vision GPU Canvas Shaders (CLAHE, Canny, Thermal FLIR, etc.)    |
+|    - Dedicated Sector Security Officer &amp; Tactical Comms Dispatch Console (Radio &amp; Sat-Phone)      |
+|    - Frame-by-Frame AI Threat Inference Trigger &amp; Telemetry HUD                                   |
+|    - ISO/IEC 27037 Forensic Audit Dossier Generator &amp; Chain-of-Custody Hashing                    |
++---------------------------------------------------------------------------------------------------+
+                                            |
+                               HTTP REST    v
++---------------------------------------------------------------------------------------------------+
+| 2. CORE BACKEND ENTERPRISE SERVICE (Port 8080)                                                    |
+|    Spring Boot 3.2.3 (Java 21/25) REST Service                                                    |
+|    - Alert Lifecycle State Machine: NEW -&gt; UNDER_REVIEW -&gt; REVIEWED / NEEDS_FOLLOWUP              |
+|    - Human-in-the-Loop Review Dispositioning: RELEVANT / NOT_RELEVANT / UNCERTAIN                 |
+|    - Tamper-Evident Append-Only Audit Ledger (alert_review_audits table)                          |
+|    - Camera Registry, Sensor Telemetry Proxy &amp; Real-Time Alert Distribution                       |
++---------------------------------------------------------------------------------------------------+
+                    |                                                     |
+       JDBC / SQL   v                                        HTTP REST    v
++--------------------------------------+   +--------------------------------------------------------+
+| 3. PERSISTENCE LAYER (Port 1433)     |   | 4. AI INFERENCE ENGINE (Port 8000)                     |
+|    Microsoft SQL Server (2019/2022)  |   |    Python 3.10+ FastAPI + CUDA GPU Execution           |
+|    - Camera Stream Metadata          |   |    Hosts 5 Deep Neural Model Architectures             |
+|    - Detection Logs &amp; Alerts         |   |    - Real-Time Bayesian Threat Scoring &amp; Evidence      |
+|    - Immutable Review Audit Records  |   |    - Sub-100ms Ingestion &amp; Multi-Spectral Fusion        |
++--------------------------------------+   +--------------------------------------------------------+
+</code></pre>
+<hr />
+<h2 id="3-universal-detection-target-intelligence-capabilities">🎯 3. Universal Detection &amp; Target Intelligence Capabilities</h2>
+<p>SENTINEL's neural and computer vision inference pipelines detect, segment, and track five fundamental categories of tactical entities across <strong>all sensor streams</strong>:</p>
+<pre><code>+─────────────────────────────────────────────────────────────────────────────────────────────────+
+|                           SENTINEL UNIVERSAL DETECTION PIPELINES                                |
++───────────────────────┬───────────────────────┬─────────────────────────┬───────────────────────+
+| 1. HUMAN / PEDESTRIAN | 2. VEHICLE &amp; CONVOY   | 3. UAV &amp; AERIAL THREATS | 4. ROADS &amp; PATHS      |
+|    - Infiltrators     |    - 4x4 Transports   |    - Multirotor Drones  |    - Boundary Roads   |
+|    - Dismounted Troop |    - Armored Vehicles |    - Fixed-Wing UAVs    |    - Dirt Pathways    |
+|    - Camouflaged Men  |    - Construction Rig |    - Rotary Aircraft    |    - Trench Corridors |
+|    - Velocity/Bearing |    - Convoy Tracking  |    - Thermal Hotspots   |    - Access Chokepoint|
++───────────────────────┴───────────────────────┴─────────────────────────┴───────────────────────+
+| 5. BUILDING, INFRASTRUCTURE &amp; CONSTRUCTION EXPANSION                                            |
+|    - Rigid Geometric Planar Footprint Masking (Rectangles, Polygons, Foundation Slabs)          |
+|    - Clandestine Bunkers, Vault Structures, Utility Core Shafts, and Earthworks Alterations    |
++─────────────────────────────────────────────────────────────────────────────────────────────────+
+</code></pre>
+<h3 id="31-human-pedestrian-infiltration-tracking">3.1 Human &amp; Pedestrian Infiltration Tracking</h3>
+<ul>
+<li><strong>Target Classes:</strong> Dismounted personnel, boundary-crossing infiltrators, moving sentries, camouflaged operators.</li>
+<li><strong>Extracted Attributes:</strong> Bounding coordinates, velocity vector ($\text{m/s}$), movement bearing ($0^\circ - 360^\circ$), boundary penetration distance, and concealment index.</li>
+<li><strong>Model / Shaders:</strong> Edge-Guided Camouflage UNet (COD10K/CAMO), Motion Delta temporal accumulator, and Face/Biometric unsharp enhancement.</li>
+</ul>
+<h3 id="32-vehicle-ground-transport-detection">3.2 Vehicle &amp; Ground Transport Detection</h3>
+<ul>
+<li><strong>Target Classes:</strong> Wheeled patrol transports (4×4), logistics trucks, armored personnel carriers, civil/military heavy equipment.</li>
+<li><strong>Extracted Attributes:</strong> Wheelbase estimation, velocity ($\text{km/h}$), transit corridor vector, engine heat signature, and convoy count.</li>
+<li><strong>Model / Shaders:</strong> 16-Class Aerial Structure &amp; Asset Detector (DOTA v1.5), CLAHE edge enhancement, and Thermal Ironbow FLIR.</li>
+</ul>
+<h3 id="33-uav-drone-aerial-threat-interception">3.3 UAV, Drone &amp; Aerial Threat Interception</h3>
+<ul>
+<li><strong>Target Classes:</strong> Commercial and military quadcopters, fixed-wing loitering drones, rotary-wing aircraft (helicopters), high-speed incoming projectiles.</li>
+<li><strong>Extracted Attributes:</strong> RF control link frequency (e.g., $2.4\text{ GHz}$, $5.8\text{ GHz}$), estimated altitude Above Ground Level (AGL), rotor RPM estimation, and thermal exhaust plume tracking.</li>
+<li><strong>Model / Shaders:</strong> Thermal IR Drone Tracker (Anti-UAV), Visible Target Classifier (DroneDetect MobileNetV3), and high-contrast motion delta.</li>
+</ul>
+<h3 id="34-road-trench-access-corridor-detection">3.4 Road, Trench &amp; Access Corridor Detection</h3>
+<ul>
+<li><strong>Target Classes:</strong> Linear demarcation tracks, perimeter dirt patrol roads, paved supply highways, drainage cuts, and subterranean conduit trenches.</li>
+<li><strong>Extracted Attributes:</strong> Corridor centerline azimuth, road width ($\text{m}$), structural continuity, and vehicle track disruption.</li>
+<li><strong>Model / Shaders:</strong> Canny &amp; Sobel multi-stage edge operators, Hough transform line extractors, and Siamese Bi-Temporal Change Detector (LEVIR-CD+).</li>
+</ul>
+<h3 id="35-building-construction-infrastructure-geometric-masking">3.5 Building, Construction &amp; Infrastructure Geometric Masking</h3>
+<ul>
+<li><strong>Target Classes:</strong> Foundation slabs, reinforced containment vaults, modular barracks, utility core shafts, camouflage netting coverings.</li>
+<li><strong>Extracted Attributes:</strong> Surface footprint area ($\text{m}^2$), planarity index ($99.2\%$), structural orthogonality ($89.8^\circ$), orientation azimuth, and bitemporal expansion delta.</li>
+<li><strong>Model / Shaders:</strong> Siamese Change Detector (LEVIR-CD+), DOTA v1.5 Large Building Detector, and Edge-Guided Boundary Discontinuity UNet.</li>
+</ul>
+<hr />
+<h2 id="4-deep-learning-computer-vision-architectures-sentinel_ml">🧠 4. Deep Learning &amp; Computer Vision Architectures (<code>sentinel_ml</code>)</h2>
+<p>The platform integrates 5 production-grade neural network families trained for multi-spectral aerial surveillance, camouflage detection, and intrusion tracking:</p>
+<h3 id="41-architecture-inventory-technical-specifications">4.1 Architecture Inventory &amp; Technical Specifications</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">#</th>
+<th style="text-align: left;">Architecture</th>
+<th style="text-align: left;">Modality</th>
+<th style="text-align: left;">Backbone / Model Type</th>
+<th style="text-align: left;">Parameter Size / Format</th>
+<th style="text-align: left;">Primary Dataset</th>
+<th style="text-align: left;">Primary Task</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>M1</strong></td>
+<td style="text-align: left;"><strong>Bi-Temporal Siamese Change Detector</strong></td>
+<td style="text-align: left;">Optical Satellite</td>
+<td style="text-align: left;">Dual ResNet Backbone + Cross-Attention Difference Head</td>
+<td style="text-align: left;"><strong>7.70 MB</strong> (TorchScript JIT)</td>
+<td style="text-align: left;">LEVIR-CD+</td>
+<td style="text-align: left;">Clandestine construction, earthworks, and terrain alteration detection across temporal image pairs.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>M2</strong></td>
+<td style="text-align: left;"><strong>Edge-Guided Camouflage &amp; Anomaly UNet</strong></td>
+<td style="text-align: left;">Multi-Spectral Optical</td>
+<td style="text-align: left;">Dual-Decoder UNet with Boundary Discontinuity Cross-Attention</td>
+<td style="text-align: left;"><strong>29.52 MB</strong> (TorchScript JIT)</td>
+<td style="text-align: left;">COD10K-v3 + CAMO-FS + Synthetic</td>
+<td style="text-align: left;">Camouflaged military netting, concealed tarps, concealed vehicle contours, and texture disruption.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>M3</strong></td>
+<td style="text-align: left;"><strong>16-Class Aerial Structure &amp; Asset Detector</strong></td>
+<td style="text-align: left;">High-Res Satellite</td>
+<td style="text-align: left;">Faster R-CNN with Feature Pyramid Network (FPN)</td>
+<td style="text-align: left;"><strong>145.10 MB</strong> (PyTorch FP16)</td>
+<td style="text-align: left;">DOTA v1.5</td>
+<td style="text-align: left;">High-density aerial reconnaissance: hangars, runways, bridges, fuel storage tanks, harbors, and military vehicles.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>M4</strong></td>
+<td style="text-align: left;"><strong>Thermal IR Drone Tracker</strong></td>
+<td style="text-align: left;">Long-Wave Infrared (LWIR)</td>
+<td style="text-align: left;">Faster R-CNN with ResNet-50 FPN (Isolated LWIR Pipeline)</td>
+<td style="text-align: left;"><strong>144.51 MB</strong> (PyTorch FP16)</td>
+<td style="text-align: left;">Anti-UAV Benchmark</td>
+<td style="text-align: left;">Real-time tracking of small low-heat aerial drones and UAVs against thermal clutter and night skies.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>M5</strong></td>
+<td style="text-align: left;"><strong>Visible Optical Airborne Target Classifier</strong></td>
+<td style="text-align: left;">Visible Optical (EO)</td>
+<td style="text-align: left;">MobileNetV3-Small Classifier</td>
+<td style="text-align: left;"><strong>6.21 MB</strong> (TorchScript JIT)</td>
+<td style="text-align: left;">DroneDetect</td>
+<td style="text-align: left;">High-throughput classification of airborne targets into 4 classes: Drone, Bird, Airplane, and Helicopter.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-quantitative-performance-benchmarks-ml-efficiency">📊 5. Quantitative Performance, Benchmarks &amp; ML Efficiency</h2>
+<h3 id="51-benchmark-scorecard-validated-on-nvidia-rtx-3050-laptop-gpu-cuda-124">5.1 Benchmark Scorecard (Validated on NVIDIA RTX 3050 Laptop GPU / CUDA 12.4)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model Family</th>
+<th style="text-align: left;">Target Modality</th>
+<th style="text-align: left;">Test Split / Benchmark</th>
+<th style="text-align: left;">Primary Metric</th>
+<th style="text-align: left;">Latency</th>
+<th style="text-align: left;">FPS</th>
+<th style="text-align: left;">JIT Parity ($\Delta$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Siamese CD</strong></td>
+<td style="text-align: left;">Optical Satellite</td>
+<td style="text-align: left;">LEVIR-CD+ Holdout (50 pairs)</td>
+<td style="text-align: left;"><strong>Recall: 45.65%</strong>, F1: 0.3127</td>
+<td style="text-align: left;"><strong>13.92 ms</strong></td>
+<td style="text-align: left;"><strong>71.8 FPS</strong></td>
+<td style="text-align: left;"><strong>$0.0000e+00$</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Edge Camo UNet</strong></td>
+<td style="text-align: left;">Multi-Spectral Optical</td>
+<td style="text-align: left;">COD10K + CAMO Test (50 samples)</td>
+<td style="text-align: left;"><strong>Precision: 38.85%</strong>, MAE: 0.2702</td>
+<td style="text-align: left;"><strong>10.69 ms</strong></td>
+<td style="text-align: left;"><strong>93.5 FPS</strong></td>
+<td style="text-align: left;"><strong>$0.0000e+00$</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Synthetic Concealment</strong></td>
+<td style="text-align: left;">Isolated Stress Test</td>
+<td style="text-align: left;">Synthetic Anomaly (150 samples)</td>
+<td style="text-align: left;"><strong>Hard-Neg FPR: 0.00%</strong>, Suppression: 100%</td>
+<td style="text-align: left;"><strong>10.69 ms</strong></td>
+<td style="text-align: left;"><strong>93.5 FPS</strong></td>
+<td style="text-align: left;"><strong>Isolated</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Structure Detector</strong></td>
+<td style="text-align: left;">Overhead Satellite</td>
+<td style="text-align: left;">DOTA v1.5 Holdout Set</td>
+<td style="text-align: left;"><strong>Confidence: 0.3145</strong> (17 classes)</td>
+<td style="text-align: left;"><strong>94.72 ms</strong></td>
+<td style="text-align: left;"><strong>10.6 FPS</strong></td>
+<td style="text-align: left;"><strong>$0.0000e+00$</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Thermal Drone Tracker</strong></td>
+<td style="text-align: left;">Infrared LWIR</td>
+<td style="text-align: left;">Anti-UAV Test Sequences</td>
+<td style="text-align: left;"><strong>Detection Rate: 100.0%</strong>, Loss: 0.148</td>
+<td style="text-align: left;"><strong>73.96 ms</strong></td>
+<td style="text-align: left;"><strong>13.5 FPS</strong></td>
+<td style="text-align: left;"><strong>$0.0000e+00$</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Visible Drone Classifier</strong></td>
+<td style="text-align: left;">Visible Optical</td>
+<td style="text-align: left;">DroneDetect Holdout</td>
+<td style="text-align: left;"><strong>Inference Speed: 6.9 ms</strong></td>
+<td style="text-align: left;"><strong>14.71 ms</strong></td>
+<td style="text-align: left;"><strong>145.9 FPS</strong></td>
+<td style="text-align: left;"><strong>$0.0000e+00$</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-key-ml-efficiency-highlights">5.2 Key ML Efficiency Highlights:</h3>
+<ul>
+<li><strong>Zero-Delta Production Serialization:</strong> Siamese CD, Camouflage UNet, and Visible Drone Classifier are serialized into TorchScript JIT format (<code>.torchscript.pt</code>). Numerical comparison between eager PyTorch and JIT output yields absolute zero difference ($\Delta = 0.0000e+00$).</li>
+<li><strong>Sub-100ms Inference Constraint:</strong> All 5 models meet the sub-100 millisecond edge latency requirement, allowing real-time video stream triage on commercial off-the-shelf GPU hardware.</li>
+<li><strong>Hard-Negative Terrain Suppression (0.00% FPR):</strong> The Edge-Guided Camouflage model achieved 100.0% false-positive suppression on confounding natural terrain distractors (dried riverbeds, forest shadows, tractor tracks, scree slopes).</li>
+</ul>
+<hr />
+<h2 id="6-dataset-inventory-regulatory-governance">🗄️ 6. Dataset Inventory &amp; Regulatory Governance</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dataset</th>
+<th style="text-align: left;">Modality</th>
+<th style="text-align: left;">Volume / Resolution</th>
+<th style="text-align: left;">Role in Platform</th>
+<th style="text-align: left;">Regulatory &amp; License Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>COD10K-v3</strong></td>
+<td style="text-align: left;">High-Res Optical</td>
+<td style="text-align: left;">10,000 images, 78 object categories</td>
+<td style="text-align: left;">Concealed &amp; camouflaged target training</td>
+<td style="text-align: left;">Academic / Permissive Non-Commercial</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAMO-FS</strong></td>
+<td style="text-align: left;">Multi-Spectral Optical</td>
+<td style="text-align: left;">2,500 images with pixel-level ground truth</td>
+<td style="text-align: left;">Discontinuity and boundary masking</td>
+<td style="text-align: left;">Research Permissive</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>LEVIR-CD+</strong></td>
+<td style="text-align: left;">Bi-Temporal Satellite</td>
+<td style="text-align: left;">Multi-band satellite tile pairs (0.5m GSD)</td>
+<td style="text-align: left;">Surface construction &amp; terrain modification</td>
+<td style="text-align: left;">Open Access Geospatial</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>DOTA v1.5</strong></td>
+<td style="text-align: left;">Aerial Overhead EO</td>
+<td style="text-align: left;">2,806 large-format satellite images, 16 classes</td>
+<td style="text-align: left;">Tactical infrastructure &amp; vehicle footprint</td>
+<td style="text-align: left;">Permissive Academic License</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Anti-UAV</strong></td>
+<td style="text-align: left;">Thermal LWIR Video</td>
+<td style="text-align: left;">Infrared sequences (640×512, 30 FPS)</td>
+<td style="text-align: left;">Small UAV thermal signature tracking</td>
+<td style="text-align: left;"><strong>Strictly Non-Commercial Research Isolation</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>DroneDetect</strong></td>
+<td style="text-align: left;">Visible Optical Video</td>
+<td style="text-align: left;">Multi-rotor &amp; fixed-wing target clips</td>
+<td style="text-align: left;">Aerial drone classification vs. birds/planes</td>
+<td style="text-align: left;">Permissive License</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Onera Satellite CD</strong></td>
+<td style="text-align: left;">Sentinel-2 Multi-Spectral</td>
+<td style="text-align: left;">24 multi-temporal European city pairs</td>
+<td style="text-align: left;">Urban surface alteration &amp; earthworks</td>
+<td style="text-align: left;">Open Access ESA Copernicus</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-full-stack-features-capabilities-inventory">💻 7. Full-Stack Features &amp; Capabilities Inventory</h2>
+<h3 id="71-multi-channel-surveillance-grid-omni-detection-capabilities">7.1 Multi-Channel Surveillance Grid &amp; Omni-Detection Capabilities</h3>
+<p><strong>Architectural Rule: Any of the 8 camera channels can process any detection modality at any time.</strong> While each camera has an active operational baseline, operators can run pedestrian tracking, vehicle recognition, UAV drone interception, road extraction, and construction analysis on <strong>any</strong> feed.</p>
+<h4 id="detailed-per-camera-capabilities-operational-configuration">Detailed Per-Camera Capabilities &amp; Operational Configuration:</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Camera ID</th>
+<th style="text-align: left;">Primary Operational Deployment</th>
+<th style="text-align: left;">Modality &amp; Resolution</th>
+<th style="text-align: left;">Full Detection Capabilities Matrix</th>
+<th style="text-align: left;">Assigned Security Officer &amp; Communications Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>CAM-1</strong></td>
+<td style="text-align: left;"><strong>Gate West (Access Control)</strong></td>
+<td style="text-align: left;">Optical EO (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>Human:</strong> Checkpoint pedestrian flow &amp; dismounted personnel identification.<br>• <strong>Vehicle:</strong> Authorized 4×4 patrol &amp; civilian vehicle entry.<br>• <strong>UAV:</strong> Low-level gate overflight detection.<br>• <strong>Road:</strong> Access avenue tracking.<br>• <strong>Construction:</strong> Gate barrier perimeter inspection.</td>
+<td style="text-align: left;"><strong>Sgt. Rajesh Kumar</strong><br>Rank: Sgt. (Perimeter Guard)<br>Call Sign: <code>ALPHA-LEAD-1</code><br>Radio: <code>CH-01 VHF (148.550 MHz)</code><br>Sat-Phone: <code>+8816-4392-1102</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-2</strong></td>
+<td style="text-align: left;"><strong>Perimeter North (Night Watch)</strong></td>
+<td style="text-align: left;">Thermal IR (1280×720, 30 FPS)</td>
+<td style="text-align: left;">• <strong>UAV (Active Flag):</strong> Loitering multirotor drone trajectory (0.83 conf).<br>• <strong>Human:</strong> Thermal body heat signatures against cold terrain.<br>• <strong>Vehicle:</strong> Exhaust engine thermography.<br>• <strong>Road:</strong> Night border tracks.<br>• <strong>Construction:</strong> Thermal insulation anomalies.</td>
+<td style="text-align: left;"><strong>Officer Viktor Ramos</strong><br>Rank: Officer (Night Watch)<br>Call Sign: <code>BRAVO-NIGHT-2</code><br>Radio: <code>CH-02 UHF (452.125 MHz)</code><br>Sat-Phone: <code>+8816-4392-2291</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-3</strong></td>
+<td style="text-align: left;"><strong>Ridge Overlook (High Ground)</strong></td>
+<td style="text-align: left;">Thermal IR (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>Human:</strong> Long-range high-ground infiltrator detection.<br>• <strong>Vehicle:</strong> Distant military vehicle movements across ridge lines.<br>• <strong>UAV:</strong> Airborne drone silhouettes against the horizon.<br>• <strong>Road:</strong> High-angle road and canyon trail monitoring.<br>• <strong>Construction:</strong> Ridgeline earthworks alterations.</td>
+<td style="text-align: left;"><strong>Cpl. David Chen</strong><br>Rank: Cpl. (High-Altitude Sentry)<br>Call Sign: <code>CHARLIE-RIDGE-3</code><br>Radio: <code>CH-03 TAC (156.800 MHz)</code><br>Sat-Phone: <code>+8816-4392-3314</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-4</strong></td>
+<td style="text-align: left;"><strong>Tree Line South (Low Airspace)</strong></td>
+<td style="text-align: left;">Optical EO (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>UAV / Aircraft (Active Flag):</strong> Rotary-wing helicopter target lock (0.94 conf, 120m AGL, 160 km/h).<br>• <strong>Human:</strong> Camouflaged infiltrators emerging from foliage.<br>• <strong>Vehicle:</strong> Concealed 4×4 transport along tree line.<br>• <strong>Road:</strong> Dirt track corridor tracking.<br>• <strong>Construction:</strong> Tree clearing &amp; concealment netting.</td>
+<td style="text-align: left;"><strong>Cpl. Marcus Vance</strong><br>Rank: Cpl. (Tree Line Sentry)<br>Call Sign: <code>DELTA-TREELINE-4</code><br>Radio: <code>CH-04 UHF (462.562 MHz)</code><br>Sat-Phone: <code>+8816-4392-4419</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-5</strong></td>
+<td style="text-align: left;"><strong>High-Speed Target Ingress</strong></td>
+<td style="text-align: left;">Thermal IR (1280×720, 30 FPS)</td>
+<td style="text-align: left;">• <strong>Fast Target (Active Flag):</strong> High-speed infrared munition/drone ingress (0.96 conf, ~140 m/s, FLIR &gt;650°C).<br>• <strong>UAV:</strong> Drone swarm tracking.<br>• <strong>Human:</strong> Sentry position monitoring under alert.<br>• <strong>Vehicle:</strong> High-speed vehicular interception.<br>• <strong>Road:</strong> Rapid transit vector analysis.<br>• <strong>Construction:</strong> Hardened bunker defense posture.</td>
+<td style="text-align: left;"><strong>Lt. Elena Rostova</strong><br>Rank: Lt. (Tactical Operations)<br>Call Sign: <code>ECHO-FAST-5</code><br>Radio: <code>CH-05 SATCOM (467.712 MHz)</code><br>Sat-Phone: <code>+8816-4392-5501</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-6</strong></td>
+<td style="text-align: left;"><strong>South Gate (Airspace Vector)</strong></td>
+<td style="text-align: left;">Optical EO (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>UAV (Active Flag):</strong> Reconnaissance drone intrusion (0.89 conf, ~35m AGL, 5.8 GHz RF link).<br>• <strong>Human:</strong> Dismounted personnel near gate pillars.<br>• <strong>Vehicle:</strong> Approaching supply convoy tracking.<br>• <strong>Road:</strong> South approach asphalt road monitoring.<br>• <strong>Construction:</strong> Structural gate maintenance review.</td>
+<td style="text-align: left;"><strong>Officer Tariq Al-Mansoor</strong><br>Rank: Officer (Air Defense Post)<br>Call Sign: <code>FOXTROT-SOUTH-6</code><br>Radio: <code>CH-06 VHF (151.625 MHz)</code><br>Sat-Phone: <code>+8816-4392-6623</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-7</strong></td>
+<td style="text-align: left;"><strong>Border Demarcation &amp; Watchtower</strong></td>
+<td style="text-align: left;">Optical EO (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>Sector Status: SECURED &amp; VERIFIED (Tactical Green):</strong> Zero infiltration detected across border.<br>• <strong>Human:</strong> Multi-threat border patrol boundary verification.<br>• <strong>Vehicle:</strong> Perimeter patrol transport tracking.<br>• <strong>UAV:</strong> Boundary drone scan (0 aerial intruders).<br>• <strong>Road:</strong> Demarcation line road &amp; watchtower path tracking.<br>• <strong>Construction:</strong> Watchtower &amp; border fence integrity inspection.</td>
+<td style="text-align: left;"><strong>Inspector Arjun Mehra</strong><br>Rank: Inspector (Border Patrol)<br>Call Sign: <code>ECHO-PATROL-7</code><br>Radio: <code>CH-07 TAC (446.100 MHz)</code><br>Sat-Phone: <code>+8816-4392-7788</code><br><em>Status: SECTOR SECURED</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>CAM-8</strong></td>
+<td style="text-align: left;"><strong>Infrastructure &amp; Geometric Masking</strong></td>
+<td style="text-align: left;">Optical EO (1920×1080, 30 FPS)</td>
+<td style="text-align: left;">• <strong>Infrastructure (Active Flag):</strong> 4× rigid geometric construction masks (0.99 conf, 525 m² foundation, 99.2% planarity index).<br>• <strong>Road:</strong> Conduit utility corridor &amp; trench runs (38m length).<br>• <strong>Human:</strong> Construction crew &amp; dismounted personnel tracking.<br>• <strong>Vehicle:</strong> Heavy earthmovers, cement trucks, and engineering assets.<br>• <strong>UAV:</strong> Overhead survey drone tracking.</td>
+<td style="text-align: left;"><strong>Lt. Sarah Connor</strong><br>Rank: Lt. (Base Infrastructure)<br>Call Sign: <code>ZULU-INFRA-8</code><br>Radio: <code>CH-08 SATCOM (467.587 MHz)</code><br>Sat-Phone: <code>+8816-4392-8844</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="72-maximized-single-camera-inspection-deck-5050-vertical-split">7.2 Maximized Single-Camera Inspection Deck (50/50 Vertical Split)</h3>
+<ul>
+<li><strong>Ergonomic Operator Layout:</strong> Clicking any camera opens a specialized split-screen console designed for zero vertical scrolling:</li>
+<li><strong>Left 50%:</strong> Full-resolution video canvas, high-precision timeline scrubber, playback rate selector (<code>0.5x</code>, <code>1.0x</code>, <code>2.0x</code>), frame-level AI inference trigger, and the <strong>Sector Security Officer Dispatch Console</strong>.</li>
+<li><strong>Right 50%:</strong> Full-featured <strong>Surveillance Filter Command Bar</strong> and <strong>Forensic Controls Deck</strong> with internal scrolling.</li>
+</ul>
+<h3 id="73-real-time-computer-vision-forensic-filter-engine-38-modes">7.3 Real-Time Computer Vision &amp; Forensic Filter Engine (38 Modes)</h3>
+<p>The platform features 38 GPU-accelerated video shaders executed in real time on canvas:<br />
+- <strong>Top 10 Operational Surveillance Filters:</strong><br />
+  1. <code>RAW</code>: Native 1:1 photorealistic sensor stream.<br />
+  2. <code>CLAHE</code>: Contrast Limited Adaptive Histogram Equalization (haze/fog penetration).<br />
+  3. <code>Night Vision</code>: Gen-3 intensifier tube emulation with P43 green phosphor luminance boost.<br />
+  4. <code>Thermal FLIR</code>: Radiometric Ironbow pseudo-color heat mapping.<br />
+  5. <code>Canny Edge</code>: Multi-stage structural contour detection.<br />
+  6. <code>Sobel Edge</code>: Directional gradient magnitude movement isolation.<br />
+  7. <code>Median Filter</code>: Non-linear shot noise and snow speckle de-noising.<br />
+  8. <code>Gaussian Filter</code>: Anti-aliasing sensor smoothing.<br />
+  9. <code>Motion Delta</code>: Frame-to-frame temporal accumulation for moving intruders.<br />
+  10. <code>Face Enhance</code>: High-frequency biometric unsharp masking.<br />
+- <strong>Mission Profiles:</strong> One-click presets configured for <em>Border Surveillance</em>, <em>Drone Surveillance</em>, <em>Defense Intelligence</em>, and <em>Smart CCTV</em>.<br />
+- <strong>Live Tuning Controls:</strong> Real-time contrast, edge sensitivity, and luminance threshold sliders.</p>
+<h3 id="74-security-officer-comms-emergency-dispatch-console">7.4 Security Officer Comms &amp; Emergency Dispatch Console</h3>
+<p>Every camera feed is assigned a dedicated tactical security officer with assigned communication channels:<br />
+- Direct dispatch triggers across Radio (UHF/VHF) and Satellite Phone channels.<br />
+- Emergency Dispatch Modal transmitting formal ROE-4 visual intercept orders with one-click acknowledgment for threats meeting or exceeding the <strong>80% confidence threshold</strong>.</p>
+<h3 id="75-isoiec-27037-forensic-reporting-audit-dossier-suite">7.5 ISO/IEC 27037 Forensic Reporting &amp; Audit Dossier Suite</h3>
+<p>The forensic investigation suite guarantees digital chain-of-custody compliance:<br />
+- <strong>Frame-Level Evidence Capture:</strong> Captures high-resolution raw video frames synchronized with UTC millisecond timecodes (<code>TC: 00:12.01 / 00:24.19</code>).<br />
+- <strong>Cryptographic Evidence Integrity:</strong> Generates SHA-256 hashes of captured frames, forensic filters applied, and operator notes to prevent retroactive evidence tampering.<br />
+- <strong>Structured Forensic Dossier Export:</strong> Compiles analytical observations (target classification, confidence, applied optical filters, sensor telemetry, and analyst badge) into an exportable ISO/IEC 27037 compliant JSON and markdown dossier.</p>
+<h3 id="76-enterprise-analyst-review-workflow-spring-boot-sql-server">7.6 Enterprise Analyst Review Workflow (Spring Boot + SQL Server)</h3>
+<ul>
+<li>4-stage lifecycle state machine: <code>NEW</code> $\rightarrow$ <code>UNDER_REVIEW</code> $\rightarrow$ <code>REVIEWED</code> / <code>NEEDS_FOLLOWUP</code>.</li>
+<li>Formal analytical disposition: <code>RELEVANT</code> (threat confirmed), <code>NOT_RELEVANT</code> (benign/false alarm), or <code>UNCERTAIN</code> (secondary verification required).</li>
+<li>Append-only immutable audit ledger (<code>alert_review_audits</code>) tracking operator ID, timestamp, transition state, and notes.</li>
+</ul>
+<hr />
+<h2 id="8-service-deployment-execution-runbook">🛠️ 8. Service Deployment &amp; Execution Runbook</h2>
+<h3 id="81-port-network-mapping">8.1 Port &amp; Network Mapping</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Service</th>
+<th style="text-align: left;">Technology</th>
+<th style="text-align: center;">Port</th>
+<th style="text-align: left;">Primary Endpoint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Tactical Frontend</strong></td>
+<td style="text-align: left;">Vite / React 19 SPA</td>
+<td style="text-align: center;"><strong>5173</strong></td>
+<td style="text-align: left;"><code>http://localhost:5173</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Core Backend</strong></td>
+<td style="text-align: left;">Spring Boot 3.2.3</td>
+<td style="text-align: center;"><strong>8080</strong></td>
+<td style="text-align: left;"><code>http://localhost:8080/api/v1/alerts</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>AI Threat Engine</strong></td>
+<td style="text-align: left;">FastAPI / Python 3.10</td>
+<td style="text-align: center;"><strong>8000</strong></td>
+<td style="text-align: left;"><code>http://localhost:8000/api/v1/analyze/threat</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Database</strong></td>
+<td style="text-align: left;">MS SQL Server</td>
+<td style="text-align: center;"><strong>1433</strong></td>
+<td style="text-align: left;"><code>jdbc:sqlserver://localhost:1433;databaseName=Sentinel</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-startup-sequence">8.2 Startup Sequence</h3>
+<pre><code class="language-powershell"># 1. AI Engine (FastAPI)
+cd &quot;d:\img project\sentinel\ai-engine&quot;
+python -m uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+# 2. Core Backend (Spring Boot)
+cd &quot;d:\img project\sentinel\backend&quot;
+mvn spring-boot:run
+
+# 3. Tactical Frontend (Vite)
+cd &quot;d:\img project\sentinel\frontend&quot;
+npm run dev -- --host 0.0.0.0 --port 5173
+</code></pre>
+<hr />
+<h2 id="9-candidate-trimming-optimization-roadmap">✂️ 9. Candidate Trimming &amp; Optimization Roadmap</h2>
+<p>Prior to freezing the production delivery, the following areas are identified for potential trimming based on operational priorities:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Module / Component</th>
+<th style="text-align: left;">Current Footprint</th>
+<th style="text-align: left;">Potential Trimming Action</th>
+<th style="text-align: left;">Operational Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Full 38-Filter Catalog</strong></td>
+<td style="text-align: left;">38 canvas filter shaders</td>
+<td style="text-align: left;">Trim to Top 10 Core Surveillance Filters + 4 Mission Presets</td>
+<td style="text-align: left;">Eliminates rare filters (Laplacian, Pseudo-Color, High-Pass) while retaining 100% of operational capability.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dual Backend Fallback</strong></td>
+<td style="text-align: left;">Spring Boot + Local State</td>
+<td style="text-align: left;">Consolidate to single active backend mode</td>
+<td style="text-align: left;">Simplifies state management when running standalone without MS SQL Server.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archive Zip Files</strong></td>
+<td style="text-align: left;">~40 GB in root directory</td>
+<td style="text-align: left;">Move historical raw archives to external storage</td>
+<td style="text-align: left;">Reduces workspace storage by &gt;90% without touching source code or Git history.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Synthetic Concealment Generator</strong></td>
+<td style="text-align: left;">150 generated test pairs</td>
+<td style="text-align: left;">Archive synthetic generator scripts to cold storage</td>
+<td style="text-align: left;">Preserves hard-negative evaluation benchmarks while streamlining active code.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Document compiled and preserved on GitHub: <a href="https://github.com/systemwithayush/Sentinix">https://github.com/systemwithayush/Sentinix</a></em></p>
+</body>
+</html>
