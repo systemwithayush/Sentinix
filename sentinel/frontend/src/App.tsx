@@ -1003,91 +1003,94 @@ function App() {
             {/* Main Video View: Either Maximized Single Feature Inspection or 8-Channel Detection Grid */}
             <div className="panel flex-1 min-h-0 p-2 overflow-hidden flex flex-col">
               {selectedCam ? (
-                /* Maximized Single Video Channel Feature Inspection View */
-                <div className="w-full h-full bg-black border-2 border-tactical-green flex flex-col relative overflow-y-auto">
-                  {/* Top HUD */}
-                  <div className="sticky top-0 inset-x-0 bg-black/95 border-b border-tactical-olive p-2.5 flex flex-wrap gap-2 justify-between items-center z-30 font-mono shadow-md">
-                    <div className="space-y-0.5">
-                      <div className="flex items-center space-x-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse"></span>
-                        <span className="text-white font-bold text-sm tracking-wider">{selectedCam.name}</span>
-                        <span className={selectedCam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500 text-orange-400 text-[10px] px-1.5 py-0.5' : 'bg-emerald-950/80 border border-status-green text-status-green text-[10px] px-1.5 py-0.5'}>
-                          {selectedCam.sensorType === 'IR_THERMAL' ? 'IR THERMAL SENSOR' : 'EO OPTICAL SENSOR'}
-                        </span>
-                        <span className="bg-tactical-olive/80 border border-tactical-green text-white text-[10px] px-1.5 py-0.5 font-bold">
-                          🔬 FEATURE INSPECTION ACTIVE
-                        </span>
-                        {selectedCam.fileName && (
-                          <span className="bg-blue-950/80 border border-blue-400 text-blue-300 text-[10px] px-1.5 py-0.5">
-                            UPLOADED: {selectedCam.fileName} ({selectedCam.fileSize})
+                /* Maximized Single Video Channel Feature Inspection View - 50/50 Split */
+                <div className="w-full h-full bg-black border-2 border-tactical-green flex flex-col relative overflow-hidden">
+                  
+                  {/* TOP HALF (50% Screen): Video Feed + Scrubber + Playback & Action Controls */}
+                  <div className="h-1/2 flex flex-col min-h-0 border-b-2 border-tactical-green bg-black shrink-0 overflow-hidden">
+                    {/* Top HUD */}
+                    <div className="bg-black/95 border-b border-tactical-olive px-2.5 py-1.5 flex flex-wrap gap-2 justify-between items-center z-30 font-mono shadow-md shrink-0">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center space-x-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse"></span>
+                          <span className="text-white font-bold text-sm tracking-wider">{selectedCam.name}</span>
+                          <span className={selectedCam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500 text-orange-400 text-[10px] px-1.5 py-0.5' : 'bg-emerald-950/80 border border-status-green text-status-green text-[10px] px-1.5 py-0.5'}>
+                            {selectedCam.sensorType === 'IR_THERMAL' ? 'IR THERMAL SENSOR' : 'EO OPTICAL SENSOR'}
                           </span>
-                        )}
+                          <span className="bg-tactical-olive/80 border border-tactical-green text-white text-[10px] px-1.5 py-0.5 font-bold">
+                            🔬 FEATURE INSPECTION ACTIVE
+                          </span>
+                          {selectedCam.fileName && (
+                            <span className="bg-blue-950/80 border border-blue-400 text-blue-300 text-[10px] px-1.5 py-0.5">
+                              UPLOADED: {selectedCam.fileName} ({selectedCam.fileSize})
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-tactical-light">
+                          GRID REF: 43R TN 8923 1245 | RES: {selectedCam.resolution} | FPS: {selectedCam.fps} | ACTIVE FILTER: <strong className="text-status-amber">{forensicFilter}</strong>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-tactical-light">
-                        GRID REF: 43R TN 8923 1245 | RES: {selectedCam.resolution} | FPS: {selectedCam.fps} | ACTIVE FILTER: <strong className="text-status-amber">{forensicFilter}</strong>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Live Camera Feed Quick Switcher */}
+                        <div className="hidden lg:flex items-center space-x-1 bg-black/80 p-1 border border-tactical-olive">
+                          <span className="text-[10px] text-tactical-light mr-1 font-bold">FEEDS:</span>
+                          {cameraFeeds.map(feed => (
+                            <button
+                              key={feed.id}
+                              type="button"
+                              onClick={() => setSelectedCamId(feed.id)}
+                              className={`px-2 py-0.5 text-[10px] font-mono border transition-all ${
+                                feed.id === selectedCam.id
+                                  ? 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_8px_rgba(255,183,3,0.3)]'
+                                  : 'bg-black/60 text-tactical-light border-tactical-olive hover:text-white hover:border-tactical-green'
+                              }`}
+                            >
+                              {feed.name.split(' ')[0]}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Prominent ISO/IEC 27037 Forensic Report Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleGenerateForensicReport(selectedCam)}
+                          className="px-3 py-1 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:brightness-125 text-white font-mono font-bold text-xs border border-status-green shadow-[0_0_12px_rgba(0,255,65,0.4)] transition-all flex items-center space-x-1.5 animate-pulse"
+                          title="Generate certified ISO/IEC 27037 Digital Forensics Evidence Dossier"
+                        >
+                          <span>📑</span>
+                          <span>FORENSIC REPORT (ISO/IEC 27037)</span>
+                        </button>
+
+                        <span className="text-status-green text-xs font-bold bg-black/80 px-2 py-1 border border-tactical-green">
+                          {tacticalTime}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCamId(null)}
+                          className="px-3 py-1 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-xs transition-colors"
+                        >
+                          [ ✖ EXIT INSPECTION ]
+                        </button>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      {/* Live Camera Feed Quick Switcher */}
-                      <div className="hidden lg:flex items-center space-x-1 bg-black/80 p-1 border border-tactical-olive">
-                        <span className="text-[10px] text-tactical-light mr-1 font-bold">FEEDS:</span>
-                        {cameraFeeds.map(feed => (
-                          <button
-                            key={feed.id}
-                            type="button"
-                            onClick={() => setSelectedCamId(feed.id)}
-                            className={`px-2 py-0.5 text-[10px] font-mono border transition-all ${
-                              feed.id === selectedCam.id
-                                ? 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_8px_rgba(255,183,3,0.3)]'
-                                : 'bg-black/60 text-tactical-light border-tactical-olive hover:text-white hover:border-tactical-green'
-                            }`}
-                          >
-                            {feed.name.split(' ')[0]}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Prominent ISO/IEC 27037 Forensic Report Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleGenerateForensicReport(selectedCam)}
-                        className="px-3 py-1 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:brightness-125 text-white font-mono font-bold text-xs border border-status-green shadow-[0_0_12px_rgba(0,255,65,0.4)] transition-all flex items-center space-x-1.5 animate-pulse"
-                        title="Generate certified ISO/IEC 27037 Digital Forensics Evidence Dossier"
-                      >
-                        <span>📑</span>
-                        <span>FORENSIC REPORT (ISO/IEC 27037)</span>
-                      </button>
-
-                      <span className="text-status-green text-xs font-bold bg-black/80 px-2 py-1 border border-tactical-green">
-                        {tacticalTime}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedCamId(null)}
-                        className="px-3 py-1 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-xs transition-colors"
-                      >
-                        [ ✖ EXIT INSPECTION ]
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* High-Res Forensic Video Player with Canvas Filters */}
-                  <div className="flex-1 w-full min-h-[360px] relative flex items-center justify-center bg-black overflow-hidden">
-                    <ForensicVideoPlayer
-                      ref={expandedPlayerRef}
-                      camId={selectedCam.id}
-                      videoUrl={selectedCam.videoUrl}
-                      isMuted={isMuted}
-                      filterMode={forensicFilter}
-                      filterOptions={forensicOptions}
-                      playbackSpeed={playbackSpeed}
-                      onTimeUpdate={(cTime, dur) => {
-                        setActiveVideoTime(cTime);
-                        setActiveVideoDuration(dur);
-                      }}
-                      className="w-full h-full"
-                    />
+                    {/* High-Res Forensic Video Player with Canvas Filters */}
+                    <div className="flex-1 w-full min-h-0 relative flex items-center justify-center bg-black overflow-hidden">
+                      <ForensicVideoPlayer
+                        ref={expandedPlayerRef}
+                        camId={selectedCam.id}
+                        videoUrl={selectedCam.videoUrl}
+                        isMuted={isMuted}
+                        filterMode={forensicFilter}
+                        filterOptions={forensicOptions}
+                        playbackSpeed={playbackSpeed}
+                        onTimeUpdate={(cTime, dur) => {
+                          setActiveVideoTime(cTime);
+                          setActiveVideoDuration(dur);
+                        }}
+                        className="w-full h-full"
+                      />
 
                     {/* Single Cam Expanded Overlays for CAM-8 (Infrastructure Detection via Geometrical Masking) */}
                     {showDetectionOverlays && selectedCam.id === '8' && (
@@ -1365,43 +1368,46 @@ function App() {
                       </label>
                     </div>
                   </div>
+                </div>
 
-                  {/* Tactical Surveillance Filters Command Bar (Feature Inspection Mode) */}
-                  <div className="shrink-0 border-t border-tactical-green/60">
-                    <SurveillanceFilterCommandBar
-                      activeFilter={forensicFilter}
-                      onFilterChange={setForensicFilter}
-                      filterOptions={forensicOptions}
-                      onOptionsChange={setForensicOptions}
-                      selectedScope={selectedCam.id}
-                      onScopeChange={(scope) => {
-                        if (scope !== 'ALL') setSelectedCamId(scope);
-                      }}
-                      availableCameras={cameraFeeds.map(c => ({ id: c.id, name: c.name }))}
-                      onOpenForensicLab={(camId) => setSelectedCamId(camId)}
-                      activeMissionPreset={activeMissionPreset}
-                      onMissionPresetChange={setActiveMissionPreset}
-                    />
-                  </div>
+                {/* BOTTOM HALF (50% Screen): All Surveillance Tools & Forensic Deck */}
+                <div className="h-1/2 flex flex-col min-h-0 bg-tactical-dark overflow-hidden">
+                    {/* Tactical Surveillance Filters Command Bar */}
+                    <div className="shrink-0 border-b border-tactical-olive">
+                      <SurveillanceFilterCommandBar
+                        activeFilter={forensicFilter}
+                        onFilterChange={setForensicFilter}
+                        filterOptions={forensicOptions}
+                        onOptionsChange={setForensicOptions}
+                        selectedScope={selectedCam.id}
+                        onScopeChange={(scope) => {
+                          if (scope !== 'ALL') setSelectedCamId(scope);
+                        }}
+                        availableCameras={cameraFeeds.map(c => ({ id: c.id, name: c.name }))}
+                        onOpenForensicLab={(camId) => setSelectedCamId(camId)}
+                        activeMissionPreset={activeMissionPreset}
+                        onMissionPresetChange={setActiveMissionPreset}
+                      />
+                    </div>
 
-                  {/* Forensic Image Processing, Write-up Deck & Forensic Report Generator */}
-                  <div className="shrink-0 border-t border-tactical-olive">
-                    <ForensicControlsDeck
-                      camId={selectedCam.id}
-                      camName={selectedCam.name}
-                      filterMode={forensicFilter}
-                      onFilterChange={setForensicFilter}
-                      filterOptions={forensicOptions}
-                      onOptionsChange={setForensicOptions}
-                      activeTimecode={formatTimecode(activeVideoTime)}
-                      analystId={reviewerId}
-                      cameraFeeds={cameraFeeds}
-                      onSelectCamera={(id) => setSelectedCamId(id)}
-                      onSaveWriteup={handleSaveForensicWriteup}
-                      onFlagFollowup={handleFlagFollowupWriteup}
-                      existingWriteups={forensicWriteups}
-                      onGenerateReport={() => handleGenerateForensicReport(selectedCam)}
-                    />
+                    {/* Forensic Image Processing, Write-up Deck & Forensic Report Generator */}
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                      <ForensicControlsDeck
+                        camId={selectedCam.id}
+                        camName={selectedCam.name}
+                        filterMode={forensicFilter}
+                        onFilterChange={setForensicFilter}
+                        filterOptions={forensicOptions}
+                        onOptionsChange={setForensicOptions}
+                        activeTimecode={formatTimecode(activeVideoTime)}
+                        analystId={reviewerId}
+                        onSelectCamera={(id) => setSelectedCamId(id)}
+                        onSaveWriteup={handleSaveForensicWriteup}
+                        onFlagFollowup={handleFlagFollowupWriteup}
+                        existingWriteups={forensicWriteups}
+                        onGenerateReport={() => handleGenerateForensicReport(selectedCam)}
+                      />
+                    </div>
                   </div>
                 </div>
               ) : (
