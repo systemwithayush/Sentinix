@@ -957,9 +957,9 @@ function App() {
 
       {/* DASHBOARD VIEW */}
       {view === 'DASHBOARD' && (
-        <main className="flex-1 flex overflow-hidden p-4 space-x-4 min-h-0">
-          {/* Left: 8 Video Streams Grid */}
-          <div className="flex-[3] flex flex-col space-y-2 min-w-0">
+        <main className={`flex-1 flex overflow-hidden p-4 min-h-0 ${selectedCam ? '' : 'space-x-4'}`}>
+          {/* Left: 8 Video Streams Grid or Fullscreen Maximized Inspection */}
+          <div className={`${selectedCam ? 'flex-1 w-full' : 'flex-[3]'} flex flex-col space-y-2 min-w-0`}>
             {/* Toolbar above feeds */}
             <div className="flex justify-between items-center bg-tactical-gray/60 px-3 py-1.5 border border-tactical-olive">
               <div className="flex items-center space-x-3">
@@ -1621,104 +1621,106 @@ function App() {
             </div>
           </div>
 
-          {/* Right: Threat Intelligence Alert Feed (Phase 7 Review Workflow) */}
-          <div className="flex-[2] flex flex-col space-y-3 min-w-0">
-            <div className="flex justify-between items-center">
-              <h2 className="font-mono text-tactical-light tracking-widest text-sm font-bold flex items-center">
-                <span className="text-status-red mr-2">›</span>
-                TACTICAL ALERT INBOX
-                <span className="ml-2 px-1.5 py-0.2 bg-status-red/20 border border-status-red text-status-red text-[11px] font-bold">
-                  {alerts.length}
-                </span>
-              </h2>
-            </div>
+          {/* Right: Threat Intelligence Alert Feed (Phase 7 Review Workflow) - Visible ONLY in 8-Feed Overview, Hidden in Single Cam Inspection */}
+          {!selectedCam && (
+            <div className="flex-[2] flex flex-col space-y-3 min-w-0">
+              <div className="flex justify-between items-center">
+                <h2 className="font-mono text-tactical-light tracking-widest text-sm font-bold flex items-center">
+                  <span className="text-status-red mr-2">›</span>
+                  TACTICAL ALERT INBOX
+                  <span className="ml-2 px-1.5 py-0.2 bg-status-red/20 border border-status-red text-status-red text-[11px] font-bold">
+                    {alerts.length}
+                  </span>
+                </h2>
+              </div>
 
-            {/* Filter Tabs */}
-            <div className="flex space-x-1 font-mono text-[10px] bg-tactical-gray p-1 border border-tactical-olive">
-              {['ALL', 'NEW', 'UNDER_REVIEW', 'REVIEWED', 'NEEDS_FOLLOWUP'].map((filterKey) => (
-                <button
-                  key={filterKey}
-                  onClick={() => setStatusFilter(filterKey)}
-                  className={`flex-1 py-1 text-center transition-colors ${
-                    statusFilter === filterKey
-                      ? 'bg-tactical-green text-black font-bold'
-                      : 'text-tactical-light hover:text-white hover:bg-tactical-olive/30'
-                  }`}
-                >
-                  {filterKey.replace('_', ' ')}
-                </button>
-              ))}
-            </div>
-
-            {/* Alerts List */}
-            <div className="panel flex-1 overflow-y-auto space-y-2.5 p-2 min-h-0">
-              {filteredAlerts.length === 0 ? (
-                <div className="flex items-center justify-center h-48 font-mono text-tactical-olive text-xs tracking-widest">
-                  NO ALERTS IN THIS CATEGORY
-                </div>
-              ) : (
-                filteredAlerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    onClick={() => openReviewModal(alert)}
-                    className="p-3 bg-black/60 border border-tactical-olive hover:border-tactical-green hover:bg-black/90 cursor-pointer transition-all relative group"
+              {/* Filter Tabs */}
+              <div className="flex space-x-1 font-mono text-[10px] bg-tactical-gray p-1 border border-tactical-olive">
+                {['ALL', 'NEW', 'UNDER_REVIEW', 'REVIEWED', 'NEEDS_FOLLOWUP'].map((filterKey) => (
+                  <button
+                    key={filterKey}
+                    onClick={() => setStatusFilter(filterKey)}
+                    className={`flex-1 py-1 text-center transition-colors ${
+                      statusFilter === filterKey
+                        ? 'bg-tactical-green text-black font-bold'
+                        : 'text-tactical-light hover:text-white hover:bg-tactical-olive/30'
+                    }`}
                   >
-                    {/* Header Row */}
-                    <div className="flex justify-between items-center font-mono text-[11px] mb-1.5">
-                      <span className="text-white font-bold">{alert.cam || 'CAM-SYS'} | {alert.time || alert.timestamp}</span>
-                      <div className="flex items-center space-x-2">
-                        {getThreatBadge(alert.threatLevel)}
-                        {getStatusBadge(alert.reviewStatus)}
+                    {filterKey.replace('_', ' ')}
+                  </button>
+                ))}
+              </div>
+
+              {/* Alerts List */}
+              <div className="panel flex-1 overflow-y-auto space-y-2.5 p-2 min-h-0">
+                {filteredAlerts.length === 0 ? (
+                  <div className="flex items-center justify-center h-48 font-mono text-tactical-olive text-xs tracking-widest">
+                    NO ALERTS IN THIS CATEGORY
+                  </div>
+                ) : (
+                  filteredAlerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      onClick={() => openReviewModal(alert)}
+                      className="p-3 bg-black/60 border border-tactical-olive hover:border-tactical-green hover:bg-black/90 cursor-pointer transition-all relative group"
+                    >
+                      {/* Header Row */}
+                      <div className="flex justify-between items-center font-mono text-[11px] mb-1.5">
+                        <span className="text-white font-bold">{alert.cam || 'CAM-SYS'} | {alert.time || alert.timestamp}</span>
+                        <div className="flex items-center space-x-2">
+                          {getThreatBadge(alert.threatLevel)}
+                          {getStatusBadge(alert.reviewStatus)}
+                        </div>
+                      </div>
+
+                      {/* Module & Description */}
+                      <div className="font-mono text-xs text-status-amber font-semibold mb-1 flex items-center">
+                        <span className="mr-1.5 opacity-60">MOD:</span> {alert.module}
+                      </div>
+                      <div className="font-sans text-xs text-gray-300 line-clamp-2 mb-2">
+                        {alert.description}
+                      </div>
+
+                      {/* Quick Actions & Provenance Footer */}
+                      <div className="pt-2 border-t border-tactical-olive/50 flex items-center justify-between font-mono text-[10px]">
+                        <div>{getDispositionBadge(alert.disposition)}</div>
+                        {alert.reviewStatus === 'NEW' || alert.reviewStatus === 'UNDER_REVIEW' ? (
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={(e) => handleQuickConfirm(e, alert.id)}
+                              className="px-2 py-0.5 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-[9px] transition-colors"
+                              title="Confirm as real threat"
+                            >
+                              ✓ THREAT
+                            </button>
+                            <button
+                              onClick={(e) => handleQuickDismiss(e, alert.id)}
+                              className="px-2 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-white hover:border-tactical-green font-bold text-[9px] transition-colors"
+                              title="Dismiss / mark as benign"
+                            >
+                              ✗ DISMISS
+                            </button>
+                            <button
+                              onClick={() => openReviewModal(alert)}
+                              className="px-1.5 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-status-green text-[9px] transition-colors"
+                              title="Full review"
+                            >
+                              ›
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-tactical-light/60 group-hover:text-status-green transition-colors flex items-center">
+                            <span className="mr-1">[REVIEWED]</span>
+                            <span>›</span>
+                          </div>
+                        )}
                       </div>
                     </div>
-
-                    {/* Module & Description */}
-                    <div className="font-mono text-xs text-status-amber font-semibold mb-1 flex items-center">
-                      <span className="mr-1.5 opacity-60">MOD:</span> {alert.module}
-                    </div>
-                    <div className="font-sans text-xs text-gray-300 line-clamp-2 mb-2">
-                      {alert.description}
-                    </div>
-
-                    {/* Quick Actions & Provenance Footer */}
-                    <div className="pt-2 border-t border-tactical-olive/50 flex items-center justify-between font-mono text-[10px]">
-                      <div>{getDispositionBadge(alert.disposition)}</div>
-                      {alert.reviewStatus === 'NEW' || alert.reviewStatus === 'UNDER_REVIEW' ? (
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={(e) => handleQuickConfirm(e, alert.id)}
-                            className="px-2 py-0.5 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-[9px] transition-colors"
-                            title="Confirm as real threat"
-                          >
-                            ✓ THREAT
-                          </button>
-                          <button
-                            onClick={(e) => handleQuickDismiss(e, alert.id)}
-                            className="px-2 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-white hover:border-tactical-green font-bold text-[9px] transition-colors"
-                            title="Dismiss / mark as benign"
-                          >
-                            ✗ DISMISS
-                          </button>
-                          <button
-                            onClick={() => openReviewModal(alert)}
-                            className="px-1.5 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-status-green text-[9px] transition-colors"
-                            title="Full review"
-                          >
-                            ›
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="text-tactical-light/60 group-hover:text-status-green transition-colors flex items-center">
-                          <span className="mr-1">[REVIEWED]</span>
-                          <span>›</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </main>
       )}
 
