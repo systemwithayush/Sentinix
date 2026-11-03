@@ -183,7 +183,7 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   },
   {
     id: '7',
-    name: 'CAM-7 (Border Infiltration Line)',
+    name: 'CAM-7 (Border Security // Multi-Threat)',
     sensorType: 'IR_THERMAL',
     status: 'LIVE_STREAM',
     videoUrl: '/videos/cam7.mp4',
@@ -193,7 +193,7 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   },
   {
     id: '8',
-    name: 'CAM-8 (Perimeter Recon & Vehicle Patrol)',
+    name: 'CAM-8 (Infrastructure & Geometric Masking)',
     sensorType: 'EO_OPTICAL',
     status: 'LIVE_STREAM',
     videoUrl: '/videos/cam8.mp4',
@@ -278,25 +278,22 @@ const INITIAL_ALERTS: Alert[] = [
     id: 'alt-007',
     cam: 'CAM-7',
     cameraId: '7',
-    module: 'Boundary Perimeter',
-    threatLevel: 1,
-    description: 'AUDITED: Border Watchtower Demarcation Line verified clear. Zero human infiltrations detected (Sector Bravo MGRS 43R XA 8995 1230)',
+    module: 'M5 Deep Learning (Multi-Threat Border Defense)',
+    threatLevel: 4,
+    description: 'MULTI-THREAT BORDER INTRUSION: Tri-vector intrusion detected across demarcation line. Dismounted personnel infiltration, ground transport vehicle (4x4), and low-altitude reconnaissance drone actively tracked.',
     time: '15:10:22',
     timestamp: '2026-10-25T15:10:22',
-    reviewStatus: 'REVIEWED',
-    disposition: 'NOT_RELEVANT',
-    reviewedBy: 'AUTO-AI',
-    reviewedAt: '2026-10-26T02:00:00',
-    reviewerNotes: 'Watchtower sector verified clear. Demarcation line intact, zero human or vehicular boundary breaches.',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
     engineVersion: 'ai-engine-1.3.0'
   },
   {
     id: 'alt-008',
     cam: 'CAM-8',
     cameraId: '8',
-    module: 'M5 Deep Learning (DOTA Aerial & Vehicle)',
-    threatLevel: 2,
-    description: 'AERIAL RECONNAISSANCE: Airborne target tracked. DOTA Model Classification: HELICOPTER (0.94). Ground vehicle sector patrol active.',
+    module: 'M4 Camouflage (Infrastructure Geometric Masking)',
+    threatLevel: 3,
+    description: 'INFRASTRUCTURE DETECTION: Clandestine structural expansion detected via rigid geometric masking. 4x polygonal infrastructure footprints (380m² combined foundation area) segmented with 99.2% planarity index.',
     time: '15:04:10',
     timestamp: '2026-10-25T15:04:10',
     reviewStatus: 'NEW',
@@ -528,7 +525,7 @@ function App() {
   const handleGenerateForensicReport = (cam: CameraFeed) => {
     const defaultTarget: TargetClassification = 
       cam.id === '7' ? 'HUMAN_INFILTRATION' :
-      cam.id === '8' ? 'VEHICLE_DETECTION' :
+      cam.id === '8' ? 'STRUCTURAL_BREACH' :
       cam.id === '5' ? 'DRONE_UAV' :
       cam.id === '2' ? 'DRONE_UAV' : 'CAMOUFLAGED_ASSET';
 
@@ -608,27 +605,28 @@ function App() {
       return c;
     }));
 
-    // If custom video uploaded on CAM-7 without humans, update alert alt-007
+    // If custom video uploaded on CAM-7 (Multi-Threat Border Security)
     if (camId === '7') {
       setAlerts(prev => prev.map(a => {
         if (a.id === 'alt-007') {
           return {
             ...a,
-            reviewStatus: 'REVIEWED',
-            disposition: 'NOT_RELEVANT',
-            description: `Custom footage uploaded (${file.name}): Sector boundary scanned. Zero infiltration or human movement detected. Demarcation line clear.`
+            reviewStatus: 'UNDER_REVIEW',
+            threatLevel: 3,
+            description: `Custom border footage uploaded (${file.name}): Multi-Threat Perimeter Analytics active. Sector scan tracking Personnel, Ground Vehicles, and Airborne UAV vectors.`
           };
         }
         return a;
       }));
     } else if (camId === '8') {
+      // If custom video uploaded on CAM-8 (Infrastructure Geometric Masking)
       setAlerts(prev => prev.map(a => {
         if (a.id === 'alt-008') {
           return {
             ...a,
             reviewStatus: 'UNDER_REVIEW',
-            threatLevel: 2,
-            description: `Custom video uploaded (${file.name}): DOTA v1.5 Multi-Class Vehicle Detection active. Ground vehicle movement (cars, trucks, transports) tracked.`
+            threatLevel: 3,
+            description: `Custom infrastructure footage uploaded (${file.name}): Automated Infrastructure Geometric Masking active. Rigid structural contours and foundation footprints segmented.`
           };
         }
         return a;
@@ -1074,74 +1072,130 @@ function App() {
                       className="w-full h-full"
                     />
 
-                    {/* Single Cam Expanded Overlays for CAM-8 (DOTA Aerial & Ground Vehicle Patrol) */}
+                    {/* Single Cam Expanded Overlays for CAM-8 (Infrastructure Detection via Geometrical Masking) */}
                     {showDetectionOverlays && selectedCam.id === '8' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
                         {/* Top Tactical Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-cyan-950/95 border border-cyan-400 text-cyan-300 p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
-                          <span className="font-bold flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></span>
-                            {selectedCam.status === 'CUSTOM_VIDEO'
-                              ? 'DOTA v1.5 MULTI-CLASS DETECTION: GROUND VEHICLES & TRANSPORTS'
-                              : 'DOTA v1.5 AERIAL RECONNAISSANCE: AIRBORNE TARGET TRACKING'}
+                        <div className="absolute top-4 left-4 right-4 bg-cyan-950/95 border-2 border-cyan-400 text-cyan-300 p-2 font-mono text-xs flex justify-between items-center shadow-2xl pointer-events-none">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            <span className="font-bold text-white tracking-wider">
+                              INFRASTRUCTURE GEOMETRICAL MASKING &amp; FEATURE EXTRACTION
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 text-[11px]">
+                            <span className="text-yellow-300 font-bold">4x SITES MASKED</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="text-white">FOOTPRINT: 525 m²</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="bg-cyan-500 text-black px-1.5 py-0.5 font-bold">PLANARITY: 99.2%</span>
+                          </div>
+                        </div>
+
+                        {/* 1. Large Foundation Slab Geometric Mask */}
+                        <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.35)]">
+                          {/* Corner crosshair brackets */}
+                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                          <span className="absolute -top-4 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            📐 MASK #1: 24.5m × 14.0m [FOUNDATION SLAB // 343 m² // θ: 042°]
                           </span>
-                          <span className="bg-black text-cyan-300 px-2 py-0.5 border border-cyan-400 text-[10px]">
-                            {selectedCam.status === 'CUSTOM_VIDEO' ? 'small-vehicle & large-vehicle' : 'HELICOPTER (0.94) // ID: TRK-08'}
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
+                            PLANARITY: 99.6% | ORTHOGONALITY: 89.8° | RIGID MASK LOCKED
+                          </div>
+                        </div>
+
+                        {/* 2. Reinforced Containment / Vault Geometric Mask */}
+                        <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_12px_rgba(250,204,21,0.35)]">
+                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                          <span className="absolute -top-4 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            📐 MASK #2: 16.2m × 8.4m [VAULT // 136 m² // θ: 042°]
+                          </span>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-yellow-300 font-mono bg-black/80 px-1 border border-yellow-500/50">
+                            PLANARITY: 98.9% | HIGH CONCEALMENT PROBABILITY
+                          </div>
+                        </div>
+
+                        {/* 3. Utility Core Shaft Square Mask */}
+                        <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border-2 border-amber-400 bg-amber-500/25 shadow-[0_0_10px_rgba(245,158,11,0.35)]">
+                          <span className="absolute -top-4 left-0 bg-amber-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            ◼ MASK #3: 6.8m × 6.8m [CORE // 46 m²]
                           </span>
                         </div>
 
-                        {selectedCam.status === 'CUSTOM_VIDEO' ? (
-                          /* Vehicle Detection Reticles for Uploaded Video */
-                          <>
-                            {/* 1. Small Vehicle (Car / Sedan) */}
-                            <div className="absolute top-[44%] left-[22%] w-[22%] h-[16%] border-2 border-status-green bg-status-green/15 shadow-[0_0_12px_rgba(34,197,94,0.4)]">
-                              <span className="absolute -top-3.5 left-0 bg-status-green text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                                🚗 DOTA: small-vehicle [CAR / SEDAN // CONF 0.94]
-                              </span>
-                              <div className="absolute -bottom-3 left-0 text-[7px] text-status-green font-mono">
-                                SPD: 42 km/h | HDG: 082°
-                              </div>
-                            </div>
-
-                            {/* 2. Large Vehicle (Truck / 4x4 Patrol) */}
-                            <div className="absolute top-[52%] left-[56%] w-[25%] h-[20%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.4)]">
-                              <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                                🚙 DOTA: large-vehicle [PATROL TRUCK // CONF 0.91]
-                              </span>
-                              <div className="absolute -bottom-3 left-0 text-[7px] text-cyan-300 font-mono">
-                                SPD: 38 km/h | HDG: 078°
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          /* Default Helicopter Tracking Reticle on cam8.mp4 */
-                          <div className="absolute top-[24%] left-[38%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_15px_rgba(34,211,238,0.4)]">
-                            <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                            <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                            <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                            <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                            <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap flex items-center space-x-1">
-                              <span>🚁</span>
-                              <span>DOTA v1.5: HELICOPTER (0.94) [TRACK-08]</span>
-                            </span>
-                            <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
-                              ALT: ~120m AGL | AIRSPEED: 65 kt | STATUS: ACTIVE PATROL
-                            </div>
-                          </div>
-                        )}
+                        {/* 4. Infrastructure Utility Conduit Corridor */}
+                        <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
+                          <span className="absolute -top-4 left-8 bg-fuchsia-950/95 text-fuchsia-300 px-1 text-[8px] font-mono border border-fuchsia-500 whitespace-nowrap shadow">
+                            ⫽ CORRIDOR: 38.0m @ 342° [INFRASTRUCTURE CONDUIT TRENCH RUN]
+                          </span>
+                        </div>
                       </div>
                     )}
 
-                    {/* Single Cam Expanded Overlays for CAM-7 (Perimeter Verified Clear) */}
+                    {/* Single Cam Expanded Overlays for CAM-7 (Multi-Threat Border Security: Humans + Vehicles + Drones) */}
                     {showDetectionOverlays && selectedCam.id === '7' && (
-                      <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border border-status-green text-status-green p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
-                        <span className="font-bold flex items-center">
-                          <span className="w-2 h-2 rounded-full bg-status-green mr-2"></span>
-                          BORDER DEMARCATION LINE CLEAR // ZERO HUMAN INFILTRATION DETECTED
-                        </span>
-                        <span className="bg-black text-white px-2 py-0.5 border border-status-green text-[10px]">
-                          0 TARGETS // INTACT PERIMETER
-                        </span>
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* Top Multi-Threat Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2 font-mono text-xs flex justify-between items-center shadow-2xl pointer-events-none">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                            <span className="font-bold text-status-red tracking-wider">
+                              BORDER SECURITY PERIMETER // MULTI-THREAT SURVEILLANCE ACTIVE
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 text-[11px]">
+                            <span className="bg-orange-500 text-black px-1.5 py-0.5 font-bold">🚶 HUMANS: 1</span>
+                            <span className="bg-cyan-500 text-black px-1.5 py-0.5 font-bold">🚗 VEHICLES: 1</span>
+                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">🛸 DRONES: 1</span>
+                          </div>
+                        </div>
+
+                        {/* 1. Low-Altitude Recon Drone Tracking Reticle */}
+                        <div className="absolute top-[22%] left-[46%] w-[20%] h-[18%] border-2 border-status-red bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                          <span className="absolute -top-4 left-0 bg-status-red text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            🛸 DRONE: LOITERING UAV [CONF 0.96]
+                          </span>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-red-300 font-mono bg-black/80 px-1 border border-status-red/50">
+                            ALT: ~45m AGL | FREQ: 2.4 GHz | BRG: 195° S
+                          </div>
+                        </div>
+
+                        {/* 2. Ground Vehicle Crossing Reticle */}
+                        <div className="absolute top-[50%] left-[16%] w-[25%] h-[20%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                          <span className="absolute -top-4 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            🚗 VEHICLE: 4x4 PATROL TRANSPORT [CONF 0.91]
+                          </span>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
+                            SPD: 34 km/h | BRG: 072° E | WHEELBASE: 2.8m
+                          </div>
+                        </div>
+
+                        {/* 3. Dismounted Personnel Infiltrator Reticle */}
+                        <div className="absolute top-[66%] left-[64%] w-[15%] h-[24%] border-2 border-orange-500 bg-orange-500/25 shadow-[0_0_15px_rgba(249,115,22,0.5)]">
+                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                          <span className="absolute -top-4 left-0 bg-orange-500 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
+                            🚶 INFILTRATOR: PERSONNEL [CONF 0.94]
+                          </span>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-orange-300 font-mono bg-black/80 px-1 border border-orange-500/50">
+                            SPD: 1.4 m/s | BRG: 184° S | BOUNDARY CROSS: +12m
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -1396,16 +1450,46 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Tactical Detection Banner for CAM-7 (Border Perimeter Verified Clear) */}
+                      {/* Tactical Detection Banner for CAM-7 (Multi-Threat Border Security: Humans, Vehicles, Drones) */}
                       {showDetectionOverlays && cam.id === '7' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/90 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                          <span className="font-bold flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1"></span>
-                            SECTOR CLEAR // ZERO INFILTRATION DETECTED
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                          <span className="font-bold flex items-center text-status-red">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                            BORDER THREAT: 3 VECTORS
                           </span>
-                          <span className="bg-black/80 text-white px-1 border border-status-green text-[8px]">
-                            0 TARGETS
+                          <span className="bg-black/90 text-[7px] text-tactical-light px-1 border border-status-red flex items-center space-x-1">
+                            <span className="text-orange-400 font-bold">🚶 1</span>
+                            <span>|</span>
+                            <span className="text-cyan-400 font-bold">🚗 1</span>
+                            <span>|</span>
+                            <span className="text-red-400 font-bold">🛸 1</span>
                           </span>
+                        </div>
+                      )}
+
+                      {/* Multi-Threat Reticles Overlaid on CAM-7 in Grid */}
+                      {showDetectionOverlays && cam.id === '7' && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+                          {/* 1. Low-Altitude Drone Ingress */}
+                          <div className="absolute top-[22%] left-[46%] w-[20%] h-[16%] border border-status-red bg-status-red/15 shadow-[0_0_8px_rgba(239,68,68,0.5)]">
+                            <span className="absolute -top-2.5 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🛸 DRONE [0.96]
+                            </span>
+                          </div>
+
+                          {/* 2. Ground Vehicle Crossing */}
+                          <div className="absolute top-[52%] left-[16%] w-[24%] h-[18%] border border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.5)]">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🚗 4x4 PATROL [0.91]
+                            </span>
+                          </div>
+
+                          {/* 3. Personnel Infiltration */}
+                          <div className="absolute top-[68%] left-[64%] w-[14%] h-[22%] border border-orange-500 bg-orange-500/20 shadow-[0_0_8px_rgba(249,115,22,0.5)]">
+                            <span className="absolute -top-2.5 left-0 bg-orange-500 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🚶 PERSONNEL [0.94]
+                            </span>
+                          </div>
                         </div>
                       )}
 
@@ -1436,42 +1520,49 @@ function App() {
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-8 (DOTA Aerial & Ground Recon) */}
+                      {/* Tactical Detection Banner for CAM-8 (Infrastructure Geometric Masking) */}
                       {showDetectionOverlays && cam.id === '8' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-cyan-950/90 border border-cyan-400 text-cyan-300 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-cyan-950/95 border border-cyan-400 text-cyan-300 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
                           <span className="font-bold flex items-center">
                             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mr-1 animate-pulse"></span>
-                            {cam.status === 'CUSTOM_VIDEO' ? 'DOTA v1.5: VEHICLE DETECTION' : 'DOTA v1.5: AERIAL PATROL'}
+                            INFRASTRUCTURE GEOMETRICAL MASKING
                           </span>
-                          <span className="bg-black/80 text-cyan-300 px-1 border border-cyan-400 text-[8px]">
-                            {cam.status === 'CUSTOM_VIDEO' ? 'CARS & VEHICLES' : 'HELICOPTER (0.94)'}
+                          <span className="bg-black/80 text-cyan-300 px-1 border border-cyan-400 text-[7px] font-bold">
+                            4x SITES (99.2% PLANAR)
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical DOTA Reticles Overlaid on CAM-8 in Grid */}
+                      {/* Tactical Geometrical Masks Overlaid on CAM-8 in Grid */}
                       {showDetectionOverlays && cam.id === '8' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-                          {cam.status === 'CUSTOM_VIDEO' ? (
-                            <>
-                              <div className="absolute top-[44%] left-[22%] w-[24%] h-[18%] border-2 border-status-green bg-status-green/15 shadow-[0_0_8px_rgba(34,197,94,0.4)]">
-                                <span className="absolute -top-2.5 left-0 bg-status-green text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                                  🚗 small-vehicle (0.94)
-                                </span>
-                              </div>
-                              <div className="absolute top-[54%] left-[56%] w-[26%] h-[20%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
-                                <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                                  🚙 large-vehicle (0.91)
-                                </span>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="absolute top-[26%] left-[40%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
-                              <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                                🚁 HELICOPTER (0.94)
-                              </span>
-                            </div>
-                          )}
+                          {/* 1. Large Foundation Slab Geometric Mask */}
+                          <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
+                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              📐 MASK #1: 24.5m × 14.0m [SLAB // 343 m²]
+                            </span>
+                          </div>
+
+                          {/* 2. Reinforced Containment / Vault Geometric Mask */}
+                          <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_8px_rgba(250,204,21,0.4)]">
+                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              📐 MASK #2: 16.2m × 8.4m [VAULT // 136 m²]
+                            </span>
+                          </div>
+
+                          {/* 3. Utility Core Shaft Square Mask */}
+                          <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border-2 border-amber-400 bg-amber-500/25 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
+                            <span className="absolute -top-2.5 left-0 bg-amber-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              ◼ MASK #3: 6.8m [CORE]
+                            </span>
+                          </div>
+
+                          {/* 4. Infrastructure Utility Conduit Corridor */}
+                          <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
+                            <span className="absolute -top-3 left-6 bg-fuchsia-950/95 text-fuchsia-300 px-0.5 text-[6px] font-mono border border-fuchsia-500 whitespace-nowrap">
+                              ⫽ CORRIDOR: 38.0m [CONDUIT]
+                            </span>
+                          </div>
                         </div>
                       )}
 
@@ -1945,7 +2036,7 @@ function App() {
                                 sensorId: cam.id,
                                 sensorName: cam.name,
                                 sensorModality: cam.sensorType,
-                                targetClass: cam.id === '7' ? 'HUMAN_INFILTRATION' : cam.id === '8' ? 'VEHICLE_DETECTION' : 'DRONE_UAV',
+                                targetClass: cam.id === '7' ? 'HUMAN_INFILTRATION' : cam.id === '8' ? 'STRUCTURAL_BREACH' : 'DRONE_UAV',
                                 confidence: 'CONFIRMED',
                                 filterMode: forensicFilter,
                                 filterOptions: forensicOptions,
