@@ -8,16 +8,16 @@ export default {
     extend: {
       colors: {
         tactical: {
-          dark: '#0a0a0a',     // Deep black
-          gray: '#1a1a1a',     // Very dark gray for panels
-          olive: '#2d3329',    // Dark olive green
-          green: '#4b5e40',    // Military green
-          light: '#a0a39f',    // Muted text
+          dark: '#0b0f19',     // Refined dark slate canvas
+          gray: '#111827',     // Slate-900 surface for cards/panels
+          olive: '#1e293b',    // Slate-800 clean divider/border
+          green: '#2563eb',    // Professional cobalt accent
+          light: '#94a3b8',    // Clean slate-400 secondary text
         },
         status: {
-          green: '#00ff41',    // Bright tactical green (Nominal)
-          amber: '#ffb300',    // Warning
-          red: '#ff2a00',      // Threat
+          green: '#10b981',    // Clean emerald (calm, non-neon)
+          amber: '#f59e0b',    // Balanced amber
+          red: '#ef4444',      // Crisp crimson
         }
       },
       fontFamily: {

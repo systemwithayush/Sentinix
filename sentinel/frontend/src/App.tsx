@@ -175,11 +175,11 @@ export const SECTOR_GUARDS: Record<string, SectorSecurityGuard> = {
 };
 
 export const CAM_THREAT_CONFIDENCE: Record<string, { label: string; confidence: number; icon: string }> = {
-  '2': { label: 'DRONE TRAJECTORY', confidence: 0.83, icon: '🛸' },
-  '4': { label: 'ROTARY AIRCRAFT (HELICOPTER)', confidence: 0.94, icon: '🚁' },
-  '5': { label: 'HIGH-SPEED IR TARGET', confidence: 0.96, icon: '🚀' },
-  '6': { label: 'RECON DRONE INGRESS', confidence: 0.89, icon: '🛸' },
-  '8': { label: 'INFRASTRUCTURE BREACH', confidence: 0.99, icon: '📐' }
+  '2': { label: 'DRONE TRAJECTORY', confidence: 0.83, icon: '[UAV]' },
+  '4': { label: 'ROTARY AIRCRAFT (HELICOPTER)', confidence: 0.94, icon: '[HELI]' },
+  '5': { label: 'HIGH-SPEED IR TARGET', confidence: 0.96, icon: '[FAST-IR]' },
+  '6': { label: 'RECON DRONE INGRESS', confidence: 0.89, icon: '[UAV]' },
+  '8': { label: 'INFRASTRUCTURE BREACH', confidence: 0.99, icon: '[INFRA]' }
 };
 
 export const isCamFlagged = (camId: string) => Boolean(CAM_THREAT_CONFIDENCE[camId]);
@@ -1092,81 +1092,88 @@ function App() {
   }, [activeAlert, cameraFeeds, modalCameraOverrideId]);
 
   return (
-    <div className="min-h-screen flex flex-col h-screen overflow-hidden bg-tactical-dark text-tactical-light">
-      {/* Top Header */}
-      <header className="bg-tactical-gray border-b border-tactical-green px-6 py-3 flex items-center justify-between shadow-md z-10 shrink-0">
+    <div className="min-h-screen flex flex-col h-screen overflow-hidden bg-slate-950 text-slate-300">
+      {/* Top Header - Modern Enterprise Security Console */}
+      <header className="bg-slate-900 border-b border-slate-800 px-5 py-2.5 flex items-center justify-between shadow-sm z-10 shrink-0">
         <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 bg-status-green rounded-full shadow-[0_0_8px_#00ff41]"></span>
-            <h1 className="text-2xl font-black text-white tracking-widest font-mono">SENTINEL</h1>
-            <span className="text-[10px] bg-tactical-olive/60 border border-tactical-green/50 text-tactical-light px-2 py-0.5 rounded font-mono">v1.2.0-m5</span>
+          <div className="flex items-center space-x-2.5">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+            <h1 className="text-xl font-bold text-white tracking-wider font-mono">SENTINEL</h1>
+            <span className="text-[10px] bg-slate-800 border border-slate-700 text-slate-400 px-2 py-0.5 rounded font-mono">v1.2.0</span>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-2">
             <button
               onClick={() => setView('DASHBOARD')}
-              className={`px-4 py-1.5 border ${view === 'DASHBOARD' ? 'border-tactical-green text-status-green bg-tactical-olive/40 shadow-[0_0_10px_rgba(0,255,65,0.15)]' : 'border-tactical-olive text-tactical-light hover:text-white'} font-mono text-xs transition-colors tracking-wider`}
+              className={`px-3.5 py-1.5 border rounded-xs font-mono text-xs transition-colors tracking-wide ${
+                view === 'DASHBOARD'
+                  ? 'border-slate-600 text-white bg-slate-800 shadow-sm'
+                  : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-850'
+              }`}
             >
-              TACTICAL DASHBOARD
+              TACTICAL FEEDS
             </button>
             <button
               onClick={() => setView('M4_CAMOUFLAGE')}
-              className={`px-4 py-1.5 border ${view === 'M4_CAMOUFLAGE' ? 'border-tactical-green text-status-green bg-tactical-olive/40 shadow-[0_0_10px_rgba(0,255,65,0.15)]' : 'border-tactical-olive text-tactical-light hover:text-white'} font-mono text-xs transition-colors tracking-wider`}
+              className={`px-3.5 py-1.5 border rounded-xs font-mono text-xs transition-colors tracking-wide ${
+                view === 'M4_CAMOUFLAGE'
+                  ? 'border-slate-600 text-white bg-slate-800 shadow-sm'
+                  : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-850'
+              }`}
             >
               M4 CAMOUFLAGE ANALYSIS
             </button>
           </div>
         </div>
-        <div className="font-mono text-xs tracking-wide text-tactical-light flex items-center space-x-5">
-          <span className="text-status-green flex items-center">
-            <span className="w-2 h-2 rounded-full bg-status-green mr-2 animate-pulse"></span>
-            FEEDS: {cameraFeeds.filter(c => c.isPlaying).length}/{cameraFeeds.length} PLAYING
+        <div className="font-mono text-xs tracking-wide text-slate-400 flex items-center space-x-5">
+          <span className="text-emerald-400 flex items-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
+            FEEDS: {cameraFeeds.filter(c => c.isPlaying).length}/{cameraFeeds.length} ONLINE
           </span>
-          <span className="border-l border-tactical-olive pl-4">ROLE: ANALYST</span>
-          <span className="text-white font-bold bg-tactical-olive/40 px-2 py-0.5 border border-tactical-olive">OPR: {reviewerId}</span>
+          <span className="border-l border-slate-800 pl-4">ANALYST</span>
+          <span className="text-white font-medium bg-slate-800 px-2 py-0.5 border border-slate-700 rounded-xs">ID: {reviewerId}</span>
         </div>
       </header>
 
       {/* DASHBOARD VIEW */}
       {view === 'DASHBOARD' && (
-        <main className={`flex-1 flex overflow-hidden p-4 min-h-0 ${selectedCam ? '' : 'space-x-4'}`}>
+        <main className={`flex-1 flex overflow-hidden p-3 min-h-0 ${selectedCam ? '' : 'space-x-3'}`}>
           {/* Left: 8 Video Streams Grid or Fullscreen Maximized Inspection */}
           <div className={`${selectedCam ? 'flex-1 w-full' : 'flex-[3]'} flex flex-col space-y-2 min-w-0`}>
             {/* Toolbar above feeds */}
-            <div className="flex justify-between items-center bg-tactical-gray/60 px-3 py-1.5 border border-tactical-olive">
+            <div className="flex justify-between items-center bg-slate-900 px-3 py-1.5 border border-slate-800 rounded-xs">
               <div className="flex items-center space-x-3">
-                <h2 className="font-mono text-white tracking-widest text-xs font-bold flex items-center">
-                  <span className="text-status-green mr-2">›</span>
-                  MULTI-SOURCE VIDEO INTELLIGENCE (M1)
+                <h2 className="font-mono text-white tracking-wider text-xs font-semibold flex items-center">
+                  SURVEILLANCE CHANNELS (M1)
                 </h2>
-                <span className="text-[10px] font-mono text-status-green bg-black/60 px-2 py-0.5 border border-tactical-green/50">
-                  {cameraFeeds.length} LIVE VIDEO CHANNELS
+                <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 border border-slate-700 rounded-xs">
+                  {cameraFeeds.length} SENSOR STREAMS
                 </span>
               </div>
               
               <div className="flex items-center space-x-2 font-mono text-[10px]">
                 <button
                   onClick={() => setShowDetectionOverlays(!showDetectionOverlays)}
-                  className={`px-2 py-1 border transition-colors ${
+                  className={`px-2.5 py-1 border rounded-xs transition-colors font-medium ${
                     showDetectionOverlays
-                      ? 'bg-status-amber/20 border-status-amber text-status-amber hover:bg-status-amber hover:text-black font-bold'
-                      : 'bg-black/50 border-tactical-olive text-tactical-light hover:text-white'
+                      ? 'bg-slate-800 border-slate-600 text-slate-100 shadow-sm'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                   }`}
-                  title="Toggle tactical AI detection overlays on all feeds"
+                  title="Toggle AI detection overlays on feeds"
                 >
-                  👁️ {showDetectionOverlays ? 'DETECTIONS ON' : 'DETECTIONS HIDDEN'}
+                  {showDetectionOverlays ? 'OVERLAYS: ON' : 'OVERLAYS: OFF'}
                 </button>
                 <button
                   onClick={togglePlayAll}
-                  className="px-2 py-1 bg-tactical-olive/50 border border-tactical-green hover:bg-tactical-green hover:text-black text-white transition-colors"
+                  className="px-2.5 py-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 rounded-xs transition-colors font-medium"
                 >
-                  ⏯ PLAY/PAUSE ALL
+                  PLAY / PAUSE ALL
                 </button>
                 <button
                   onClick={handleResetFeeds}
-                  className="px-2 py-1 bg-black/50 border border-tactical-olive hover:border-tactical-light text-tactical-light hover:text-white transition-colors"
+                  className="px-2.5 py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-xs transition-colors"
                   title="Reset all channels to default tactical surveillance videos"
                 >
-                  ⟲ RESET TO DEFAULTS
+                  RESET FEEDS
                 </button>
               </div>
             </div>
@@ -1266,63 +1273,54 @@ function App() {
                     {/* Single Cam Expanded Overlays for CAM-8 (Infrastructure Detection via Geometrical Masking) */}
                     {showDetectionOverlays && selectedCam.id === '8' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Tactical Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-cyan-950/95 border-2 border-cyan-400 text-cyan-300 p-2 font-mono text-xs flex justify-between items-center shadow-2xl pointer-events-none">
+                        {/* Top Banner - Clean Architectural CAD Style */}
+                        <div className="absolute top-4 left-4 right-4 bg-slate-900/95 border border-sky-600/70 text-slate-100 p-2 font-mono text-xs flex justify-between items-center rounded-xs shadow-sm pointer-events-none">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                            <span className="font-bold text-white tracking-wider">
-                              INFRASTRUCTURE GEOMETRICAL MASKING &amp; FEATURE EXTRACTION
+                            <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+                            <span className="font-semibold text-sky-400 tracking-wider">
+                              INFRASTRUCTURE GEOMETRIC ANALYSIS &amp; FOOTPRINT MASKING
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3 text-[11px]">
-                            <span className="text-yellow-300 font-bold">4x SITES MASKED</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="text-white">FOOTPRINT: 525 m²</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="bg-cyan-500 text-black px-1.5 py-0.5 font-bold">PLANARITY: 99.2%</span>
+                          <div className="flex items-center space-x-3 text-[11px] text-slate-300">
+                            <span>4 SITES ANALYZED</span>
+                            <span className="text-slate-600">|</span>
+                            <span>FOOTPRINT: 525 m²</span>
+                            <span className="text-slate-600">|</span>
+                            <span className="bg-sky-950/80 border border-sky-700/60 text-sky-300 px-1.5 py-0.5 rounded-xs font-medium">PLANARITY: 99.2%</span>
                           </div>
                         </div>
 
                         {/* 1. Large Foundation Slab Geometric Mask */}
-                        <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.35)]">
-                          {/* Corner crosshair brackets */}
-                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                          <span className="absolute -top-4 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            📐 MASK #1: 24.5m × 14.0m [FOUNDATION SLAB // 343 m² // θ: 042°]
-                          </span>
-                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
-                            PLANARITY: 99.6% | ORTHOGONALITY: 89.8° | RIGID MASK LOCKED
+                        <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border border-sky-400/80 bg-sky-950/20">
+                          <div className="absolute -top-4 left-0 bg-sky-900/90 text-sky-100 text-[8px] font-medium px-1 whitespace-nowrap rounded-xs">
+                            SITE 1: FOUNDATION SLAB [24.5m × 14.0m // 343 m²]
+                          </div>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-sky-300 font-mono bg-slate-950/90 px-1 border border-slate-800">
+                            PLANARITY: 99.6% | ORTHOGONALITY: 89.8°
                           </div>
                         </div>
 
                         {/* 2. Reinforced Containment / Vault Geometric Mask */}
-                        <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_12px_rgba(250,204,21,0.35)]">
-                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                          <span className="absolute -top-4 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            📐 MASK #2: 16.2m × 8.4m [VAULT // 136 m² // θ: 042°]
-                          </span>
-                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-yellow-300 font-mono bg-black/80 px-1 border border-yellow-500/50">
+                        <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border border-sky-400/80 bg-sky-950/20">
+                          <div className="absolute -top-4 left-0 bg-sky-900/90 text-sky-100 text-[8px] font-medium px-1 whitespace-nowrap rounded-xs">
+                            SITE 2: VAULT FOOTPRINT [16.2m × 8.4m // 136 m²]
+                          </div>
+                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-sky-300 font-mono bg-slate-950/90 px-1 border border-slate-800">
                             PLANARITY: 98.9% | HIGH CONCEALMENT PROBABILITY
                           </div>
                         </div>
 
                         {/* 3. Utility Core Shaft Square Mask */}
-                        <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border-2 border-amber-400 bg-amber-500/25 shadow-[0_0_10px_rgba(245,158,11,0.35)]">
-                          <span className="absolute -top-4 left-0 bg-amber-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            ◼ MASK #3: 6.8m × 6.8m [CORE // 46 m²]
+                        <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border border-sky-400/80 bg-sky-950/20">
+                          <span className="absolute -top-4 left-0 bg-sky-900/90 text-sky-100 text-[8px] font-medium px-1 whitespace-nowrap rounded-xs">
+                            SITE 3: CORE [6.8m × 6.8m // 46 m²]
                           </span>
                         </div>
 
                         {/* 4. Infrastructure Utility Conduit Corridor */}
-                        <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
-                          <span className="absolute -top-4 left-8 bg-fuchsia-950/95 text-fuchsia-300 px-1 text-[8px] font-mono border border-fuchsia-500 whitespace-nowrap shadow">
-                            ⫽ CORRIDOR: 38.0m @ 342° [INFRASTRUCTURE CONDUIT TRENCH RUN]
+                        <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t border-dashed border-sky-400/70 rotate-[-12deg]">
+                          <span className="absolute -top-3.5 left-8 bg-slate-950/90 text-sky-300 px-1 text-[8px] font-mono border border-slate-800 whitespace-nowrap">
+                            CORRIDOR: 38.0m @ 342° [CONDUIT TRENCH RUN]
                           </span>
                         </div>
                       </div>
@@ -1331,50 +1329,44 @@ function App() {
                     {/* Single Cam Expanded Overlays for CAM-7 (Border Security // Sector Secured) */}
                     {showDetectionOverlays && selectedCam.id === '7' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Status Banner - All Clear / Border Secured in Tactical Green */}
-                        <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border-2 border-status-green text-white px-3 py-1.5 font-mono text-xs flex justify-between items-center shadow-[0_0_15px_rgba(0,255,65,0.3)]">
+                        {/* Top Status Banner - All Clear / Border Secured in Clean Slate-Emerald */}
+                        <div className="absolute top-4 left-4 right-4 bg-slate-900/95 border border-emerald-600/70 text-white px-3 py-1.5 font-mono text-xs flex justify-between items-center rounded-xs shadow-sm">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse shadow-[0_0_8px_#00ff41]"></span>
-                            <span className="font-bold text-status-green tracking-wider">
-                              CAM-7 // BORDER SECURITY — SECTOR SECURED &amp; VERIFIED
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span className="font-semibold text-emerald-400 tracking-wider">
+                              CAM-7 // BORDER DEMARCATION — SECTOR SECURED &amp; VERIFIED
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2 text-[10px] text-emerald-300">
-                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
-                              ✔ ZERO INFILTRATION DETECTED
+                          <div className="flex items-center space-x-2 text-[10px] text-slate-300">
+                            <span className="border border-emerald-700/60 bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded-xs font-medium">
+                              ZERO INFILTRATION DETECTED
                             </span>
-                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
-                              ✔ DEMARCATION LINE CLEAR
-                            </span>
-                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
-                              🛡️ PERIMETER SECURE
+                            <span className="border border-emerald-700/60 bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded-xs font-medium">
+                              DEMARCATION LINE CLEAR
                             </span>
                           </div>
                         </div>
 
-                        {/* Corner scope brackets in green */}
-                        <div className="absolute top-[13%] left-[2%] w-8 h-8 border-t-2 border-l-2 border-status-green/70"></div>
-                        <div className="absolute top-[13%] right-[2%] w-8 h-8 border-t-2 border-r-2 border-status-green/70"></div>
-                        <div className="absolute bottom-[10%] left-[2%] w-8 h-8 border-b-2 border-l-2 border-status-green/70"></div>
-                        <div className="absolute bottom-[10%] right-[2%] w-8 h-8 border-b-2 border-r-2 border-status-green/70"></div>
+                        {/* Corner scope brackets in subtle emerald */}
+                        <div className="absolute top-[13%] left-[2%] w-6 h-6 border-t border-l border-emerald-500/40"></div>
+                        <div className="absolute top-[13%] right-[2%] w-6 h-6 border-t border-r border-emerald-500/40"></div>
+                        <div className="absolute bottom-[10%] left-[2%] w-6 h-6 border-b border-l border-emerald-500/40"></div>
+                        <div className="absolute bottom-[10%] right-[2%] w-6 h-6 border-b border-r border-emerald-500/40"></div>
 
-                        {/* Center scan crosshair in green */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 opacity-60">
-                          <div className="absolute top-1/2 left-0 right-0 h-px bg-status-green"></div>
-                          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-status-green"></div>
+                        {/* Center scan crosshair in subtle emerald */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 opacity-40">
+                          <div className="absolute top-1/2 left-0 right-0 h-px bg-emerald-500"></div>
+                          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-emerald-500"></div>
                         </div>
 
-                        {/* Bottom telemetry bar in green */}
-                        <div className="absolute bottom-12 left-4 right-4 bg-black/90 border border-status-green/60 px-3 py-1 font-mono text-[10px] text-emerald-300 flex justify-between shadow-md">
-                          <span className="flex items-center space-x-1">
-                            <span className="text-status-green font-bold">SECTOR:</span>
+                        {/* Bottom telemetry bar */}
+                        <div className="absolute bottom-12 left-4 right-4 bg-slate-950/90 border border-slate-800 px-3 py-1 font-mono text-[10px] text-slate-300 flex justify-between rounded-xs">
+                          <span className="flex items-center space-x-1.5">
+                            <span className="text-slate-400 font-medium">SECTOR:</span>
                             <span>ECHO-7 DEMARCATION LINE &amp; WATCHTOWER</span>
                           </span>
-                          <span className="text-status-green font-bold flex items-center space-x-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-green inline-block animate-pulse"></span>
-                            <span>M5 DEEP LEARNING ENGINE — ALL CLEAR // REGULAR PATROL ACTIVE</span>
-                          </span>
-                          <span className="text-emerald-400 font-bold">STATUS: ZERO ANOMALIES</span>
+                          <span className="text-emerald-400 font-medium">ALL CLEAR // REGULAR PATROL ACTIVE</span>
+                          <span className="text-slate-400">STATUS: ZERO ANOMALIES</span>
                         </div>
                       </div>
                     )}
@@ -1382,58 +1374,44 @@ function App() {
                     {/* Single Cam Expanded Overlays for CAM-5 (High-Speed Thermal Target) */}
                     {showDetectionOverlays && selectedCam.id === '5' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Critical Alert Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                        {/* Top Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-slate-900/95 border border-red-500/80 text-white p-2 font-mono text-xs flex justify-between items-center rounded-xs shadow-sm">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
-                            <span className="font-bold text-status-red tracking-wider">
-                              CRITICAL THREAT: HIGH-SPEED INFRARED TARGET DETECTED
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="font-semibold text-red-400 tracking-wider">
+                              TARGET DETECTED: HIGH-SPEED INFRARED TARGET
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3 text-[11px]">
-                            <span className="text-yellow-300 font-bold">VELOCITY: ~140 m/s</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="text-white">BEARING: 215° SW</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">FLIR &gt;650°C</span>
+                          <div className="flex items-center space-x-3 text-[10px] text-slate-300">
+                            <span className="text-red-300 font-medium">VELOCITY: ~140 m/s</span>
+                            <span className="text-slate-600">|</span>
+                            <span>BEARING: 215° SW</span>
+                            <span className="text-slate-600">|</span>
+                            <span className="bg-red-950/80 border border-red-800 text-red-200 px-1.5 py-0.5 rounded-xs font-medium">FLIR &gt;650°C</span>
                           </div>
                         </div>
 
-                        {/* High-Speed Target Lock Reticle over Thermal Hotspot */}
-                        <div className="absolute top-[50%] left-[34%] w-[18%] h-[20%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
-                          {/* Corner brackets */}
-                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
-
-                          {/* Top Label */}
-                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
-                            <span>🚀 TGT-FAST-01</span>
-                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.96</span>
+                        {/* High-Speed Target Lock Reticle */}
+                        <div className="absolute top-[50%] left-[34%] w-[18%] h-[20%] border border-red-500 bg-red-950/25">
+                          <div className="absolute -top-4 left-0 bg-red-900/90 text-red-100 px-1.5 py-0.2 font-mono font-medium text-[8px] whitespace-nowrap rounded-xs">
+                            TARGET: FAST-01 [CONF 96%]
                           </div>
-
-                          {/* Bottom Label */}
-                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
-                            IR CORE: PEAK // EXHAUST PLUME ACTIVE
+                          <div className="absolute -bottom-4 left-0 right-0 bg-slate-950/90 border border-slate-800 text-slate-300 px-1 py-0.2 text-[7px] font-mono text-center whitespace-nowrap">
+                            THERMAL PLUME SIGNATURE VERIFIED
                           </div>
                         </div>
 
-                        {/* Exhaust Trail Line Vector (from top-right to target) */}
-                        <div className="absolute top-[38%] left-[44%] w-[24%] h-0 border-t-2 border-dashed border-status-amber rotate-[-42deg] shadow-[0_0_8px_rgba(255,183,3,0.5)]">
-                          <span className="absolute -top-3.5 left-4 bg-black/90 text-status-amber px-1 text-[7px] font-mono border border-status-amber whitespace-nowrap">
-                            ⫽ THERMAL EXHAUST PLUME WAKE (TRAIL: 28m)
-                          </span>
-                        </div>
+                        {/* Exhaust Trail Line Vector */}
+                        <div className="absolute top-[38%] left-[44%] w-[24%] h-0 border-t border-dashed border-red-400/60 rotate-[-42deg]"></div>
 
-                        {/* Bottom Air Defense Telemetry Badge */}
-                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
-                          <div className="text-status-red font-bold flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
-                            IMMEDIATE AIR DEFENSE INTERCEPT QUEUED
+                        {/* Telemetry Badge */}
+                        <div className="absolute bottom-16 right-6 bg-slate-900/95 border border-red-600/70 p-2.5 font-mono text-xs text-slate-300 space-y-1 rounded-xs shadow-sm">
+                          <div className="text-red-400 font-semibold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-pulse"></span>
+                            AIR DEFENSE INTERCEPT QUEUED
                           </div>
-                          <div className="text-[10px] text-gray-300">Descent trajectory: 32° dive angle // Sector Echo</div>
-                          <div className="text-[10px] text-yellow-300">Target Type: High-Speed Rocket/Jet-Assisted UAV or Munition</div>
+                          <div className="text-[10px] text-slate-400">Descent trajectory: 32° dive angle // Sector Echo</div>
+                          <div className="text-[10px] text-slate-300">Class: High-Speed Ingress Vector</div>
                         </div>
                       </div>
                     )}
@@ -1441,46 +1419,41 @@ function App() {
                     {/* Single Cam Expanded Overlays for CAM-4 (Helicopter Detection) */}
                     {showDetectionOverlays && selectedCam.id === '4' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Critical Alert Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                        {/* Top Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-slate-900/95 border border-red-500/80 text-white p-2 font-mono text-xs flex justify-between items-center rounded-xs shadow-sm">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
-                            <span className="font-bold text-status-red tracking-wider">
-                              CRITICAL AERIAL THREAT: ROTARY-WING AIRCRAFT (HELICOPTER) DETECTED
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="font-semibold text-red-400 tracking-wider">
+                              TARGET DETECTED: ROTARY-WING AIRCRAFT (HELICOPTER)
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3 text-[11px]">
-                            <span className="text-yellow-300 font-bold">AIRFRAME: HELICOPTER</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="text-white">ALTITUDE: ~120m AGL</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">CONF: 0.94</span>
+                          <div className="flex items-center space-x-3 text-[10px] text-slate-300">
+                            <span>AIRFRAME: HELICOPTER</span>
+                            <span className="text-slate-600">|</span>
+                            <span>ALTITUDE: ~120m AGL</span>
+                            <span className="text-slate-600">|</span>
+                            <span className="bg-red-950/80 border border-red-800 text-red-200 px-1.5 py-0.5 rounded-xs font-medium">CONF: 0.94</span>
                           </div>
                         </div>
 
                         {/* Helicopter Lock Reticle */}
-                        <div className="absolute top-[20%] left-[58%] w-[34%] h-[28%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
-                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
-                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
-                            <span>🚁 TGT-HELI-01</span>
-                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.94</span>
+                        <div className="absolute top-[20%] left-[58%] w-[34%] h-[28%] border border-red-500 bg-red-950/25">
+                          <div className="absolute -top-4 left-0 bg-red-900/90 text-red-100 px-1.5 py-0.2 font-mono font-medium text-[8px] whitespace-nowrap rounded-xs">
+                            TARGET: HELI-04 [CONF 94%]
                           </div>
-                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
+                          <div className="absolute -bottom-4 left-0 right-0 bg-slate-950/90 border border-slate-800 text-slate-300 px-1 py-0.2 text-[7px] font-mono text-center whitespace-nowrap">
                             HEADING: 084° E | VEL: ~160 km/h | ROTOR: ~380 RPM
                           </div>
                         </div>
 
                         {/* Telemetry Badge */}
-                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
-                          <div className="text-status-red font-bold flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
-                            ROTARY WING AIRSPACE VIOLATION
+                        <div className="absolute bottom-16 right-6 bg-slate-900/95 border border-red-600/70 p-2.5 font-mono text-xs text-slate-300 space-y-1 rounded-xs shadow-sm">
+                          <div className="text-red-400 font-semibold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-pulse"></span>
+                            ROTARY WING AIRSPACE TRACK
                           </div>
-                          <div className="text-[10px] text-gray-300">Tree Line South Low-Alt Corridor (Bearing: 084° E)</div>
-                          <div className="text-[10px] text-yellow-300">Officer On-Duty: Cpl. Marcus Vance (CH-04 UHF / SAT-4419)</div>
+                          <div className="text-[10px] text-slate-400">Tree Line South Low-Alt Corridor (Bearing: 084° E)</div>
+                          <div className="text-[10px] text-slate-300">Officer On-Duty: Cpl. Marcus Vance (CH-04 / SAT-4419)</div>
                         </div>
                       </div>
                     )}
@@ -1488,46 +1461,41 @@ function App() {
                     {/* Single Cam Expanded Overlays for CAM-6 (Drone Detection) */}
                     {showDetectionOverlays && selectedCam.id === '6' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Critical Alert Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                        {/* Top Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-slate-900/95 border border-red-500/80 text-white p-2 font-mono text-xs flex justify-between items-center rounded-xs shadow-sm">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
-                            <span className="font-bold text-status-red tracking-wider">
-                              CRITICAL AERIAL THREAT: UNAUTHORIZED DRONE / UAV INTRUSION
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="font-semibold text-red-400 tracking-wider">
+                              TARGET DETECTED: UNAUTHORIZED UAV / RECON DRONE
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3 text-[11px]">
-                            <span className="text-yellow-300 font-bold">RF LINK: 5.8 GHz</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="text-white">ALTITUDE: ~35m AGL</span>
-                            <span className="text-tactical-olive">|</span>
-                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">CONF: 0.89</span>
+                          <div className="flex items-center space-x-3 text-[10px] text-slate-300">
+                            <span>RF LINK: 5.8 GHz</span>
+                            <span className="text-slate-600">|</span>
+                            <span>ALTITUDE: ~35m AGL</span>
+                            <span className="text-slate-600">|</span>
+                            <span className="bg-red-950/80 border border-red-800 text-red-200 px-1.5 py-0.5 rounded-xs font-medium">CONF: 0.89</span>
                           </div>
                         </div>
 
                         {/* Drone Lock Reticle */}
-                        <div className="absolute top-[32%] left-[42%] w-[20%] h-[20%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
-                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
-                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
-                            <span>🛸 TGT-DRONE-06</span>
-                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.89</span>
+                        <div className="absolute top-[32%] left-[42%] w-[20%] h-[20%] border border-red-500 bg-red-950/25">
+                          <div className="absolute -top-4 left-0 bg-red-900/90 text-red-100 px-1.5 py-0.2 font-mono font-medium text-[8px] whitespace-nowrap rounded-xs">
+                            TARGET: UAV-06 [CONF 89%]
                           </div>
-                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
+                          <div className="absolute -bottom-4 left-0 right-0 bg-slate-950/90 border border-slate-800 text-slate-300 px-1 py-0.2 text-[7px] font-mono text-center whitespace-nowrap">
                             HEADING: NORTHBOUND | VEL: ~45 km/h | 4-ROTOR
                           </div>
                         </div>
 
                         {/* Telemetry Badge */}
-                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
-                          <div className="text-status-red font-bold flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
+                        <div className="absolute bottom-16 right-6 bg-slate-900/95 border border-red-600/70 p-2.5 font-mono text-xs text-slate-300 space-y-1 rounded-xs shadow-sm">
+                          <div className="text-red-400 font-semibold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-pulse"></span>
                             AIRSPACE INGRESS // SOUTH GATE POST
                           </div>
-                          <div className="text-[10px] text-gray-300">Approaching perimeter wall at 12 m/s</div>
-                          <div className="text-[10px] text-yellow-300">Officer On-Duty: Officer Tariq Al-Mansoor (CH-06 VHF / SAT-6623)</div>
+                          <div className="text-[10px] text-slate-400">Approaching perimeter wall at 12 m/s</div>
+                          <div className="text-[10px] text-slate-300">Officer On-Duty: Officer Tariq Al-Mansoor (CH-06 / SAT-6623)</div>
                         </div>
                       </div>
                     )}
@@ -1643,74 +1611,71 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Dedicated Tactical Guard & Satellite Comms Dispatch Console (Single Cam Mode) */}
+                  {/* Dedicated Security Officer & Satellite Comms Console (Single Cam Mode) */}
                   {SECTOR_GUARDS[selectedCam.id] && (
-                    <div className="bg-black/95 border-t border-tactical-olive p-2.5 font-mono text-xs z-20 shrink-0">
+                    <div className="bg-slate-900 border-t border-slate-800 p-2.5 font-mono text-xs z-20 shrink-0">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <div className="flex items-center space-x-2">
-                          <span className="text-base">👮</span>
+                          <span className="w-5 h-5 rounded-xs bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[10px] border border-slate-700">
+                            G
+                          </span>
                           <div>
-                            <span className="text-white font-bold">{SECTOR_GUARDS[selectedCam.id].name}</span>
-                            <span className="text-[10px] text-tactical-light ml-1.5 bg-tactical-olive/60 px-1.5 py-0.2 border border-tactical-olive">
+                            <span className="text-white font-semibold">{SECTOR_GUARDS[selectedCam.id].name}</span>
+                            <span className="text-[10px] text-slate-400 ml-2 bg-slate-800 px-1.5 py-0.5 border border-slate-700 rounded-xs">
                               {SECTOR_GUARDS[selectedCam.id].callSign}
                             </span>
-                            <span className="text-[10px] text-status-green ml-1.5 font-bold">
+                            <span className="text-[10px] text-emerald-400 ml-2 font-medium">
                               ● {SECTOR_GUARDS[selectedCam.id].status} ({SECTOR_GUARDS[selectedCam.id].distanceToCam})
                             </span>
                           </div>
                         </div>
 
                         {selectedCam.id === '7' ? (
-                          <div className="bg-emerald-950/90 border border-status-green text-status-green text-[10px] font-bold px-2 py-0.5 flex items-center space-x-1 shadow-[0_0_8px_rgba(0,255,65,0.3)]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse"></span>
-                            <span>🛡️ SECTOR SECURED // BORDER PATROL INTACT (ALL-CLEAR)</span>
+                          <div className="bg-emerald-950/70 border border-emerald-600/70 text-emerald-300 text-[10px] font-medium px-2 py-0.5 flex items-center space-x-1.5 rounded-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>SECTOR SECURED // ALL CLEAR</span>
                           </div>
                         ) : CAM_THREAT_CONFIDENCE[selectedCam.id] && CAM_THREAT_CONFIDENCE[selectedCam.id].confidence >= 0.8 ? (
-                          <div className="bg-red-950/90 border border-status-red text-status-red text-[10px] font-bold px-2 py-0.5 animate-pulse flex items-center space-x-1 shadow-md">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red animate-ping"></span>
-                            <span>{CAM_THREAT_CONFIDENCE[selectedCam.id].icon} {CAM_THREAT_CONFIDENCE[selectedCam.id].label} ({(CAM_THREAT_CONFIDENCE[selectedCam.id].confidence * 100).toFixed(0)}%) — THREAT &gt; 80%</span>
+                          <div className="bg-red-950/70 border border-red-600/70 text-red-300 text-[10px] font-medium px-2 py-0.5 flex items-center space-x-1.5 rounded-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span>{CAM_THREAT_CONFIDENCE[selectedCam.id].label} ({(CAM_THREAT_CONFIDENCE[selectedCam.id].confidence * 100).toFixed(0)}%)</span>
                           </div>
                         ) : null}
                       </div>
 
                       {/* Comms & Direct Dispatch Trigger Buttons */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 bg-tactical-gray/60 p-2 border border-tactical-olive/80">
-                        <div className="flex flex-wrap items-center gap-2.5 text-[10px]">
-                          <div className="flex items-center space-x-1 text-cyan-300">
-                            <span>📻</span>
-                            <span>WALKIE: <strong className="text-white">{SECTOR_GUARDS[selectedCam.id].walkieChannel}</strong></span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-950/60 p-2 border border-slate-800 rounded-xs">
+                        <div className="flex flex-wrap items-center gap-3 text-[10px]">
+                          <div className="text-slate-400">
+                            RADIO: <strong className="text-slate-200">{SECTOR_GUARDS[selectedCam.id].walkieChannel}</strong>
                           </div>
-                          <span className="text-tactical-olive">|</span>
-                          <div className="flex items-center space-x-1 text-yellow-300">
-                            <span>🛰️</span>
-                            <span>SAT-PHONE: <strong className="text-white">{SECTOR_GUARDS[selectedCam.id].satellitePhone}</strong></span>
+                          <span className="text-slate-700">|</span>
+                          <div className="text-slate-400">
+                            SATCOM: <strong className="text-slate-200">{SECTOR_GUARDS[selectedCam.id].satellitePhone}</strong>
                           </div>
                         </div>
 
                         <div className="flex items-center space-x-1.5">
                           <button
-                            onClick={() => handleDispatchGuard(selectedCam.id, 'SAT_PHONE')}
-                            className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-400 text-yellow-300 hover:bg-yellow-400 hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1"
-                            title={`Call satellite phone ${SECTOR_GUARDS[selectedCam.id].satellitePhone}`}
-                          >
-                            <span>📞</span>
-                            <span>CALL SAT-PHONE</span>
-                          </button>
-                          <button
                             onClick={() => handleDispatchGuard(selectedCam.id, 'WALKIE')}
-                            className="px-2 py-0.5 bg-cyan-500/20 border border-cyan-400 text-cyan-300 hover:bg-cyan-400 hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1"
+                            className="px-2.5 py-1 bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-white font-medium text-[10px] transition-colors rounded-xs"
                             title={`Broadcast on walkie-talkie ${SECTOR_GUARDS[selectedCam.id].walkieTalkie}`}
                           >
-                            <span>📻</span>
-                            <span>BROADCAST WALKIE</span>
+                            RADIO DISPATCH
+                          </button>
+                          <button
+                            onClick={() => handleDispatchGuard(selectedCam.id, 'SAT_PHONE')}
+                            className="px-2.5 py-1 bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-white font-medium text-[10px] transition-colors rounded-xs"
+                            title={`Call satellite phone ${SECTOR_GUARDS[selectedCam.id].satellitePhone}`}
+                          >
+                            CALL SAT-PHONE
                           </button>
                           <button
                             onClick={() => handleDispatchGuard(selectedCam.id, 'SECTOR_SIREN')}
-                            className="px-2 py-0.5 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1 animate-pulse"
+                            className="px-2.5 py-1 bg-red-950/80 border border-red-700 text-red-200 hover:bg-red-800 hover:text-white font-medium text-[10px] transition-colors rounded-xs"
                             title="Sound sector alarm & order intercept"
                           >
-                            <span>🚨</span>
-                            <span>ALARM / INTERCEPT</span>
+                            ORDER INTERCEPT
                           </button>
                         </div>
                       </div>
@@ -1759,17 +1724,17 @@ function App() {
                   </div>
                 </div>
               ) : (
-                /* 4x2 Video Channels Grid (8 Feeds) — TACTICAL DETECTION MODE */
+                /* 4x2 Video Channels Grid (8 Feeds) — Clean Enterprise Security Console */
                 <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-2 h-full w-full">
                   {cameraFeeds.map((cam) => (
                     <div
                       key={cam.id}
-                      className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
+                      className={`bg-slate-950 border relative group overflow-hidden flex flex-col transition-all rounded-xs shadow-sm ${
                         isCamFlagged(cam.id)
-                          ? 'border-status-red shadow-[0_0_10px_rgba(255,0,51,0.5)] animate-[pulse_1s_ease-in-out_infinite]'
+                          ? 'border-red-600/80 ring-1 ring-red-500/30'
                           : cam.id === '7'
-                          ? 'border-status-green/70 shadow-[0_0_8px_rgba(0,255,65,0.25)] hover:border-status-green'
-                          : 'border-tactical-olive hover:border-tactical-green'
+                          ? 'border-emerald-600/60 ring-1 ring-emerald-500/20'
+                          : 'border-slate-800 hover:border-slate-700'
                       }`}
                     >
                       {/* Live Video Stream */}
@@ -1786,30 +1751,30 @@ function App() {
                       />
 
                       {/* Top HUD Overlay */}
-                      <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
-                        <div className="flex items-center space-x-1">
-                          <span className={`w-2 h-2 rounded-full ${isCamFlagged(cam.id) ? 'bg-status-red animate-ping' : 'bg-status-green animate-pulse'}`}></span>
-                          <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
+                      <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-slate-950/95 via-slate-950/60 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
+                        <div className="flex items-center space-x-1.5">
+                          <span className={`w-1.5 h-1.5 rounded-full ${isCamFlagged(cam.id) ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                          <span className="text-slate-100 bg-slate-900/90 px-1.5 py-0.2 border border-slate-700/80 text-[10px] font-semibold truncate max-w-[130px] rounded-xs">
                             {cam.name}
                           </span>
-                          <span className={cam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500/80 text-orange-400 text-[8px] px-1 font-mono' : 'bg-emerald-950/80 border border-status-green/80 text-status-green text-[8px] px-1 font-mono'}>
+                          <span className="bg-slate-800 text-slate-300 border border-slate-700 text-[8px] px-1 font-mono rounded-xs">
                             {cam.sensorType === 'IR_THERMAL' ? 'IR' : 'EO'}
                           </span>
                         </div>
-                        <div className="text-[8px] text-tactical-olive/80 bg-black/70 px-1 border border-tactical-olive/40 font-mono">
-                          {cam.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'OPTICAL'} · {cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'LIVE'}
+                        <div className="text-[8px] text-slate-400 bg-slate-900/90 px-1 border border-slate-800 font-mono rounded-xs">
+                          {cam.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'OPTICAL'}
                         </div>
                       </div>
 
                       {/* Tactical Detection Banner for CAM-4 (Helicopter) */}
                       {showDetectionOverlays && cam.id === '4' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
-                          <span className="font-bold text-status-red flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            ⚠ ROTARY TARGET: HELICOPTER
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-slate-950/90 border border-red-500/70 text-slate-100 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between rounded-xs">
+                          <span className="font-semibold text-red-400 flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                            TARGET: ROTARY AIRCRAFT
                           </span>
-                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
-                            CONF 0.94
+                          <span className="bg-red-950/80 text-red-300 px-1 border border-red-700/60 text-[7px] font-medium">
+                            CONF 94%
                           </span>
                         </div>
                       )}
@@ -1817,9 +1782,9 @@ function App() {
                       {/* Tactical Reticle over Helicopter on CAM-4 in Grid */}
                       {showDetectionOverlays && cam.id === '4' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                          <div className="absolute top-[20%] left-[58%] w-[32%] h-[26%] border-2 border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse">
-                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🚁 HELICOPTER (0.94)
+                          <div className="absolute top-[20%] left-[58%] w-[32%] h-[26%] border border-red-500 bg-red-950/20">
+                            <span className="absolute -top-3 left-0 bg-red-900/90 text-red-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              AIRCRAFT: HELI (0.94)
                             </span>
                           </div>
                         </div>
@@ -1827,13 +1792,13 @@ function App() {
 
                       {/* Tactical Detection Banner for CAM-6 (Drone) */}
                       {showDetectionOverlays && cam.id === '6' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
-                          <span className="font-bold text-status-red flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            ⚠ DRONE INTRUSION
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-slate-950/90 border border-red-500/70 text-slate-100 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between rounded-xs">
+                          <span className="font-semibold text-red-400 flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                            TARGET: RECON UAV
                           </span>
-                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
-                            CONF 0.89
+                          <span className="bg-red-950/80 text-red-300 px-1 border border-red-700/60 text-[7px] font-medium">
+                            CONF 89%
                           </span>
                         </div>
                       )}
@@ -1841,9 +1806,9 @@ function App() {
                       {/* Tactical Reticle over Drone on CAM-6 in Grid */}
                       {showDetectionOverlays && cam.id === '6' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                          <div className="absolute top-[32%] left-[42%] w-[18%] h-[18%] border-2 border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse">
-                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🛸 DRONE-06 (0.89)
+                          <div className="absolute top-[32%] left-[42%] w-[18%] h-[18%] border border-red-500 bg-red-950/20">
+                            <span className="absolute -top-3 left-0 bg-red-900/90 text-red-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              UAV-06 (0.89)
                             </span>
                           </div>
                         </div>
@@ -1851,55 +1816,51 @@ function App() {
 
                       {/* Tactical Detection Banner for CAM-7 (Border Secured // Zero Threats) */}
                       {showDetectionOverlays && cam.id === '7' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/95 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_8px_rgba(0,255,65,0.3)]">
-                          <span className="font-bold flex items-center text-status-green">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1 animate-pulse"></span>
-                            SECTOR SECURED // BORDER CLEAR
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-slate-950/90 border border-emerald-600/70 text-slate-200 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between rounded-xs">
+                          <span className="font-semibold text-emerald-400 flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                            SECTOR SECURED // PERIMETER CLEAR
                           </span>
-                          <span className="bg-black/90 text-[7px] text-emerald-400 px-1 border border-status-green flex items-center space-x-1">
-                            <span className="font-bold">✔ 0 THREATS</span>
-                            <span>|</span>
-                            <span>PERIMETER INTACT</span>
+                          <span className="bg-emerald-950/80 text-emerald-300 px-1 border border-emerald-800 text-[7px] font-medium">
+                            0 THREATS
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-5 (High-Speed Thermal Target) — ALWAYS VISIBLE: CRITICAL THREAT */}
+                      {/* Tactical Detection Banner for CAM-5 (High-Speed Thermal Target) */}
                       {cam.id === '5' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
-                          <span className="font-bold text-status-red flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            ⚠ CRITICAL: HIGH-SPEED IR TARGET
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-slate-950/90 border border-red-500/70 text-slate-100 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between rounded-xs">
+                          <span className="font-semibold text-red-400 flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                            TARGET: FAST THERMAL INGRESS
                           </span>
-                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
-                            VEL: ~140 m/s
+                          <span className="bg-red-950/80 text-red-300 px-1 border border-red-700/60 text-[7px] font-medium">
+                            VEL: 140 m/s
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical Target Reticle & Plume Overlay on CAM-5 in Grid — ALWAYS VISIBLE */}
+                      {/* Tactical Target Reticle & Plume Overlay on CAM-5 in Grid */}
                       {cam.id === '5' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                          {/* Target Bounding Reticle */}
-                          <div className="absolute top-[52%] left-[34%] w-[16%] h-[18%] border border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.6)]">
-                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🚀 TGT-FAST-01 (0.96)
+                          <div className="absolute top-[52%] left-[34%] w-[16%] h-[18%] border border-red-500 bg-red-950/20">
+                            <span className="absolute -top-3 left-0 bg-red-900/90 text-red-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              TARGET: FAST-01 (0.96)
                             </span>
                           </div>
-                          {/* Plume Trail Line */}
-                          <div className="absolute top-[40%] left-[42%] w-[20%] h-0 border-t border-dashed border-status-amber rotate-[-42deg]"></div>
+                          <div className="absolute top-[40%] left-[42%] w-[20%] h-0 border-t border-dashed border-red-400/60 rotate-[-42deg]"></div>
                         </div>
                       )}
 
                       {/* Tactical Detection Banner for CAM-8 (Infrastructure Geometric Masking) */}
                       {showDetectionOverlays && cam.id === '8' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-cyan-950/95 border border-cyan-400 text-cyan-300 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                          <span className="font-bold flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mr-1 animate-pulse"></span>
-                            INFRASTRUCTURE GEOMETRICAL MASKING
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-slate-950/90 border border-sky-500/70 text-slate-200 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between rounded-xs">
+                          <span className="font-semibold text-sky-400 flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mr-1.5"></span>
+                            INFRASTRUCTURE GEOMETRIC ANALYSIS
                           </span>
-                          <span className="bg-black/80 text-cyan-300 px-1 border border-cyan-400 text-[7px] font-bold">
-                            4x SITES (99.2% PLANAR)
+                          <span className="bg-sky-950/80 text-sky-300 px-1 border border-sky-800 text-[7px] font-medium">
+                            4 SITES (99.2% PLANAR)
                           </span>
                         </div>
                       )}
@@ -1908,30 +1869,30 @@ function App() {
                       {showDetectionOverlays && cam.id === '8' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
                           {/* 1. Large Foundation Slab Geometric Mask */}
-                          <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              📐 MASK #1: 24.5m × 14.0m [SLAB // 343 m²]
+                          <div className="absolute top-[26%] left-[10%] w-[32%] h-[26%] border border-sky-400/80 bg-sky-950/20">
+                            <span className="absolute -top-2.5 left-0 bg-sky-900/90 text-sky-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              SITE 1: FOUNDATION [343m²]
                             </span>
                           </div>
 
                           {/* 2. Reinforced Containment / Vault Geometric Mask */}
-                          <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border-2 border-yellow-400 bg-yellow-500/20 shadow-[0_0_8px_rgba(250,204,21,0.4)]">
-                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              📐 MASK #2: 16.2m × 8.4m [VAULT // 136 m²]
+                          <div className="absolute top-[44%] left-[46%] w-[24%] h-[20%] border border-sky-400/80 bg-sky-950/20">
+                            <span className="absolute -top-2.5 left-0 bg-sky-900/90 text-sky-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              SITE 2: VAULT [136m²]
                             </span>
                           </div>
 
                           {/* 3. Utility Core Shaft Square Mask */}
-                          <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border-2 border-amber-400 bg-amber-500/25 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
-                            <span className="absolute -top-2.5 left-0 bg-amber-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ◼ MASK #3: 6.8m [CORE]
+                          <div className="absolute top-[30%] left-[68%] w-[12%] h-[15%] border border-sky-400/80 bg-sky-950/20">
+                            <span className="absolute -top-2.5 left-0 bg-sky-900/90 text-sky-100 text-[6px] font-medium px-1 whitespace-nowrap rounded-xs">
+                              SITE 3: CORE [46m²]
                             </span>
                           </div>
 
                           {/* 4. Infrastructure Utility Conduit Corridor */}
-                          <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
-                            <span className="absolute -top-3 left-6 bg-fuchsia-950/95 text-fuchsia-300 px-0.5 text-[6px] font-mono border border-fuchsia-500 whitespace-nowrap">
-                              ⫽ CORRIDOR: 38.0m [CONDUIT]
+                          <div className="absolute top-[52%] left-[18%] w-[50%] h-0 border-t border-dashed border-sky-400/70 rotate-[-12deg]">
+                            <span className="absolute -top-3 left-6 bg-slate-900/90 text-sky-300 px-1 text-[6px] font-mono border border-sky-600/50 whitespace-nowrap">
+                              CORRIDOR: 38m [CONDUIT]
                             </span>
                           </div>
                         </div>
@@ -1939,36 +1900,35 @@ function App() {
 
                       {/* Custom Upload Badge */}
                       {cam.fileName && (
-                        <div className="absolute top-8 left-2 bg-blue-950/90 border border-blue-400 text-blue-300 text-[9px] px-1.5 py-0.5 font-mono z-10 pointer-events-none">
+                        <div className="absolute top-8 left-2 bg-slate-900/90 border border-slate-700 text-slate-300 text-[9px] px-1.5 py-0.5 font-mono z-10 pointer-events-none rounded-xs">
                           FILE: {cam.fileName}
                         </div>
                       )}
 
-                      {/* Center Crosshair Overlay - Confined to video area so it never blocks bottom controls */}
+                      {/* Center Crosshair Overlay - Confined to video area */}
                       <div
                         onClick={() => setSelectedCamId(cam.id)}
-                        className="absolute inset-x-0 top-8 bottom-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-black/40 z-20"
+                        className="absolute inset-x-0 top-8 bottom-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-slate-950/60 z-20"
                       >
-                        <div className="text-status-green font-mono text-[10px] font-bold bg-black/90 px-2.5 py-1 border border-tactical-green tracking-wider shadow-lg flex items-center space-x-1.5">
-                          <span>🔬</span>
-                          <span>[ INSPECT & FILTERS ]</span>
+                        <div className="text-slate-100 font-mono text-[10px] font-semibold bg-slate-900 px-3 py-1 border border-slate-700 tracking-wider shadow-sm flex items-center space-x-1.5 rounded-xs">
+                          <span>INSPECT FEED &amp; FORENSICS</span>
                         </div>
                       </div>
 
-                      {/* Security Guard / Operator Badge & Quick Direct Dispatch (>80% Threat) */}
+                      {/* Security Guard / Operator Badge & Quick Direct Dispatch */}
                       {SECTOR_GUARDS[cam.id] && (
                         <div className="absolute bottom-8 left-1.5 right-1.5 flex items-center justify-between pointer-events-auto z-20 font-mono">
-                          <div className="bg-black/95 border border-tactical-olive/80 text-[7px] px-1 py-0.5 text-gray-300 flex items-center space-x-1 shadow">
-                            <span>👮</span>
-                            <span className="text-white font-bold truncate max-w-[65px]">{SECTOR_GUARDS[cam.id].name.split(' ')[0]}</span>
-                            <span className="text-tactical-olive">·</span>
-                            <span className="text-cyan-400 font-bold">{SECTOR_GUARDS[cam.id].walkieChannel}</span>
+                          <div className="bg-slate-950/90 border border-slate-800 text-[7px] px-1.5 py-0.5 text-slate-300 flex items-center space-x-1.5 rounded-xs shadow-sm">
+                            <span className="text-slate-400 font-medium">GUARD:</span>
+                            <span className="text-white font-medium truncate max-w-[70px]">{SECTOR_GUARDS[cam.id].name.split(' ')[0]}</span>
+                            <span className="text-slate-700">|</span>
+                            <span className="text-slate-300 font-mono">{SECTOR_GUARDS[cam.id].walkieChannel}</span>
                           </div>
 
                           {cam.id === '7' ? (
-                            <div className="bg-emerald-950/90 border border-status-green text-status-green text-[7px] font-bold px-1.5 py-0.5 flex items-center space-x-1 shadow">
-                              <span className="w-1 h-1 rounded-full bg-status-green animate-pulse"></span>
-                              <span>✔ SECURED</span>
+                            <div className="bg-emerald-950/80 border border-emerald-600/70 text-emerald-300 text-[7px] font-medium px-1.5 py-0.5 flex items-center space-x-1 rounded-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              <span>SECURED</span>
                             </div>
                           ) : CAM_THREAT_CONFIDENCE[cam.id] && CAM_THREAT_CONFIDENCE[cam.id].confidence >= 0.8 ? (
                             <button
@@ -1976,22 +1936,21 @@ function App() {
                                 e.stopPropagation();
                                 handleDispatchGuard(cam.id, 'SAT_PHONE');
                               }}
-                              className="bg-red-950/95 border border-status-red text-status-red hover:bg-status-red hover:text-black text-[7px] font-bold px-1.5 py-0.5 animate-pulse flex items-center space-x-0.5 shadow-[0_0_6px_rgba(255,0,51,0.5)] transition-colors cursor-pointer"
+                              className="bg-red-950/90 border border-red-600 text-red-200 hover:bg-red-700 hover:text-white text-[7px] font-bold px-2 py-0.5 flex items-center space-x-1 transition-colors cursor-pointer rounded-xs"
                               title={`Direct Comms: Call ${SECTOR_GUARDS[cam.id].name} on ${SECTOR_GUARDS[cam.id].satellitePhone} / ${SECTOR_GUARDS[cam.id].walkieChannel}`}
                             >
-                              <span>📞</span>
-                              <span>CALL GUARD</span>
+                              <span>DISPATCH</span>
                             </button>
                           ) : null}
                         </div>
                       )}
 
-                      {/* Bottom HUD & Action Controls - Compact, Zero Overlap, High Z-Index */}
-                      <div className="absolute bottom-0 inset-x-0 px-2 py-1 bg-gradient-to-t from-black/95 via-black/85 to-transparent flex items-center justify-between z-30 pointer-events-auto font-mono text-[10px]">
+                      {/* Bottom HUD & Action Controls */}
+                      <div className="absolute bottom-0 inset-x-0 px-2 py-1 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent flex items-center justify-between z-30 pointer-events-auto font-mono text-[10px]">
                         {/* Left: Feed Status */}
-                        <div className="flex items-center space-x-1 text-tactical-light text-[9px] shrink-0 truncate max-w-[85px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-status-green inline-block shrink-0"></span>
-                          <span className="truncate">{cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'FEED'}</span>
+                        <div className="flex items-center space-x-1 text-slate-400 text-[9px] shrink-0 truncate max-w-[85px]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
+                          <span className="truncate">{cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'LIVE'}</span>
                         </div>
 
                         {/* Right: Clean, non-wrapping control buttons */}
@@ -1999,11 +1958,10 @@ function App() {
                           {/* Dedicated Upload Button for this feed */}
                           <label
                             htmlFor={`feed-upload-${cam.id}`}
-                            className="px-1.5 py-0.5 bg-tactical-olive/80 border border-tactical-green hover:bg-tactical-green hover:text-black text-status-green text-[9px] font-bold cursor-pointer transition-colors flex items-center space-x-0.5 shrink-0"
+                            className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-[9px] font-medium cursor-pointer transition-colors flex items-center space-x-0.5 shrink-0 rounded-xs"
                             title="Upload custom video for this camera feed"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <span>↑</span>
                             <span>UPLOAD</span>
                           </label>
                           <input
@@ -2766,68 +2724,65 @@ function App() {
 
       {/* Emergency Guard Direct Dispatch & Satellite Comms Modal */}
       {activeDispatchAlert && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-tactical-dark border-2 border-status-red max-w-lg w-full p-4 shadow-[0_0_35px_rgba(255,0,51,0.6)] font-mono animate-[pulse_1.5s_ease-in-out_infinite]">
-            <div className="flex justify-between items-start border-b border-status-red/60 pb-2 mb-3">
-              <div className="flex items-center space-x-2 text-status-red font-bold text-sm">
-                <span className="w-3 h-3 rounded-full bg-status-red animate-ping"></span>
-                <span>🚨 EMERGENCY DISPATCH TRANSMISSION ACTIVE</span>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 max-w-lg w-full p-5 shadow-2xl font-mono rounded-md">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
+              <div className="flex items-center space-x-2 text-red-400 font-semibold text-sm">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <span>TACTICAL DISPATCH TRANSMISSION ACTIVE</span>
               </div>
               <button
                 onClick={() => setActiveDispatchAlert(null)}
-                className="text-tactical-light hover:text-white px-2 py-0.5 border border-tactical-olive text-xs"
+                className="text-slate-400 hover:text-white px-2 py-0.5 border border-slate-700 hover:border-slate-500 rounded-xs text-xs transition-colors"
               >
-                [ ✖ CLOSE ]
+                CLOSE
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="bg-red-950/90 border border-status-red/80 p-2.5 text-red-200">
-                <div className="font-bold text-yellow-300 text-sm flex items-center space-x-2 mb-1">
-                  <span>⚠ THREAT CONFIDENCE: {(activeDispatchAlert.confidence * 100).toFixed(0)}%</span>
-                  <span className="text-[10px] bg-status-red text-black px-1.5 py-0.2 font-bold">&gt;80% THRESHOLD MET</span>
+              <div className="bg-slate-950 border border-red-900/60 p-3 rounded-xs text-slate-300">
+                <div className="font-semibold text-red-400 text-sm flex items-center space-x-2 mb-1">
+                  <span>THREAT CONFIDENCE: {(activeDispatchAlert.confidence * 100).toFixed(0)}%</span>
+                  <span className="text-[10px] bg-red-950 border border-red-700 text-red-200 px-1.5 py-0.2 rounded-xs font-medium">&gt;80% THRESHOLD</span>
                 </div>
-                <div className="text-white">
-                  Target: <strong className="text-yellow-300">{activeDispatchAlert.threatLabel}</strong> detected in <strong>{activeDispatchAlert.guard.sector}</strong>
+                <div className="text-slate-200">
+                  Target: <strong className="text-white font-medium">{activeDispatchAlert.threatLabel}</strong> in <strong>{activeDispatchAlert.guard.sector}</strong>
                 </div>
               </div>
 
-              <div className="bg-black/90 border border-tactical-olive p-2.5 space-y-1.5 text-tactical-light">
-                <div className="text-white font-bold flex items-center space-x-1.5 text-sm">
-                  <span>👮</span>
-                  <span>ASSIGNED OFFICER: {activeDispatchAlert.guard.name}</span>
+              <div className="bg-slate-950 border border-slate-800 p-3 space-y-2 rounded-xs text-slate-300">
+                <div className="text-white font-semibold flex items-center space-x-2 text-sm">
+                  <span>OFFICER: {activeDispatchAlert.guard.name}</span>
                 </div>
-                <div className="text-[11px] text-gray-300">
-                  Call Sign: <strong>{activeDispatchAlert.guard.callSign}</strong> · Location: <strong>{activeDispatchAlert.guard.distanceToCam} from camera</strong> · Status: <strong>{activeDispatchAlert.guard.status}</strong>
+                <div className="text-[11px] text-slate-400">
+                  Call Sign: <strong className="text-slate-200">{activeDispatchAlert.guard.callSign}</strong> · Location: <strong className="text-slate-200">{activeDispatchAlert.guard.distanceToCam} from camera</strong> · Status: <strong className="text-emerald-400">{activeDispatchAlert.guard.status}</strong>
                 </div>
-                <div className="border-t border-tactical-olive/60 pt-2 flex flex-col space-y-1 text-[11px]">
-                  <div className="text-cyan-300 flex items-center space-x-2">
-                    <span>📻</span>
-                    <span>Walkie-Talkie: <strong>{activeDispatchAlert.guard.walkieTalkie}</strong></span>
-                    <span className="text-status-green font-bold text-[9px] bg-green-950/80 border border-status-green px-1">[BROADCASTING]</span>
+                <div className="border-t border-slate-800/80 pt-2 flex flex-col space-y-1.5 text-[11px]">
+                  <div className="text-slate-300 flex items-center justify-between">
+                    <span>Radio Frequency: <strong>{activeDispatchAlert.guard.walkieTalkie}</strong></span>
+                    <span className="text-emerald-400 font-medium text-[9px] bg-emerald-950/80 border border-emerald-800 px-1.5 py-0.2 rounded-xs">[TRANSMITTING]</span>
                   </div>
-                  <div className="text-yellow-300 flex items-center space-x-2">
-                    <span>🛰️</span>
-                    <span>Satellite Phone: <strong>{activeDispatchAlert.guard.satellitePhone}</strong></span>
-                    <span className="text-status-amber font-bold text-[9px] bg-yellow-950/80 border border-status-amber px-1">[CONNECTED]</span>
+                  <div className="text-slate-300 flex items-center justify-between">
+                    <span>Satellite Link: <strong>{activeDispatchAlert.guard.satellitePhone}</strong></span>
+                    <span className="text-sky-400 font-medium text-[9px] bg-sky-950/80 border border-sky-800 px-1.5 py-0.2 rounded-xs">[ACTIVE]</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-status-amber/10 border border-status-amber/40 p-2.5 text-status-amber text-[11px]">
-                <strong className="text-white block mb-0.5">DIRECT DISPATCH DIRECTIVE TRANSMITTED:</strong>
-                <p className="text-yellow-200">
-                  "Attention {activeDispatchAlert.guard.callSign}: High-confidence threat ({activeDispatchAlert.threatLabel}, {(activeDispatchAlert.confidence * 100).toFixed(0)}%) detected in your sector. Immediate visual intercept and perimeter confirmation required per Tactical Protocol ROE-4."
+              <div className="bg-slate-950/70 border border-slate-800 p-3 rounded-xs text-slate-300 text-[11px]">
+                <strong className="text-slate-200 block mb-1">DIRECT DISPATCH DIRECTIVE:</strong>
+                <p className="text-slate-400 leading-relaxed">
+                  "Attention {activeDispatchAlert.guard.callSign}: High-confidence threat ({activeDispatchAlert.threatLabel}, {(activeDispatchAlert.confidence * 100).toFixed(0)}%) confirmed in sector. Visual intercept and perimeter confirmation ordered per Standard Defense Operating Procedure."
                 </p>
               </div>
 
-              <div className="flex justify-between items-center pt-2 border-t border-tactical-olive/60">
-                <span className="text-[10px] text-tactical-light">Transmitted at {activeDispatchAlert.timestamp} UTC</span>
+              <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                <span className="text-[10px] text-slate-500">Transmitted at {activeDispatchAlert.timestamp} UTC</span>
                 <button
                   onClick={() => setActiveDispatchAlert(null)}
-                  className="px-4 py-1.5 bg-status-red text-black font-bold text-xs hover:bg-red-400 transition-colors shadow-lg"
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white font-medium text-xs rounded-xs transition-colors shadow-sm"
                 >
-                  ✓ ACKNOWLEDGE &amp; LOG TRANSMISSION
+                  ACKNOWLEDGE TRANSMISSION
                 </button>
               </div>
             </div>

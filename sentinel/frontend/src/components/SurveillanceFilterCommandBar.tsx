@@ -59,8 +59,8 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
         
         {/* Mission Presets (The 4 highlighted operational domains) */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] text-tactical-light font-bold flex items-center mr-1">
-            <span className="w-2 h-2 rounded-full bg-status-green animate-pulse mr-1.5"></span>
+          <span className="text-[10px] text-slate-400 font-semibold flex items-center mr-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>
             MISSION PROFILES:
           </span>
 
@@ -73,16 +73,15 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
                 key={key}
                 type="button"
                 onClick={() => handleSelectMissionPreset(key)}
-                className={`px-2.5 py-1 text-[11px] font-bold border transition-all flex items-center space-x-1.5 ${
+                className={`px-2.5 py-1 text-[11px] font-medium border rounded-xs transition-all flex items-center space-x-1.5 ${
                   isActive
-                    ? 'bg-tactical-olive/90 text-status-green border-tactical-green shadow-[0_0_4px_rgba(0,255,65,0.2)]'
-                    : 'bg-black/70 text-gray-300 border-tactical-olive hover:text-white hover:border-tactical-green'
+                    ? 'bg-slate-800 text-white border-slate-500 shadow-sm'
+                    : 'bg-slate-900/90 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'
                 }`}
                 title={preset.targetDescription}
               >
-                <span>{preset.icon}</span>
                 <span>{preset.name}</span>
-                <span className="text-[9px] opacity-75 font-normal hidden xl:inline">({preset.badge})</span>
+                <span className="text-[9px] opacity-60 font-normal hidden xl:inline">({preset.badge})</span>
               </button>
             );
           })}
@@ -91,29 +90,29 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
         {/* Filter Application Scope & Lab Button */}
         <div className="flex items-center space-x-2">
           {/* Scope Selector */}
-          <div className="flex items-center bg-black/80 border border-tactical-olive px-1.5 py-0.5 space-x-1 text-[10px]">
-            <span className="text-tactical-light font-bold mr-1">APPLY TO:</span>
+          <div className="flex items-center bg-slate-900 border border-slate-800 px-1.5 py-0.5 space-x-1 text-[10px] rounded-xs">
+            <span className="text-slate-400 font-medium mr-1">APPLY TO:</span>
             <button
               type="button"
               onClick={() => onScopeChange('ALL')}
-              className={`px-1.5 py-0.5 font-bold transition-all ${
+              className={`px-1.5 py-0.5 rounded-xs font-semibold transition-all ${
                 selectedScope === 'ALL'
-                  ? 'bg-status-amber text-black shadow-[0_0_6px_rgba(255,183,3,0.5)]'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-slate-200 text-slate-900'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               ALL 8 FEEDS
             </button>
-            <span className="text-tactical-olive">|</span>
+            <span className="text-slate-700">|</span>
             {availableCameras.map(cam => (
               <button
                 key={cam.id}
                 type="button"
                 onClick={() => onScopeChange(cam.id)}
-                className={`px-1.5 py-0.5 transition-all ${
+                className={`px-1.5 py-0.5 rounded-xs transition-all ${
                   selectedScope === cam.id
-                    ? 'bg-status-green text-black font-bold shadow-[0_0_6px_rgba(0,255,65,0.5)]'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-slate-200 text-slate-900 font-semibold'
+                    : 'text-slate-400 hover:text-white'
                 }`}
                 title={`Target ${cam.name}`}
               >
@@ -127,10 +126,9 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
             <button
               type="button"
               onClick={() => onOpenForensicLab(selectedScope === 'ALL' ? '1' : selectedScope)}
-              className="px-2.5 py-1 bg-tactical-olive hover:bg-tactical-green hover:text-black text-white font-bold text-[11px] border border-tactical-green transition-all shadow-[0_0_8px_rgba(0,255,65,0.2)] flex items-center space-x-1"
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-[11px] border border-slate-700 rounded-xs transition-colors flex items-center space-x-1"
             >
-              <span>🔬</span>
-              <span>EXPAND FORENSIC LAB</span>
+              <span>FORENSIC LAB</span>
             </button>
           )}
         </div>
@@ -138,9 +136,8 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
 
       {/* SECTION 2: TOP 10 MUST-HAVE SURVEILLANCE FILTERS (PROMINENT TACTICAL BAR) */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[10px] text-tactical-light font-bold flex items-center mr-1">
-          <span className="text-status-green mr-1">⚡</span>
-          TOP 10 FILTERS:
+        <span className="text-[10px] text-slate-400 font-semibold flex items-center mr-1">
+          QUICK FILTERS:
         </span>
 
         {TOP_10_MUST_HAVE_FILTERS.map((f) => {
@@ -229,15 +226,14 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
         <button
           type="button"
           onClick={() => setShowTuning(!showTuning)}
-          className={`px-2 py-1 border transition-all text-xs font-mono flex items-center space-x-1 ${
+          className={`px-2 py-1 border rounded-xs transition-colors text-xs font-mono flex items-center space-x-1 ${
             showTuning
-              ? 'bg-tactical-olive border-tactical-green text-status-green'
-              : 'bg-black/60 border-tactical-olive text-tactical-light hover:text-white'
+              ? 'bg-slate-800 border-slate-600 text-white font-medium'
+              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
           }`}
           title="Toggle sensitivity, contrast & threshold tuning sliders"
         >
-          <span>⚙️</span>
-          <span>{showTuning ? 'HIDE TUNING' : 'TUNE FX'}</span>
+          <span>{showTuning ? 'HIDE TUNING' : 'TUNING'}</span>
         </button>
       </div>
 

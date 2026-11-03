@@ -140,112 +140,112 @@ export const TOP_10_MUST_HAVE_FILTERS: {
   {
     id: 'RAW',
     name: 'RAW',
-    tag: '1:1 SENSOR',
-    icon: '⚪',
+    tag: '1:1',
+    icon: '',
     shortcut: '1',
     desc: 'Unprocessed native sensor stream with 1:1 photorealistic fidelity.',
-    borderClass: 'border-zinc-500',
-    textClass: 'text-zinc-200',
-    activeClass: 'bg-zinc-700 text-white border-zinc-300 shadow-[0_0_10px_rgba(255,255,255,0.25)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-200',
+    activeClass: 'bg-slate-100 text-slate-900 border-white font-semibold shadow-sm'
   },
   {
     id: 'CLAHE',
     name: 'CLAHE',
-    tag: 'ADAPTIVE HDR',
-    icon: '✨',
+    tag: 'HDR',
+    icon: '',
     shortcut: '2',
     desc: 'Contrast Limited Adaptive Histogram Equalization for fog, haze & night shadow reveal.',
-    borderClass: 'border-cyan-400',
-    textClass: 'text-cyan-300',
-    activeClass: 'bg-cyan-500 text-black border-cyan-300 font-bold shadow-[0_0_10px_rgba(34,211,238,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-blue-600 text-white border-blue-400 font-semibold shadow-sm'
   },
   {
     id: 'NIGHT_VISION',
     name: 'Night Vision',
-    tag: 'P43 PHOSPHOR',
-    icon: '🟢',
+    tag: 'NVG',
+    icon: '',
     shortcut: '3',
     desc: 'Gen-3 intensifier tube emulation with green phosphor luminance boost & shadow amplification.',
-    borderClass: 'border-status-green',
-    textClass: 'text-status-green',
-    activeClass: 'bg-status-green text-black border-status-green font-bold shadow-[0_0_10px_rgba(0,255,65,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-emerald-600 text-white border-emerald-400 font-semibold shadow-sm'
   },
   {
     id: 'THERMAL_FLIR',
     name: 'Thermal FLIR',
-    tag: 'IRONBOW IR',
-    icon: '🔥',
+    tag: 'IR',
+    icon: '',
     shortcut: '4',
     desc: 'Radiometric Ironbow pseudocolor gradient for engine heat, body heat & thermal exhaust.',
-    borderClass: 'border-orange-500',
-    textClass: 'text-orange-400',
-    activeClass: 'bg-orange-500 text-black border-orange-400 font-bold shadow-[0_0_10px_rgba(249,115,22,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-amber-600 text-white border-amber-400 font-semibold shadow-sm'
   },
   {
     id: 'CANNY',
     name: 'Canny Edge',
-    tag: 'CONTOUR MAP',
-    icon: '📐',
+    tag: 'EDGE',
+    icon: '',
     shortcut: '5',
     desc: 'Multi-stage non-maxima suppression edge contours for fences, barricades & structure lines.',
-    borderClass: 'border-sky-400',
-    textClass: 'text-sky-300',
-    activeClass: 'bg-sky-500 text-black border-sky-300 font-bold shadow-[0_0_10px_rgba(56,189,248,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-blue-600 text-white border-blue-400 font-semibold shadow-sm'
   },
   {
     id: 'SOBEL',
     name: 'Sobel Edge',
-    tag: 'GRADIENT MAG',
-    icon: '⚡',
+    tag: 'GRAD',
+    icon: '',
     shortcut: '6',
     desc: 'Spatial directional differential gradient filter isolating high-contrast movement planes.',
-    borderClass: 'border-yellow-400',
-    textClass: 'text-yellow-300',
-    activeClass: 'bg-yellow-400 text-black border-yellow-300 font-bold shadow-[0_0_10px_rgba(250,204,21,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-blue-600 text-white border-blue-400 font-semibold shadow-sm'
   },
   {
     id: 'MEDIAN_FILTER',
-    name: 'Median Filter',
-    tag: 'DE-SPECKLE',
-    icon: '🧼',
+    name: 'Median',
+    tag: 'DENOISE',
+    icon: '',
     shortcut: '7',
     desc: 'Non-linear 3x3 order-statistic filter eliminating sensor shot noise and snow speckles.',
-    borderClass: 'border-emerald-400',
-    textClass: 'text-emerald-300',
-    activeClass: 'bg-emerald-500 text-black border-emerald-300 font-bold shadow-[0_0_10px_rgba(52,211,153,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-slate-700 text-white border-slate-400 font-semibold shadow-sm'
   },
   {
     id: 'GAUSSIAN_FILTER',
-    name: 'Gaussian Filter',
-    tag: 'ANTI-ALIAS',
-    icon: '🌫️',
+    name: 'Gaussian',
+    tag: 'SMOOTH',
+    icon: '',
     shortcut: '8',
     desc: 'Isotropic 2D Gaussian kernel smoothing sensor grain & anti-aliasing high frequency jitter.',
-    borderClass: 'border-teal-400',
-    textClass: 'text-teal-300',
-    activeClass: 'bg-teal-500 text-black border-teal-300 font-bold shadow-[0_0_10px_rgba(45,212,191,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-slate-700 text-white border-slate-400 font-semibold shadow-sm'
   },
   {
     id: 'MOTION_DETECTION',
-    name: 'Motion Detection',
-    tag: 'TEMPORAL DIFF',
-    icon: '🏃',
+    name: 'Motion Delta',
+    tag: 'DELTA',
+    icon: '',
     shortcut: '9',
     desc: 'Frame-to-frame luminance delta accumulator highlighting moving intruders or projectiles.',
-    borderClass: 'border-status-amber',
-    textClass: 'text-status-amber',
-    activeClass: 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_10px_rgba(255,183,3,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-red-600 text-white border-red-400 font-semibold shadow-sm'
   },
   {
     id: 'FACE_ENHANCEMENT',
-    name: 'Face Enhancement',
-    tag: 'BIOMETRICS',
-    icon: '👤',
+    name: 'Face Enhance',
+    tag: 'BIOMETRIC',
+    icon: '',
     shortcut: '0',
     desc: 'High-frequency unsharp biometric mask boosting facial landmarks, eyes & facial contrast.',
-    borderClass: 'border-purple-400',
-    textClass: 'text-purple-300',
-    activeClass: 'bg-purple-500 text-white border-purple-300 font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)]'
+    borderClass: 'border-slate-700',
+    textClass: 'text-slate-300',
+    activeClass: 'bg-blue-600 text-white border-blue-400 font-semibold shadow-sm'
   }
 ];
 
@@ -275,45 +275,45 @@ export const SURVEILLANCE_MISSION_PRESETS: Record<SurveillanceMissionPreset, Mis
     id: 'BORDER_SURVEILLANCE',
     name: 'Border Surveillance',
     badge: 'BORDER DEFENSE',
-    icon: '🛡️',
+    icon: '',
     primaryFilter: 'CLAHE',
     recommendedFilters: ['CLAHE', 'CANNY', 'MOTION_DETECTION', 'NIGHT_VISION', 'OBJECT_OUTLINE'],
     targetDescription: 'Perimeter breaches, fence line intrusions, camouflage netting & illegal crossings',
     hudTag: 'SECTOR DEMARCATION LINE',
-    accentColor: 'border-cyan-400 text-cyan-400'
+    accentColor: 'border-slate-700 text-slate-200'
   },
   DRONE_SURVEILLANCE: {
     id: 'DRONE_SURVEILLANCE',
     name: 'Drone Surveillance',
     badge: 'AIRSPACE DEFENSE',
-    icon: '🛸',
+    icon: '',
     primaryFilter: 'THERMAL_FLIR',
     recommendedFilters: ['THERMAL_FLIR', 'SOBEL', 'TARGET_TRACKING', 'DRONE_DETECTION', 'MOTION_DETECTION'],
     targetDescription: 'Loitering UAV trajectories, high-speed thermal ingress & micro-quadcopters',
     hudTag: 'RESTRICTED AIRSPACE B',
-    accentColor: 'border-orange-500 text-orange-400'
+    accentColor: 'border-slate-700 text-slate-200'
   },
   DEFENSE_INTEL: {
     id: 'DEFENSE_INTEL',
-    name: 'Defense Intelligence Dashboard',
+    name: 'Defense Intelligence',
     badge: 'TACTICAL INTEL',
-    icon: '🎖️',
+    icon: '',
     primaryFilter: 'NIGHT_VISION',
     recommendedFilters: ['NIGHT_VISION', 'OPTICAL_FLOW', 'THREAT_HIGHLIGHT', 'MULTISPECTRAL_VIEW', 'CANNY'],
     targetDescription: 'Compound tactical recon, clandestine military assets & tactical posture',
     hudTag: 'MGRS 43R TN 8923 1245',
-    accentColor: 'border-status-green text-status-green'
+    accentColor: 'border-slate-700 text-slate-200'
   },
   SMART_CCTV: {
     id: 'SMART_CCTV',
     name: 'Smart CCTV System',
     badge: 'PERIMETER CCTV',
-    icon: '📹',
+    icon: '',
     primaryFilter: 'FACE_ENHANCEMENT',
     recommendedFilters: ['FACE_ENHANCEMENT', 'LICENSE_PLATE_ENHANCEMENT', 'BACKGROUND_SUBTRACTION', 'PERSON_DETECTION', 'VEHICLE_DETECTION'],
     targetDescription: 'Dismounted personnel identification, license plate OCR & checkpoint inspection',
     hudTag: 'CHECKPOINT ACCESS GATE',
-    accentColor: 'border-purple-400 text-purple-400'
+    accentColor: 'border-slate-700 text-slate-200'
   }
 };
 
