@@ -122,6 +122,380 @@ export interface TemporalProcessingBuffers {
   frameIndex: number;
 }
 
+// ==========================================
+// TOP 10 MUST-HAVE SURVEILLANCE FILTERS
+// ==========================================
+export const TOP_10_MUST_HAVE_FILTERS: {
+  id: ForensicFilterMode;
+  name: string;
+  tag: string;
+  icon: string;
+  shortcut: string;
+  desc: string;
+  borderClass: string;
+  textClass: string;
+  activeClass: string;
+}[] = [
+  {
+    id: 'RAW',
+    name: 'RAW',
+    tag: '1:1 SENSOR',
+    icon: '⚪',
+    shortcut: '1',
+    desc: 'Unprocessed native sensor stream with 1:1 photorealistic fidelity.',
+    borderClass: 'border-zinc-500',
+    textClass: 'text-zinc-200',
+    activeClass: 'bg-zinc-700 text-white border-zinc-300 shadow-[0_0_10px_rgba(255,255,255,0.25)]'
+  },
+  {
+    id: 'CLAHE',
+    name: 'CLAHE',
+    tag: 'ADAPTIVE HDR',
+    icon: '✨',
+    shortcut: '2',
+    desc: 'Contrast Limited Adaptive Histogram Equalization for fog, haze & night shadow reveal.',
+    borderClass: 'border-cyan-400',
+    textClass: 'text-cyan-300',
+    activeClass: 'bg-cyan-500 text-black border-cyan-300 font-bold shadow-[0_0_10px_rgba(34,211,238,0.5)]'
+  },
+  {
+    id: 'NIGHT_VISION',
+    name: 'Night Vision',
+    tag: 'P43 PHOSPHOR',
+    icon: '🟢',
+    shortcut: '3',
+    desc: 'Gen-3 intensifier tube emulation with green phosphor luminance boost & shadow amplification.',
+    borderClass: 'border-status-green',
+    textClass: 'text-status-green',
+    activeClass: 'bg-status-green text-black border-status-green font-bold shadow-[0_0_10px_rgba(0,255,65,0.5)]'
+  },
+  {
+    id: 'THERMAL_FLIR',
+    name: 'Thermal FLIR',
+    tag: 'IRONBOW IR',
+    icon: '🔥',
+    shortcut: '4',
+    desc: 'Radiometric Ironbow pseudocolor gradient for engine heat, body heat & thermal exhaust.',
+    borderClass: 'border-orange-500',
+    textClass: 'text-orange-400',
+    activeClass: 'bg-orange-500 text-black border-orange-400 font-bold shadow-[0_0_10px_rgba(249,115,22,0.5)]'
+  },
+  {
+    id: 'CANNY',
+    name: 'Canny Edge',
+    tag: 'CONTOUR MAP',
+    icon: '📐',
+    shortcut: '5',
+    desc: 'Multi-stage non-maxima suppression edge contours for fences, barricades & structure lines.',
+    borderClass: 'border-sky-400',
+    textClass: 'text-sky-300',
+    activeClass: 'bg-sky-500 text-black border-sky-300 font-bold shadow-[0_0_10px_rgba(56,189,248,0.5)]'
+  },
+  {
+    id: 'SOBEL',
+    name: 'Sobel Edge',
+    tag: 'GRADIENT MAG',
+    icon: '⚡',
+    shortcut: '6',
+    desc: 'Spatial directional differential gradient filter isolating high-contrast movement planes.',
+    borderClass: 'border-yellow-400',
+    textClass: 'text-yellow-300',
+    activeClass: 'bg-yellow-400 text-black border-yellow-300 font-bold shadow-[0_0_10px_rgba(250,204,21,0.5)]'
+  },
+  {
+    id: 'MEDIAN_FILTER',
+    name: 'Median Filter',
+    tag: 'DE-SPECKLE',
+    icon: '🧼',
+    shortcut: '7',
+    desc: 'Non-linear 3x3 order-statistic filter eliminating sensor shot noise and snow speckles.',
+    borderClass: 'border-emerald-400',
+    textClass: 'text-emerald-300',
+    activeClass: 'bg-emerald-500 text-black border-emerald-300 font-bold shadow-[0_0_10px_rgba(52,211,153,0.5)]'
+  },
+  {
+    id: 'GAUSSIAN_FILTER',
+    name: 'Gaussian Filter',
+    tag: 'ANTI-ALIAS',
+    icon: '🌫️',
+    shortcut: '8',
+    desc: 'Isotropic 2D Gaussian kernel smoothing sensor grain & anti-aliasing high frequency jitter.',
+    borderClass: 'border-teal-400',
+    textClass: 'text-teal-300',
+    activeClass: 'bg-teal-500 text-black border-teal-300 font-bold shadow-[0_0_10px_rgba(45,212,191,0.5)]'
+  },
+  {
+    id: 'MOTION_DETECTION',
+    name: 'Motion Detection',
+    tag: 'TEMPORAL DIFF',
+    icon: '🏃',
+    shortcut: '9',
+    desc: 'Frame-to-frame luminance delta accumulator highlighting moving intruders or projectiles.',
+    borderClass: 'border-status-amber',
+    textClass: 'text-status-amber',
+    activeClass: 'bg-status-amber text-black border-status-amber font-bold shadow-[0_0_10px_rgba(255,183,3,0.5)]'
+  },
+  {
+    id: 'FACE_ENHANCEMENT',
+    name: 'Face Enhancement',
+    tag: 'BIOMETRICS',
+    icon: '👤',
+    shortcut: '0',
+    desc: 'High-frequency unsharp biometric mask boosting facial landmarks, eyes & facial contrast.',
+    borderClass: 'border-purple-400',
+    textClass: 'text-purple-300',
+    activeClass: 'bg-purple-500 text-white border-purple-300 font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)]'
+  }
+];
+
+// ==========================================
+// TACTICAL MISSION PRESETS
+// ==========================================
+export type SurveillanceMissionPreset =
+  | 'BORDER_SURVEILLANCE'
+  | 'DRONE_SURVEILLANCE'
+  | 'DEFENSE_INTEL'
+  | 'SMART_CCTV';
+
+export interface MissionPresetConfig {
+  id: SurveillanceMissionPreset;
+  name: string;
+  badge: string;
+  icon: string;
+  primaryFilter: ForensicFilterMode;
+  recommendedFilters: ForensicFilterMode[];
+  targetDescription: string;
+  hudTag: string;
+  accentColor: string;
+}
+
+export const SURVEILLANCE_MISSION_PRESETS: Record<SurveillanceMissionPreset, MissionPresetConfig> = {
+  BORDER_SURVEILLANCE: {
+    id: 'BORDER_SURVEILLANCE',
+    name: 'Border Surveillance',
+    badge: 'BORDER DEFENSE',
+    icon: '🛡️',
+    primaryFilter: 'CLAHE',
+    recommendedFilters: ['CLAHE', 'CANNY', 'MOTION_DETECTION', 'NIGHT_VISION', 'OBJECT_OUTLINE'],
+    targetDescription: 'Perimeter breaches, fence line intrusions, camouflage netting & illegal crossings',
+    hudTag: 'SECTOR DEMARCATION LINE',
+    accentColor: 'border-cyan-400 text-cyan-400'
+  },
+  DRONE_SURVEILLANCE: {
+    id: 'DRONE_SURVEILLANCE',
+    name: 'Drone Surveillance',
+    badge: 'AIRSPACE DEFENSE',
+    icon: '🛸',
+    primaryFilter: 'THERMAL_FLIR',
+    recommendedFilters: ['THERMAL_FLIR', 'SOBEL', 'TARGET_TRACKING', 'DRONE_DETECTION', 'MOTION_DETECTION'],
+    targetDescription: 'Loitering UAV trajectories, high-speed thermal ingress & micro-quadcopters',
+    hudTag: 'RESTRICTED AIRSPACE B',
+    accentColor: 'border-orange-500 text-orange-400'
+  },
+  DEFENSE_INTEL: {
+    id: 'DEFENSE_INTEL',
+    name: 'Defense Intelligence Dashboard',
+    badge: 'TACTICAL INTEL',
+    icon: '🎖️',
+    primaryFilter: 'NIGHT_VISION',
+    recommendedFilters: ['NIGHT_VISION', 'OPTICAL_FLOW', 'THREAT_HIGHLIGHT', 'MULTISPECTRAL_VIEW', 'CANNY'],
+    targetDescription: 'Compound tactical recon, clandestine military assets & tactical posture',
+    hudTag: 'MGRS 43R TN 8923 1245',
+    accentColor: 'border-status-green text-status-green'
+  },
+  SMART_CCTV: {
+    id: 'SMART_CCTV',
+    name: 'Smart CCTV System',
+    badge: 'PERIMETER CCTV',
+    icon: '📹',
+    primaryFilter: 'FACE_ENHANCEMENT',
+    recommendedFilters: ['FACE_ENHANCEMENT', 'LICENSE_PLATE_ENHANCEMENT', 'BACKGROUND_SUBTRACTION', 'PERSON_DETECTION', 'VEHICLE_DETECTION'],
+    targetDescription: 'Dismounted personnel identification, license plate OCR & checkpoint inspection',
+    hudTag: 'CHECKPOINT ACCESS GATE',
+    accentColor: 'border-purple-400 text-purple-400'
+  }
+};
+
+/**
+ * Returns rapid GPU-accelerated CSS filter string to visibly style video feeds in real time.
+ */
+export function getSurveillanceCSSFilter(
+  filter: ForensicFilterMode,
+  options?: Partial<ForensicFilterOptions>
+): string {
+  const contrast = options?.contrast ?? 1.4;
+  const edgeSens = options?.edgeSensitivity ?? 1.5;
+
+  switch (filter) {
+    case 'RAW':
+      return 'none';
+    case 'GRAYSCALE':
+      return `grayscale(100%) contrast(${contrast})`;
+    case 'NEGATIVE':
+      return `invert(100%) hue-rotate(180deg) contrast(${contrast})`;
+    case 'THRESHOLD':
+      return `grayscale(100%) contrast(500%) brightness(1.1)`;
+    case 'NIGHT_VISION':
+      return `brightness(1.4) contrast(${contrast * 1.3}) hue-rotate(95deg) sepia(100%) saturate(450%)`;
+    case 'CLAHE':
+      return `contrast(${contrast * 1.45}) brightness(1.2) saturate(1.25)`;
+    case 'HISTOGRAM_EQUALIZATION':
+      return `contrast(${contrast * 1.6}) brightness(1.15) saturate(1.15)`;
+    case 'GAMMA_CORRECTION':
+      return `brightness(1.5) contrast(0.85)`;
+    case 'CANNY':
+      return `grayscale(100%) invert(100%) contrast(${Math.round(edgeSens * 250)}%) brightness(1.2)`;
+    case 'SOBEL':
+      return `grayscale(100%) contrast(${Math.round(edgeSens * 220)}%) brightness(0.95)`;
+    case 'LAPLACIAN_SHARPEN':
+      return `contrast(${contrast * 1.45}) brightness(1.05)`;
+    case 'OBJECT_OUTLINE':
+      return `grayscale(100%) invert(100%) contrast(${Math.round(edgeSens * 300)}%) drop-shadow(0 0 1px cyan)`;
+    case 'MEDIAN_FILTER':
+      return `blur(0.8px) contrast(${contrast}) brightness(1.02)`;
+    case 'GAUSSIAN_FILTER':
+      return `blur(2.0px) contrast(1.05)`;
+    case 'BILATERAL_FILTER':
+      return `blur(0.6px) contrast(${contrast * 1.15})`;
+    case 'THERMAL_FLIR':
+      return `invert(100%) hue-rotate(195deg) contrast(${contrast * 1.65}) saturate(400%)`;
+    case 'PSEUDO_COLOR':
+      return `hue-rotate(160deg) contrast(${contrast * 1.4}) saturate(300%)`;
+    case 'HEATMAP':
+      return `contrast(${contrast * 1.6}) brightness(1.3) sepia(60%) saturate(320%)`;
+    case 'INFRARED_VIEW':
+      return `grayscale(90%) contrast(${contrast * 1.3}) brightness(1.25)`;
+    case 'MULTISPECTRAL_VIEW':
+      return `hue-rotate(280deg) saturate(320%) contrast(${contrast * 1.2})`;
+    case 'MOTION_DETECTION':
+      return `contrast(${contrast * 1.25}) saturate(1.4)`;
+    case 'BACKGROUND_SUBTRACTION':
+      return `grayscale(85%) contrast(${contrast * 1.35})`;
+    case 'OPTICAL_FLOW':
+      return `hue-rotate(75deg) contrast(${contrast * 1.2}) saturate(220%)`;
+    case 'MOVEMENT_HEATMAP':
+      return `hue-rotate(185deg) contrast(${contrast * 1.4}) saturate(320%)`;
+    case 'FACE_ENHANCEMENT':
+      return `contrast(${contrast * 1.3}) brightness(1.1) saturate(1.15)`;
+    case 'TEXT_ENHANCEMENT':
+      return `contrast(2.2) brightness(1.1) grayscale(85%)`;
+    case 'LICENSE_PLATE_ENHANCEMENT':
+      return `contrast(2.5) brightness(1.15) grayscale(100%)`;
+    case 'FFT_SPECTRUM':
+      return `grayscale(100%) invert(90%) contrast(250%)`;
+    case 'HIGH_PASS':
+      return `contrast(2.2) brightness(0.9) grayscale(100%)`;
+    case 'LOW_PASS':
+      return `blur(2.5px) contrast(1.1)`;
+    case 'CHANNEL_RED':
+      return `sepia(100%) hue-rotate(330deg) saturate(600%) contrast(${contrast})`;
+    case 'CHANNEL_GREEN':
+      return `sepia(100%) hue-rotate(90deg) saturate(600%) contrast(${contrast})`;
+    case 'CHANNEL_BLUE':
+      return `sepia(100%) hue-rotate(200deg) saturate(600%) contrast(${contrast})`;
+    case 'TARGET_TRACKING':
+    case 'PERSON_DETECTION':
+    case 'VEHICLE_DETECTION':
+    case 'THREAT_HIGHLIGHT':
+    case 'DRONE_DETECTION':
+      return `contrast(${contrast * 1.1}) brightness(1.05)`;
+    default:
+      return 'none';
+  }
+}
+
+/**
+ * Returns tactical HUD overlay badges, labels, and color codes for any active filter mode.
+ */
+export function getSurveillanceOverlayMeta(filter: ForensicFilterMode): {
+  tag: string;
+  badgeColor: string;
+  badgeBg: string;
+  hudNote: string;
+  hasScanlines?: boolean;
+  hasThermalScale?: boolean;
+  hasBiometrics?: boolean;
+  hasMotionRadar?: boolean;
+} {
+  switch (filter) {
+    case 'NIGHT_VISION':
+      return {
+        tag: 'P43 NVG PHOSPHOR',
+        badgeColor: 'text-status-green',
+        badgeBg: 'bg-emerald-950/90 border-status-green',
+        hudNote: '540nm EMISSION // GEN-3 INTENSIFIER ACTIVE',
+        hasScanlines: true
+      };
+    case 'THERMAL_FLIR':
+      return {
+        tag: 'FLIR IRONBOW IR',
+        badgeColor: 'text-orange-400',
+        badgeBg: 'bg-orange-950/90 border-orange-500',
+        hudNote: 'LWIR 8-14μm // RADIOMETRIC GRADIENT (18°C - 85°C)',
+        hasThermalScale: true
+      };
+    case 'CLAHE':
+      return {
+        tag: 'CLAHE ADAPTIVE HDR',
+        badgeColor: 'text-cyan-300',
+        badgeBg: 'bg-cyan-950/90 border-cyan-400',
+        hudNote: 'TILE: 8x8 | CLIP LIMIT: 2.5 | BILINEAR L-INT'
+      };
+    case 'CANNY':
+      return {
+        tag: 'CANNY CONTOURS',
+        badgeColor: 'text-sky-300',
+        badgeBg: 'bg-sky-950/90 border-sky-400',
+        hudNote: 'HYSTERESIS THRESH: T_LOW 50 / T_HIGH 150'
+      };
+    case 'SOBEL':
+      return {
+        tag: 'SOBEL GRADIENT 3x3',
+        badgeColor: 'text-yellow-300',
+        badgeBg: 'bg-yellow-950/90 border-yellow-400',
+        hudNote: 'DIFFERENTIAL MAGNITUDE √[Gx² + Gy²]'
+      };
+    case 'MEDIAN_FILTER':
+      return {
+        tag: 'MEDIAN 3x3 DE-SPECKLE',
+        badgeColor: 'text-emerald-300',
+        badgeBg: 'bg-emerald-950/90 border-emerald-400',
+        hudNote: 'IMPULSE SENSOR NOISE ATTENUATION ACTIVE'
+      };
+    case 'GAUSSIAN_FILTER':
+      return {
+        tag: 'GAUSSIAN SMOOTHING',
+        badgeColor: 'text-teal-300',
+        badgeBg: 'bg-teal-950/90 border-teal-400',
+        hudNote: '2D ISOTROPIC KERNEL (σ=1.2) ANTI-ALIAS'
+      };
+    case 'MOTION_DETECTION':
+      return {
+        tag: 'MOTION DETECTION DIFF',
+        badgeColor: 'text-status-amber',
+        badgeBg: 'bg-amber-950/90 border-status-amber',
+        hudNote: 'TEMPORAL LUMINANCE DIFFERENCE ΔL > 18',
+        hasMotionRadar: true
+      };
+    case 'FACE_ENHANCEMENT':
+      return {
+        tag: 'BIOMETRIC ENHANCEMENT',
+        badgeColor: 'text-purple-300',
+        badgeBg: 'bg-purple-950/90 border-purple-400',
+        hudNote: 'FACIAL LANDMARK CONTRAST UNSHARP MASK',
+        hasBiometrics: true
+      };
+    case 'RAW':
+    default:
+      return {
+        tag: 'RAW SENSOR 1:1',
+        badgeColor: 'text-zinc-300',
+        badgeBg: 'bg-zinc-900/90 border-zinc-500',
+        hudNote: 'NATIVE SENSOR PASSTHROUGH // UNPROCESSED'
+      };
+  }
+}
+
 export const TARGET_LABELS: Record<TargetClassification, { label: string; icon: string; desc: string; badgeClass: string }> = {
   DRONE_UAV: {
     label: 'DRONE / UAV INTRUSION',

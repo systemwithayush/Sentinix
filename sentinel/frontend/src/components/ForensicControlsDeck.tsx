@@ -5,11 +5,14 @@ import type {
   FilterCategory,
   TargetClassification, 
   ForensicConfidence, 
-  ForensicWriteup
+  ForensicWriteup,
+  SurveillanceMissionPreset
 } from '../utils/forensicFilters';
 import { 
   TARGET_LABELS, 
-  FILTER_DESCRIPTIONS 
+  FILTER_DESCRIPTIONS,
+  TOP_10_MUST_HAVE_FILTERS,
+  SURVEILLANCE_MISSION_PRESETS
 } from '../utils/forensicFilters';
 
 export interface CameraFeedQuickSelect {
@@ -238,7 +241,7 @@ export const ForensicControlsDeck: React.FC<ForensicControlsDeckProps> = ({
                 : 'border-tactical-olive text-tactical-light hover:text-white bg-black/40'
             }`}
           >
-            FILTERS & OPERATORS ({allFiltersList.length})
+            FILTERS & OPERATORS ({ALL_FILTERS_LIST.length})
           </button>
           <button
             onClick={() => setActiveTab('WRITEUP')}
@@ -273,13 +276,85 @@ export const ForensicControlsDeck: React.FC<ForensicControlsDeckProps> = ({
       {/* TAB 1: FILTERS & ENHANCEMENT */}
       {activeTab === 'FILTERS' && (
         <div className="space-y-3">
+
+          {/* Operational Mission Profiles Strip */}
+          <div className="bg-black/80 p-2 border border-tactical-olive flex flex-wrap items-center justify-between gap-2 shadow-inner">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] text-tactical-light font-bold flex items-center mr-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1.5 animate-pulse"></span>
+                MISSION PROFILES:
+              </span>
+              {(Object.keys(SURVEILLANCE_MISSION_PRESETS) as SurveillanceMissionPreset[]).map(key => {
+                const preset = SURVEILLANCE_MISSION_PRESETS[key];
+                const isActive = filterMode === preset.primaryFilter;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => onFilterChange(preset.primaryFilter)}
+                    className={`px-2 py-0.5 text-[10px] font-bold border transition-all flex items-center space-x-1 ${
+                      isActive
+                        ? 'bg-tactical-olive text-status-green border-tactical-green shadow-[0_0_8px_rgba(0,255,65,0.4)]'
+                        : 'bg-tactical-dark text-gray-300 border-tactical-olive hover:text-white hover:border-tactical-green'
+                    }`}
+                    title={preset.targetDescription}
+                  >
+                    <span>{preset.icon}</span>
+                    <span>{preset.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <span className="text-[9px] text-tactical-light/60 font-mono hidden md:inline">
+              ISO/IEC 27037 FORENSIC STANDARD
+            </span>
+          </div>
+
+          {/* Top 10 Must-Have Filters Bar */}
+          <div className="bg-tactical-dark/90 p-2 border border-tactical-green/60 shadow-md">
+            <div className="text-[10px] text-status-green font-bold mb-1.5 flex items-center justify-between">
+              <span className="flex items-center">
+                <span className="text-status-green mr-1.5">⚡</span>
+                TOP 10 SURVEILLANCE FILTERS (ONE-CLICK PRESETS):
+              </span>
+              <span className="text-[9px] text-tactical-light">
+                ACTIVE: <strong className="text-status-amber">{filterMode}</strong>
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {TOP_10_MUST_HAVE_FILTERS.map(f => {
+                const isSelected = filterMode === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => onFilterChange(f.id)}
+                    className={`px-2 py-1 text-[11px] font-bold border transition-all flex items-center space-x-1.5 ${
+                      isSelected
+                        ? f.activeClass
+                        : `bg-black/70 hover:bg-tactical-gray ${f.borderClass} ${f.textClass}`
+                    }`}
+                    title={f.desc}
+                  >
+                    <span>{f.icon}</span>
+                    <span>{f.name}</span>
+                    <span className="text-[8px] opacity-75 font-mono px-0.5 bg-black/40 border border-current rounded">
+                      {f.tag}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Category Pills & Quick Search */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-black/50 p-2 border border-tactical-olive/60">
             <div className="flex flex-wrap gap-1 text-[10px]">
               {categories.map(cat => {
                 const count = cat.id === 'ALL' 
-                  ? allFiltersList.length 
-                  : allFiltersList.filter(f => FILTER_DESCRIPTIONS[f]?.category === cat.id).length;
+                  ? ALL_FILTERS_LIST.length 
+                  : ALL_FILTERS_LIST.filter(f => FILTER_DESCRIPTIONS[f]?.category === cat.id).length;
                 return (
                   <button
                     key={cat.id}

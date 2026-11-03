@@ -3,11 +3,17 @@ import axios from 'axios';
 import type { 
   ForensicFilterMode, 
   ForensicFilterOptions, 
-  ForensicWriteup 
+  ForensicWriteup,
+  SurveillanceMissionPreset
 } from './utils/forensicFilters';
-import { TARGET_LABELS } from './utils/forensicFilters';
+import { 
+  TARGET_LABELS,
+  getSurveillanceCSSFilter,
+  getSurveillanceOverlayMeta
+} from './utils/forensicFilters';
 import { ForensicVideoPlayer, type ForensicVideoPlayerRef } from './components/ForensicVideoPlayer';
 import { ForensicControlsDeck } from './components/ForensicControlsDeck';
+import { SurveillanceFilterCommandBar } from './components/SurveillanceFilterCommandBar';
 import { CamouflageGeometricViewer } from './components/CamouflageGeometricViewer';
 import { ForensicReportModal } from './components/ForensicReportModal';
 import { createForensicDossier, type ForensicDossier } from './utils/forensicReport';
@@ -430,10 +436,12 @@ function App() {
 
   // Forensic Image Processing & Write-up State
   const [forensicFilter, setForensicFilter] = useState<ForensicFilterMode>('RAW');
+  const [activeFilterScope, setActiveFilterScope] = useState<'ALL' | string>('ALL');
+  const [activeMissionPreset, setActiveMissionPreset] = useState<SurveillanceMissionPreset | null>('BORDER_SURVEILLANCE');
   const [forensicOptions, setForensicOptions] = useState<ForensicFilterOptions>({
-    contrast: 1.0,
+    contrast: 1.4,
     threshold: 128,
-    edgeSensitivity: 1.2,
+    edgeSensitivity: 1.5,
     tint: 'MONO',
     zoom: 1.0
   });
@@ -954,6 +962,20 @@ function App() {
               </div>
             </div>
 
+            {/* Tactical Surveillance Filters & Mission Operations Command Deck (Always Visible on Dashboard!) */}
+            <SurveillanceFilterCommandBar
+              activeFilter={forensicFilter}
+              onFilterChange={setForensicFilter}
+              filterOptions={forensicOptions}
+              onOptionsChange={setForensicOptions}
+              selectedScope={activeFilterScope}
+              onScopeChange={setActiveFilterScope}
+              availableCameras={cameraFeeds.map(c => ({ id: c.id, name: c.name }))}
+              onOpenForensicLab={(camId) => setSelectedCamId(camId)}
+              activeMissionPreset={activeMissionPreset}
+              onMissionPresetChange={setActiveMissionPreset}
+            />
+
             {/* Main Video View: Either Maximized Single View or 3x2 Grid */}
             <div className="panel flex-1 min-h-0 p-2 overflow-hidden flex flex-col">
               {selectedCam ? (
@@ -1324,42 +1346,93 @@ function App() {
               ) : (
                 /* 4x2 Video Channels Grid (8 Feeds) */
                 <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-2 h-full w-full">
-                  {cameraFeeds.map((cam) => (
-                    <div
-                      key={cam.id}
-                      className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
-                        cam.id === '7' ? 'border-status-red shadow-[0_0_12px_rgba(255,0,51,0.25)]' :
-                        cam.id === '8' ? 'border-status-amber shadow-[0_0_12px_rgba(255,183,3,0.25)]' :
-                        'border-tactical-olive hover:border-tactical-green'
-                      }`}
-                    >
-                      {/* Live Video Player */}
-                      <video
-                        ref={el => { videoRefs.current[cam.id] = el; }}
-                        src={cam.videoUrl}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover cursor-pointer"
-                        onClick={() => setSelectedCamId(cam.id)}
-                      />
+                  {cameraFeeds.map((cam) => {
+                    const isFilterActiveOnThisFeed = activeFilterScope === 'ALL' || activeFilterScope === cam.id;
+                    const effectiveFeedFilter = isFilterActiveOnThisFeed ? forensicFilter : 'RAW';
+                    const filterMeta = getSurveillanceOverlayMeta(effectiveFeedFilter);
 
-                      {/* Top HUD Overlay */}
-                      <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
-                        <div className="flex items-center space-x-1">
-                          <span className={`w-2 h-2 rounded-full ${cam.id === '7' ? 'bg-status-red' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
-                          <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
-                            {cam.name}
-                          </span>
-                          <span className={cam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500/80 text-orange-400 text-[8px] px-1 font-mono' : 'bg-emerald-950/80 border border-status-green/80 text-status-green text-[8px] px-1 font-mono'}>
-                            {cam.sensorType === 'IR_THERMAL' ? 'IR' : 'EO'}
-                          </span>
+                    return (
+                      <div
+                        key={cam.id}
+                        className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
+                          cam.id === '7' ? 'border-status-red shadow-[0_0_12px_rgba(255,0,51,0.25)]' :
+                          cam.id === '8' ? 'border-status-amber shadow-[0_0_12px_rgba(255,183,3,0.25)]' :
+                          'border-tactical-olive hover:border-tactical-green'
+                        }`}
+                      >
+                        {/* Live Video Player with Real-Time Surveillance Filters */}
+                        <video
+                          ref={el => { videoRefs.current[cam.id] = el; }}
+                          src={cam.videoUrl}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          style={{
+                            filter: getSurveillanceCSSFilter(effectiveFeedFilter, forensicOptions)
+                          }}
+                          className="w-full h-full object-cover cursor-pointer transition-all duration-200"
+                          onClick={() => setSelectedCamId(cam.id)}
+                        />
+
+                        {/* Top HUD Overlay */}
+                        <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
+                          <div className="flex items-center space-x-1">
+                            <span className={`w-2 h-2 rounded-full ${cam.id === '7' ? 'bg-status-red' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
+                            <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
+                              {cam.name}
+                            </span>
+                            <span className={cam.sensorType === 'IR_THERMAL' ? 'bg-orange-950/80 border border-orange-500/80 text-orange-400 text-[8px] px-1 font-mono' : 'bg-emerald-950/80 border border-status-green/80 text-status-green text-[8px] px-1 font-mono'}>
+                              {cam.sensorType === 'IR_THERMAL' ? 'IR' : 'EO'}
+                            </span>
+                          </div>
+                          <div className="text-[9px] text-tactical-light bg-black/80 px-1 border border-tactical-olive">
+                            {cam.resolution}
+                          </div>
                         </div>
-                        <div className="text-[9px] text-tactical-light bg-black/80 px-1 border border-tactical-olive">
-                          {cam.resolution}
-                        </div>
-                      </div>
+
+                        {/* Active Filter HUD Badge */}
+                        {effectiveFeedFilter !== 'RAW' && (
+                          <div className="absolute top-7 left-1.5 z-20 pointer-events-none">
+                            <span className={`px-1.5 py-0.5 text-[8px] font-mono font-bold border ${filterMeta.badgeBg} ${filterMeta.badgeColor} shadow-md flex items-center space-x-1`}>
+                              <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping"></span>
+                              <span>FILTER: {effectiveFeedFilter}</span>
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Night Vision Scanlines Overlay */}
+                        {filterMeta.hasScanlines && (
+                          <div className="absolute inset-0 pointer-events-none z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,255,65,0.12)_50%)] bg-[length:100%_4px] opacity-70"></div>
+                        )}
+
+                        {/* Thermal FLIR Scale Bar */}
+                        {filterMeta.hasThermalScale && (
+                          <div className="absolute bottom-8 right-1.5 z-20 pointer-events-none bg-black/85 border border-orange-500/80 px-1 py-0.5 text-[7px] font-mono text-orange-300 shadow-md">
+                            <div className="w-14 h-1.5 bg-gradient-to-r from-blue-700 via-purple-600 via-rose-500 via-orange-400 to-yellow-200 mb-0.5 border border-black"></div>
+                            <div className="flex justify-between text-[6px]">
+                              <span>18°C</span>
+                              <span>85°C</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Motion Radar Indicator */}
+                        {filterMeta.hasMotionRadar && (
+                          <div className="absolute top-12 left-1.5 z-20 pointer-events-none bg-black/80 border border-status-amber px-1 py-0.5 text-[7px] font-mono text-status-amber flex items-center space-x-1 animate-pulse">
+                            <span>🏃</span>
+                            <span>MOTION ACTIVE</span>
+                          </div>
+                        )}
+
+                        {/* Biometric Face Tracking Box */}
+                        {filterMeta.hasBiometrics && (
+                          <div className="absolute top-[35%] left-[45%] w-[18%] h-[24%] border-2 border-purple-400 bg-purple-500/10 pointer-events-none z-20 shadow-[0_0_8px_rgba(168,85,247,0.5)]">
+                            <span className="absolute -top-3 left-0 bg-purple-600 text-white text-[6px] font-bold px-0.5">
+                              ID: 0.94 MATCH
+                            </span>
+                          </div>
+                        )}
 
                       {/* Tactical Detection Banner for CAM-7 (Border Perimeter Verified Clear) */}
                       {showDetectionOverlays && cam.id === '7' && (
@@ -1543,24 +1616,49 @@ function App() {
 
                           {/* Play/Pause */}
                           <button
+                            type="button"
                             onClick={(e) => toggleCameraPlay(cam.id, e)}
                             className="px-1.5 py-0.5 bg-black/80 border border-tactical-olive hover:text-white transition-colors"
+                            title="Play/Pause this feed"
                           >
                             {cam.isPlaying ? '⏸' : '▶'}
                           </button>
 
-                          {/* Maximize */}
+                          {/* Quick Filter Target Toggle */}
                           <button
-                            onClick={() => setSelectedCamId(cam.id)}
-                            className="px-1.5 py-0.5 bg-tactical-green/30 border border-tactical-green text-status-green hover:bg-tactical-green hover:text-black transition-colors font-bold"
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveFilterScope(activeFilterScope === cam.id ? 'ALL' : cam.id);
+                            }}
+                            className={`px-1.5 py-0.5 border text-[9px] font-bold transition-all ${
+                              activeFilterScope === cam.id
+                                ? 'bg-status-amber text-black border-status-amber'
+                                : 'bg-black/80 border-tactical-olive text-tactical-light hover:text-white'
+                            }`}
+                            title={`Filter target: ${activeFilterScope === cam.id ? 'THIS CAM ONLY' : 'CLICK TO ISOLATE FX'}`}
                           >
-                            ⛶
+                            ⚡ {activeFilterScope === cam.id ? 'ISO' : 'FX'}
+                          </button>
+
+                          {/* Forensic Lab Quick Inspect */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCamId(cam.id);
+                            }}
+                            className="px-1.5 py-0.5 bg-status-green/20 border border-status-green text-status-green hover:bg-status-green hover:text-black font-bold text-[9px] transition-colors"
+                            title="Inspect feed in full-screen Forensic Lab"
+                          >
+                            🔬 LAB
                           </button>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
               )}
             </div>
           </div>
