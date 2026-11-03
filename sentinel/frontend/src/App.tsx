@@ -1003,11 +1003,11 @@ function App() {
             {/* Main Video View: Either Maximized Single Feature Inspection or 8-Channel Detection Grid */}
             <div className="panel flex-1 min-h-0 p-2 overflow-hidden flex flex-col">
               {selectedCam ? (
-                /* Maximized Single Video Channel Feature Inspection View - 50/50 Split */
-                <div className="w-full h-full bg-black border-2 border-tactical-green flex flex-col relative overflow-hidden">
+                /* Maximized Single Video Channel Feature Inspection View - Vertical Split (Left: Feed & Controls, Right: Tools) */
+                <div className="w-full h-full bg-black border-2 border-tactical-green flex flex-col lg:flex-row relative overflow-hidden">
                   
-                  {/* TOP HALF (50% Screen): Video Feed + Scrubber + Playback & Action Controls */}
-                  <div className="h-1/2 flex flex-col min-h-0 border-b-2 border-tactical-green bg-black shrink-0 overflow-hidden">
+                  {/* LEFT HALF (Vertical Split): Video Feed + Scrubber + Playback & Action Controls */}
+                  <div className="w-full lg:w-1/2 flex flex-col min-h-0 border-b-2 lg:border-b-0 lg:border-r-2 border-tactical-green bg-black shrink-0 overflow-hidden h-full">
                     {/* Top HUD */}
                     <div className="bg-black/95 border-b border-tactical-olive px-2.5 py-1.5 flex flex-wrap gap-2 justify-between items-center z-30 font-mono shadow-md shrink-0">
                       <div className="space-y-0.5">
@@ -1295,12 +1295,12 @@ function App() {
                   </div>
 
                   {/* Playback & Action Controls Bar */}
-                  <div className="bg-tactical-gray border-t border-tactical-olive p-2.5 flex items-center justify-between z-20 font-mono text-xs shrink-0">
-                    <div className="flex items-center space-x-3">
+                  <div className="bg-tactical-gray border-t border-tactical-olive p-2 flex flex-wrap items-center justify-between gap-2 z-20 font-mono text-xs shrink-0">
+                    <div className="flex items-center space-x-2">
                       {/* Play/Pause */}
                       <button
                         onClick={() => expandedPlayerRef.current?.togglePlay()}
-                        className="px-3 py-1 bg-tactical-olive border border-tactical-green text-white hover:bg-tactical-green hover:text-black font-bold transition-colors"
+                        className="px-2.5 py-1 bg-tactical-olive border border-tactical-green text-white hover:bg-tactical-green hover:text-black font-bold transition-colors"
                       >
                         PLAY / PAUSE
                       </button>
@@ -1308,19 +1308,18 @@ function App() {
                       {/* Mute/Unmute */}
                       <button
                         onClick={() => setIsMuted(!isMuted)}
-                        className={`px-3 py-1 border transition-colors ${isMuted ? 'border-tactical-olive text-tactical-light' : 'border-status-green text-status-green bg-status-green/10'}`}
+                        className={`px-2 py-1 border transition-colors ${isMuted ? 'border-tactical-olive text-tactical-light' : 'border-status-green text-status-green bg-status-green/10'}`}
                       >
-                        {isMuted ? '🔇 MUTED' : '🔊 AUDIO ON'}
+                        {isMuted ? '🔇' : '🔊'}
                       </button>
 
                       {/* Playback speed */}
-                      <div className="flex items-center space-x-1 border border-tactical-olive px-1.5 py-0.5">
-                        <span className="text-[10px] text-tactical-light mr-1">SPEED:</span>
+                      <div className="flex items-center space-x-1 border border-tactical-olive px-1 py-0.5">
                         {[0.5, 1.0, 2.0].map(s => (
                           <button
                             key={s}
                             onClick={() => setPlaybackSpeed(s)}
-                            className={`px-1.5 py-0.5 text-[10px] ${playbackSpeed === s ? 'bg-tactical-green text-black font-bold' : 'text-tactical-light hover:text-white'}`}
+                            className={`px-1 py-0.5 text-[10px] ${playbackSpeed === s ? 'bg-tactical-green text-black font-bold' : 'text-tactical-light hover:text-white'}`}
                           >
                             {s}x
                           </button>
@@ -1328,31 +1327,30 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      {/* Generate ISO/IEC 27037 Forensic Evidence Dossier */}
+                    <div className="flex items-center space-x-1.5 flex-wrap gap-1">
                       {/* Dedicated Forensic Dossier Generator Button */}
                       <button
                         type="button"
                         onClick={() => handleGenerateForensicReport(selectedCam)}
-                        className="px-3 py-1 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-mono font-bold text-xs border border-status-green transition-colors flex items-center space-x-1 shadow-md"
+                        className="px-2.5 py-1 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-mono font-bold text-xs border border-status-green transition-colors flex items-center space-x-1 shadow-md"
                         title="Generate ISO/IEC 27037 Digital Forensics Evidence Dossier"
                       >
                         <span>📑</span>
-                        <span>FORENSIC REPORT DOSSIER</span>
+                        <span>DOSSIER</span>
                       </button>
 
                       {/* Run AI Analysis on current video frame */}
                       <button
                         onClick={analyzeActiveVideoFrame}
                         disabled={isAnalyzingFrame}
-                        className="px-3 py-1 bg-status-amber text-black font-bold hover:bg-yellow-400 transition-colors flex items-center space-x-1.5 shadow-md"
+                        className="px-2.5 py-1 bg-status-amber text-black font-bold hover:bg-yellow-400 transition-colors flex items-center space-x-1 shadow-md"
                       >
                         <span>⚡</span>
-                        <span>{isAnalyzingFrame ? 'ANALYZING FRAME...' : 'RUN AI INFERENCE ON FRAME'}</span>
+                        <span>{isAnalyzingFrame ? 'ANALYZING...' : 'AI INFERENCE'}</span>
                       </button>
 
                       {/* Upload Replacement Video */}
-                      <label className="px-3 py-1 bg-tactical-green text-black font-bold hover:bg-[#5f7751] transition-colors cursor-pointer flex items-center space-x-1.5">
+                      <label className="px-2.5 py-1 bg-tactical-green text-black font-bold hover:bg-[#5f7751] transition-colors cursor-pointer flex items-center space-x-1">
                         <input
                           type="file"
                           accept="video/*"
@@ -1364,14 +1362,14 @@ function App() {
                           }}
                         />
                         <span>⤒</span>
-                        <span>REPLACE VIDEO FEED</span>
+                        <span>REPLACE</span>
                       </label>
                     </div>
                   </div>
                 </div>
 
-                {/* BOTTOM HALF (50% Screen): All Surveillance Tools & Forensic Deck */}
-                <div className="h-1/2 flex flex-col min-h-0 bg-tactical-dark overflow-hidden">
+                {/* RIGHT HALF (Vertical Split): All Surveillance Tools & Forensic Deck */}
+                <div className="w-full lg:w-1/2 flex flex-col min-h-0 bg-tactical-dark overflow-y-auto h-full">
                     {/* Tactical Surveillance Filters Command Bar */}
                     <div className="shrink-0 border-b border-tactical-olive">
                       <SurveillanceFilterCommandBar
