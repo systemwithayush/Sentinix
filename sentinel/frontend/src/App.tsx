@@ -1154,64 +1154,42 @@ function App() {
                       </div>
                     )}
 
-                    {/* Single Cam Expanded Overlays for CAM-7 (Multi-Threat Border Security: Humans + Vehicles + Drones) */}
+                    {/* Single Cam Expanded Overlays for CAM-7 (Multi-Threat Border Security) */}
                     {showDetectionOverlays && selectedCam.id === '7' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Multi-Threat Banner */}
-                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2 font-mono text-xs flex justify-between items-center shadow-2xl pointer-events-none">
+                        {/* Top Status Banner — no fake counts, real status */}
+                        <div className="absolute top-4 left-4 right-4 bg-black/90 border border-status-red text-white px-3 py-1.5 font-mono text-xs flex justify-between items-center">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                            <span className="w-2 h-2 rounded-full bg-status-red animate-pulse"></span>
                             <span className="font-bold text-status-red tracking-wider">
-                              BORDER SECURITY PERIMETER // MULTI-THREAT SURVEILLANCE ACTIVE
+                              CAM-7 // BORDER SECURITY — MULTI-THREAT SCAN ACTIVE
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3 text-[11px]">
-                            <span className="bg-orange-500 text-black px-1.5 py-0.5 font-bold">🚶 HUMANS: 1</span>
-                            <span className="bg-cyan-500 text-black px-1.5 py-0.5 font-bold">🚗 VEHICLES: 1</span>
-                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">🛸 DRONES: 1</span>
+                          <div className="flex items-center space-x-2 text-[10px] text-tactical-light">
+                            <span className="border border-orange-500/60 text-orange-400 px-1">🚶 PERSONNEL</span>
+                            <span className="border border-cyan-500/60 text-cyan-400 px-1">🚗 VEHICLE</span>
+                            <span className="border border-status-red/60 text-red-400 px-1">🛸 DRONE</span>
+                            <span className="text-tactical-olive">— AWAITING DETECTION</span>
                           </div>
                         </div>
 
-                        {/* 1. Low-Altitude Recon Drone Tracking Reticle */}
-                        <div className="absolute top-[22%] left-[46%] w-[20%] h-[18%] border-2 border-status-red bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
-                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                          <span className="absolute -top-4 left-0 bg-status-red text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            🛸 DRONE: LOITERING UAV [CONF 0.96]
-                          </span>
-                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-red-300 font-mono bg-black/80 px-1 border border-status-red/50">
-                            ALT: ~45m AGL | FREQ: 2.4 GHz | BRG: 195° S
-                          </div>
+                        {/* Corner scope brackets */}
+                        <div className="absolute top-[13%] left-[2%] w-8 h-8 border-t-2 border-l-2 border-status-red/60"></div>
+                        <div className="absolute top-[13%] right-[2%] w-8 h-8 border-t-2 border-r-2 border-status-red/60"></div>
+                        <div className="absolute bottom-[10%] left-[2%] w-8 h-8 border-b-2 border-l-2 border-status-red/60"></div>
+                        <div className="absolute bottom-[10%] right-[2%] w-8 h-8 border-b-2 border-r-2 border-status-red/60"></div>
+
+                        {/* Center scan crosshair */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 opacity-40">
+                          <div className="absolute top-1/2 left-0 right-0 h-px bg-status-red"></div>
+                          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-status-red"></div>
                         </div>
 
-                        {/* 2. Ground Vehicle Crossing Reticle */}
-                        <div className="absolute top-[50%] left-[16%] w-[25%] h-[20%] border-2 border-cyan-400 bg-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.5)]">
-                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                          <span className="absolute -top-4 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            🚗 VEHICLE: 4x4 PATROL TRANSPORT [CONF 0.91]
-                          </span>
-                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
-                            SPD: 34 km/h | BRG: 072° E | WHEELBASE: 2.8m
-                          </div>
-                        </div>
-
-                        {/* 3. Dismounted Personnel Infiltrator Reticle */}
-                        <div className="absolute top-[66%] left-[64%] w-[15%] h-[24%] border-2 border-orange-500 bg-orange-500/25 shadow-[0_0_15px_rgba(249,115,22,0.5)]">
-                          <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
-                          <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
-                          <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
-                          <span className="absolute -top-4 left-0 bg-orange-500 text-black text-[8px] font-bold px-1 whitespace-nowrap shadow">
-                            🚶 INFILTRATOR: PERSONNEL [CONF 0.94]
-                          </span>
-                          <div className="absolute -bottom-3.5 left-0 text-[7px] text-orange-300 font-mono bg-black/80 px-1 border border-orange-500/50">
-                            SPD: 1.4 m/s | BRG: 184° S | BOUNDARY CROSS: +12m
-                          </div>
+                        {/* Bottom telemetry bar */}
+                        <div className="absolute bottom-12 left-4 right-4 bg-black/80 border border-tactical-olive/50 px-3 py-1 font-mono text-[10px] text-tactical-light flex justify-between">
+                          <span>SECTOR: ECHO-7 DEMARCATION LINE</span>
+                          <span className="text-status-amber">M5 DEEP LEARNING ENGINE — SCANNING</span>
+                          <span>UPLOAD VIDEO TO ENABLE LIVE DETECTION</span>
                         </div>
                       </div>
                     )}
@@ -1468,46 +1446,20 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Tactical Detection Banner for CAM-7 (Multi-Threat Border Security: Humans, Vehicles, Drones) */}
+                      {/* Tactical Detection Banner for CAM-7 (Multi-Threat Border Security) */}
                       {showDetectionOverlays && cam.id === '7' && (
                         <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
                           <span className="font-bold flex items-center text-status-red">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            BORDER THREAT: 3 VECTORS
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-pulse"></span>
+                            BORDER THREAT SCAN ACTIVE
                           </span>
                           <span className="bg-black/90 text-[7px] text-tactical-light px-1 border border-status-red flex items-center space-x-1">
-                            <span className="text-orange-400 font-bold">🚶 1</span>
+                            <span className="text-orange-400 font-bold">🚶</span>
                             <span>|</span>
-                            <span className="text-cyan-400 font-bold">🚗 1</span>
+                            <span className="text-cyan-400 font-bold">🚗</span>
                             <span>|</span>
-                            <span className="text-red-400 font-bold">🛸 1</span>
+                            <span className="text-red-400 font-bold">🛸</span>
                           </span>
-                        </div>
-                      )}
-
-                      {/* Multi-Threat Reticles Overlaid on CAM-7 in Grid */}
-                      {showDetectionOverlays && cam.id === '7' && (
-                        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-                          {/* 1. Low-Altitude Drone Ingress */}
-                          <div className="absolute top-[22%] left-[46%] w-[20%] h-[16%] border border-status-red bg-status-red/15 shadow-[0_0_8px_rgba(239,68,68,0.5)]">
-                            <span className="absolute -top-2.5 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🛸 DRONE [0.96]
-                            </span>
-                          </div>
-
-                          {/* 2. Ground Vehicle Crossing */}
-                          <div className="absolute top-[52%] left-[16%] w-[24%] h-[18%] border border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.5)]">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🚗 4x4 PATROL [0.91]
-                            </span>
-                          </div>
-
-                          {/* 3. Personnel Infiltration */}
-                          <div className="absolute top-[68%] left-[64%] w-[14%] h-[22%] border border-orange-500 bg-orange-500/20 shadow-[0_0_8px_rgba(249,115,22,0.5)]">
-                            <span className="absolute -top-2.5 left-0 bg-orange-500 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              🚶 PERSONNEL [0.94]
-                            </span>
-                          </div>
                         </div>
                       )}
 
