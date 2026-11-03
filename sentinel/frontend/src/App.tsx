@@ -193,7 +193,7 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   },
   {
     id: '8',
-    name: 'CAM-8 (Border Construction Zone)',
+    name: 'CAM-8 (Perimeter Recon & Vehicle Patrol)',
     sensorType: 'EO_OPTICAL',
     status: 'LIVE_STREAM',
     videoUrl: '/videos/cam8.mp4',
@@ -294,9 +294,9 @@ const INITIAL_ALERTS: Alert[] = [
     id: 'alt-008',
     cam: 'CAM-8',
     cameraId: '8',
-    module: 'M4 Camouflage (Rigid Geometry)',
-    threatLevel: 3,
-    description: 'FLAGGED: Clandestine border construction detected under camouflage netting. Unnatural square (5.2m x 5.2m) and rectangular (16.4m x 7.2m) foundations identified.',
+    module: 'M5 Deep Learning (DOTA Aerial & Vehicle)',
+    threatLevel: 2,
+    description: 'AERIAL RECONNAISSANCE: Airborne target tracked. DOTA Model Classification: HELICOPTER (0.94). Ground vehicle sector patrol active.',
     time: '15:04:10',
     timestamp: '2026-10-25T15:04:10',
     reviewStatus: 'NEW',
@@ -528,7 +528,7 @@ function App() {
   const handleGenerateForensicReport = (cam: CameraFeed) => {
     const defaultTarget: TargetClassification = 
       cam.id === '7' ? 'HUMAN_INFILTRATION' :
-      cam.id === '8' ? 'CAMOUFLAGED_ASSET' :
+      cam.id === '8' ? 'VEHICLE_DETECTION' :
       cam.id === '5' ? 'DRONE_UAV' :
       cam.id === '2' ? 'DRONE_UAV' : 'CAMOUFLAGED_ASSET';
 
@@ -626,7 +626,9 @@ function App() {
         if (a.id === 'alt-008') {
           return {
             ...a,
-            description: `Custom drone footage uploaded (${file.name}): Active construction complex identified with 8+ geometric structures (foundations, excavation pits, grading pads).`
+            reviewStatus: 'UNDER_REVIEW',
+            threatLevel: 2,
+            description: `Custom video uploaded (${file.name}): DOTA v1.5 Multi-Class Vehicle Detection active. Ground vehicle movement (cars, trucks, transports) tracked.`
           };
         }
         return a;
@@ -1072,78 +1074,61 @@ function App() {
                       className="w-full h-full"
                     />
 
-                    {/* Single Cam Expanded Overlays for CAM-8 (Construction) */}
+                    {/* Single Cam Expanded Overlays for CAM-8 (DOTA Aerial & Ground Vehicle Patrol) */}
                     {showDetectionOverlays && selectedCam.id === '8' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* 1. Large Concrete Foundation Slab */}
-                        <div className="absolute top-[26%] left-[8%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.3)]">
-                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ■ RECT #1: 24.5m × 12.0m [FOUNDATION SLAB // 294 m²]
+                        {/* Top Tactical Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-cyan-950/95 border border-cyan-400 text-cyan-300 p-2 font-mono text-xs flex justify-between items-center shadow-lg pointer-events-none">
+                          <span className="font-bold flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></span>
+                            {selectedCam.status === 'CUSTOM_VIDEO'
+                              ? 'DOTA v1.5 MULTI-CLASS DETECTION: GROUND VEHICLES & TRANSPORTS'
+                              : 'DOTA v1.5 AERIAL RECONNAISSANCE: AIRBORNE TARGET TRACKING'}
+                          </span>
+                          <span className="bg-black text-cyan-300 px-2 py-0.5 border border-cyan-400 text-[10px]">
+                            {selectedCam.status === 'CUSTOM_VIDEO' ? 'small-vehicle & large-vehicle' : 'HELICOPTER (0.94) // ID: TRK-08'}
                           </span>
                         </div>
 
-                        {/* 2. Reinforced Core Shaft */}
-                        <div className="absolute top-[30%] left-[16%] w-[11%] h-[13%] border-2 border-yellow-400 bg-yellow-500/25 shadow-[0_0_10px_rgba(250,204,21,0.4)]">
-                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ◼ SQ #1: 6.2m × 6.2m [CORE SHAFT]
-                          </span>
-                        </div>
+                        {selectedCam.status === 'CUSTOM_VIDEO' ? (
+                          /* Vehicle Detection Reticles for Uploaded Video */
+                          <>
+                            {/* 1. Small Vehicle (Car / Sedan) */}
+                            <div className="absolute top-[44%] left-[22%] w-[22%] h-[16%] border-2 border-status-green bg-status-green/15 shadow-[0_0_12px_rgba(34,197,94,0.4)]">
+                              <span className="absolute -top-3.5 left-0 bg-status-green text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                                🚗 DOTA: small-vehicle [CAR / SEDAN // CONF 0.94]
+                              </span>
+                              <div className="absolute -bottom-3 left-0 text-[7px] text-status-green font-mono">
+                                SPD: 42 km/h | HDG: 082°
+                              </div>
+                            </div>
 
-                        {/* 3. Central Grading Pad */}
-                        <div className="absolute top-[46%] left-[36%] w-[26%] h-[20%] border-2 border-amber-400 bg-amber-500/15 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                          <span className="absolute -top-3.5 left-0 bg-amber-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ■ RECT #2: 18.5m × 9.2m [GRADING PAD]
-                          </span>
-                        </div>
-
-                        {/* 4. Central Excavation Pit */}
-                        <div className="absolute top-[50%] left-[56%] w-[13%] h-[14%] border-2 border-yellow-400 bg-yellow-500/20">
-                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ◼ SQ #2: 8.5m [FOOTING]
-                          </span>
-                        </div>
-
-                        {/* 5. Residential Lot A */}
-                        <div className="absolute top-[14%] left-[56%] w-[14%] h-[13%] border-2 border-yellow-400 bg-yellow-500/20">
-                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ◼ SQ #3: 7.8m [LOT A]
-                          </span>
-                        </div>
-
-                        {/* 6. Residential Lot B */}
-                        <div className="absolute top-[16%] left-[73%] w-[16%] h-[12%] border border-cyan-400 bg-cyan-500/15">
-                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ■ RECT #3: 11.2m [LOT B]
-                          </span>
-                        </div>
-
-                        {/* 7. Material Staging */}
-                        <div className="absolute top-[36%] left-[68%] w-[15%] h-[8%] border border-emerald-400 bg-emerald-500/20">
-                          <span className="absolute -top-3.5 left-0 bg-emerald-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ■ RECT #4: 8.0m [STAGING]
-                          </span>
-                        </div>
-
-                        {/* 8. Southern Retention Basin */}
-                        <div className="absolute top-[66%] left-[50%] w-[26%] h-[17%] border border-cyan-400 bg-cyan-500/15">
-                          <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ■ RECT #5: 16.0m [DRAINAGE CUT]
-                          </span>
-                        </div>
-
-                        {/* 9. Sump Vault */}
-                        <div className="absolute top-[70%] left-[80%] w-[10%] h-[10%] border-2 border-yellow-400 bg-yellow-500/20">
-                          <span className="absolute -top-3.5 left-0 bg-yellow-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
-                            ◼ SQ #4: 5.4m [VAULT]
-                          </span>
-                        </div>
-
-                        {/* 10. Pipeline Trench */}
-                        <div className="absolute top-[48%] left-[20%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
-                          <span className="absolute -top-4 left-10 bg-fuchsia-950/90 text-fuchsia-300 px-1 text-[7px] font-mono border border-fuchsia-500 whitespace-nowrap">
-                            ⫽ PIPELINE TRENCH: 36.0m RUN @ 348°
-                          </span>
-                        </div>
+                            {/* 2. Large Vehicle (Truck / 4x4 Patrol) */}
+                            <div className="absolute top-[52%] left-[56%] w-[25%] h-[20%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.4)]">
+                              <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap">
+                                🚙 DOTA: large-vehicle [PATROL TRUCK // CONF 0.91]
+                              </span>
+                              <div className="absolute -bottom-3 left-0 text-[7px] text-cyan-300 font-mono">
+                                SPD: 38 km/h | HDG: 078°
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          /* Default Helicopter Tracking Reticle on cam8.mp4 */
+                          <div className="absolute top-[24%] left-[38%] w-[32%] h-[26%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+                            <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-white"></div>
+                            <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-white"></div>
+                            <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-white"></div>
+                            <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-white"></div>
+                            <span className="absolute -top-3.5 left-0 bg-cyan-400 text-black text-[8px] font-bold px-1 whitespace-nowrap flex items-center space-x-1">
+                              <span>🚁</span>
+                              <span>DOTA v1.5: HELICOPTER (0.94) [TRACK-08]</span>
+                            </span>
+                            <div className="absolute -bottom-3.5 left-0 text-[7px] text-cyan-300 font-mono bg-black/80 px-1 border border-cyan-500/50">
+                              ALT: ~120m AGL | AIRSPEED: 65 kt | STATUS: ACTIVE PATROL
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -1384,6 +1369,7 @@ function App() {
                     >
                       {/* Live Video Stream */}
                       <video
+                        key={cam.videoUrl}
                         ref={el => { videoRefs.current[cam.id] = el; }}
                         src={cam.videoUrl}
                         autoPlay
@@ -1450,98 +1436,42 @@ function App() {
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-8 (Active Construction Complex) */}
+                      {/* Tactical Detection Banner for CAM-8 (DOTA Aerial & Ground Recon) */}
                       {showDetectionOverlays && cam.id === '8' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-amber-950/95 border border-status-amber text-status-amber px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-cyan-950/90 border border-cyan-400 text-cyan-300 px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
                           <span className="font-bold flex items-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-amber mr-1 animate-ping"></span>
-                            FLAGGED: CONSTRUCTION COMPLEX
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mr-1 animate-pulse"></span>
+                            {cam.status === 'CUSTOM_VIDEO' ? 'DOTA v1.5: VEHICLE DETECTION' : 'DOTA v1.5: AERIAL PATROL'}
                           </span>
-                          <span className="bg-black/80 text-yellow-300 px-1 border border-status-amber text-[8px]">
-                            8+ SITES (SQUARES & RECTS)
+                          <span className="bg-black/80 text-cyan-300 px-1 border border-cyan-400 text-[8px]">
+                            {cam.status === 'CUSTOM_VIDEO' ? 'CARS & VEHICLES' : 'HELICOPTER (0.94)'}
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical Geometric Shapes Overlaid on CAM-8 in Grid (Full Multi-Structure Mapping) */}
+                      {/* Tactical DOTA Reticles Overlaid on CAM-8 in Grid */}
                       {showDetectionOverlays && cam.id === '8' && (
-                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                          {/* 1. Large Concrete Foundation Slab (Upper-Left Main Structure) */}
-                          <div className="absolute top-[26%] left-[8%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 24.5m [SLAB]
-                            </span>
-                          </div>
-
-                          {/* 2. Reinforced Elevator / Utility Core Shaft */}
-                          <div className="absolute top-[30%] left-[16%] w-[11%] h-[13%] border-2 border-yellow-400 bg-yellow-500/25 shadow-[0_0_6px_rgba(250,204,21,0.4)]">
-                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ◼ SQ 6.2m
-                            </span>
-                          </div>
-
-                          {/* 3. East Building Footing Trench */}
-                          <div className="absolute top-[38%] left-[26%] w-[13%] h-[10%] border border-cyan-400 bg-cyan-500/15">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 9.8m
-                            </span>
-                          </div>
-
-                          {/* 4. Central Heavy Earthmoving & Soil Grading Pad */}
-                          <div className="absolute top-[46%] left-[36%] w-[26%] h-[20%] border-2 border-amber-400 bg-amber-500/15 shadow-[0_0_8px_rgba(245,158,11,0.3)]">
-                            <span className="absolute -top-2.5 left-0 bg-amber-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 18.5m [GRADING PAD]
-                            </span>
-                          </div>
-
-                          {/* 5. Central Footing Excavation Pit */}
-                          <div className="absolute top-[50%] left-[56%] w-[13%] h-[14%] border-2 border-yellow-400 bg-yellow-500/20">
-                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ◼ SQ 8.5m [FOOTING]
-                            </span>
-                          </div>
-
-                          {/* 6. Upper Residential Lot A Structural Footing */}
-                          <div className="absolute top-[14%] left-[56%] w-[14%] h-[13%] border-2 border-yellow-400 bg-yellow-500/20">
-                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ◼ SQ 7.8m [LOT A]
-                            </span>
-                          </div>
-
-                          {/* 7. Upper Residential Lot B Perimeter Slab */}
-                          <div className="absolute top-[16%] left-[73%] w-[16%] h-[12%] border border-cyan-400 bg-cyan-500/15">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 11.2m [LOT B]
-                            </span>
-                          </div>
-
-                          {/* 8. Prefabricated Material Blocks & Staging Zone */}
-                          <div className="absolute top-[36%] left-[68%] w-[15%] h-[8%] border border-emerald-400 bg-emerald-500/20">
-                            <span className="absolute -top-2.5 left-0 bg-emerald-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 8.0m [STAGING]
-                            </span>
-                          </div>
-
-                          {/* 9. Southern Retention Drainage Trench */}
-                          <div className="absolute top-[66%] left-[50%] w-[26%] h-[17%] border border-cyan-400 bg-cyan-500/15">
-                            <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ■ RECT 16.0m [DRAINAGE CUT]
-                            </span>
-                          </div>
-
-                          {/* 10. Southern Pump Station / Sump Vault */}
-                          <div className="absolute top-[70%] left-[80%] w-[10%] h-[10%] border-2 border-yellow-400 bg-yellow-500/20">
-                            <span className="absolute -top-2.5 left-0 bg-yellow-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
-                              ◼ SQ 5.4m [VAULT]
-                            </span>
-                          </div>
-
-                          {/* 11. Main Utility Conduit Trench Line */}
-                          <div className="absolute top-[48%] left-[20%] w-[50%] h-0 border-t-2 border-dashed border-fuchsia-400 rotate-[-12deg]">
-                            <span className="absolute -top-3 left-6 bg-fuchsia-950/90 text-fuchsia-300 px-0.5 text-[5px] font-mono border border-fuchsia-500 whitespace-nowrap">
-                              ⫽ PIPELINE TRENCH: 36.0m
-                            </span>
-                          </div>
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+                          {cam.status === 'CUSTOM_VIDEO' ? (
+                            <>
+                              <div className="absolute top-[44%] left-[22%] w-[24%] h-[18%] border-2 border-status-green bg-status-green/15 shadow-[0_0_8px_rgba(34,197,94,0.4)]">
+                                <span className="absolute -top-2.5 left-0 bg-status-green text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                                  🚗 small-vehicle (0.94)
+                                </span>
+                              </div>
+                              <div className="absolute top-[54%] left-[56%] w-[26%] h-[20%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
+                                <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                                  🚙 large-vehicle (0.91)
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="absolute top-[26%] left-[40%] w-[32%] h-[24%] border-2 border-cyan-400 bg-cyan-500/15 shadow-[0_0_8px_rgba(34,211,238,0.4)]">
+                              <span className="absolute -top-2.5 left-0 bg-cyan-400 text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                                🚁 HELICOPTER (0.94)
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -1552,51 +1482,59 @@ function App() {
                         </div>
                       )}
 
-                      {/* Center Crosshair Overlay */}
+                      {/* Center Crosshair Overlay - Confined to video area so it never blocks bottom controls */}
                       <div
                         onClick={() => setSelectedCamId(cam.id)}
-                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-black/40 z-20"
+                        className="absolute inset-x-0 top-8 bottom-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-black/40 z-20"
                       >
-                        <div className="text-status-green font-mono text-[11px] font-bold bg-black/90 px-3 py-1.5 border border-tactical-green tracking-wider shadow-lg flex items-center space-x-1.5">
+                        <div className="text-status-green font-mono text-[10px] font-bold bg-black/90 px-2.5 py-1 border border-tactical-green tracking-wider shadow-lg flex items-center space-x-1.5">
                           <span>🔬</span>
-                          <span>[ CLICK TO INSPECT WITH ALL FILTERS & FORENSIC REPORT ]</span>
+                          <span>[ INSPECT & FILTERS ]</span>
                         </div>
                       </div>
 
-                      {/* Bottom HUD & Action Controls */}
-                      <div className="absolute bottom-0 inset-x-0 p-1.5 bg-gradient-to-t from-black/95 via-black/80 to-transparent flex justify-between items-center z-10 font-mono text-[10px]">
-                        <span className="text-tactical-light text-[9px] flex items-center space-x-1">
-                          <span className="text-status-green">●</span>
-                          <span>{cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM VIDEO' : 'TACTICAL FEED'}</span>
-                        </span>
+                      {/* Bottom HUD & Action Controls - Compact, Zero Overlap, High Z-Index */}
+                      <div className="absolute bottom-0 inset-x-0 px-2 py-1 bg-gradient-to-t from-black/95 via-black/85 to-transparent flex items-center justify-between z-30 pointer-events-auto font-mono text-[10px]">
+                        {/* Left: Feed Status */}
+                        <div className="flex items-center space-x-1 text-tactical-light text-[9px] shrink-0 truncate max-w-[85px]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-status-green inline-block shrink-0"></span>
+                          <span className="truncate">{cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'FEED'}</span>
+                        </div>
 
-                        <div className="flex items-center space-x-1.5">
+                        {/* Right: Clean, non-wrapping control buttons */}
+                        <div className="flex items-center space-x-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                           {/* Dedicated Upload Button for this feed */}
                           <label
-                            onClick={(e) => e.stopPropagation()}
-                            className="px-1.5 py-0.5 bg-tactical-olive/60 border border-tactical-green hover:bg-tactical-green hover:text-black text-status-green cursor-pointer transition-colors flex items-center space-x-1"
+                            htmlFor={`feed-upload-${cam.id}`}
+                            className="px-1.5 py-0.5 bg-tactical-olive/80 border border-tactical-green hover:bg-tactical-green hover:text-black text-status-green text-[9px] font-bold cursor-pointer transition-colors flex items-center space-x-0.5 shrink-0"
                             title="Upload custom video for this camera feed"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <input
-                              type="file"
-                              accept="video/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                if (e.target.files?.[0]) {
-                                  handleVideoUpload(cam.id, e.target.files[0]);
-                                }
-                              }}
-                            />
-                            <span>⤒</span>
+                            <span>↑</span>
                             <span>UPLOAD</span>
                           </label>
+                          <input
+                            id={`feed-upload-${cam.id}`}
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              if (e.target.files?.[0]) {
+                                handleVideoUpload(cam.id, e.target.files[0]);
+                              }
+                            }}
+                          />
 
-                          {/* Play/Pause */}
+                          {/* Play/Pause Button */}
                           <button
                             type="button"
-                            onClick={(e) => toggleCameraPlay(cam.id, e)}
-                            className="px-1.5 py-0.5 bg-black/80 border border-tactical-olive hover:text-white transition-colors"
-                            title="Play/Pause this feed"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleCameraPlay(cam.id, e);
+                            }}
+                            className="w-5 h-5 flex items-center justify-center bg-black/90 border border-tactical-olive hover:border-tactical-green hover:text-white text-tactical-light text-[9px] transition-colors shrink-0"
+                            title={cam.isPlaying ? "Pause feed" : "Play feed"}
                           >
                             {cam.isPlaying ? '⏸' : '▶'}
                           </button>
@@ -1608,11 +1546,10 @@ function App() {
                               e.stopPropagation();
                               setSelectedCamId(cam.id);
                             }}
-                            className="px-2 py-0.5 bg-status-green text-black hover:bg-emerald-400 font-bold text-[9px] border border-status-green transition-colors shadow-sm flex items-center space-x-1"
-                            title="Inspect this single camera with all filters and forensic report"
+                            className="w-5 h-5 flex items-center justify-center bg-tactical-olive/90 border border-status-green hover:bg-status-green hover:text-black text-status-green text-[10px] transition-colors shrink-0"
+                            title="Maximize feed for Feature Inspection & Forensic Filters"
                           >
-                            <span>🔬</span>
-                            <span>INSPECT & FILTERS</span>
+                            ⛶
                           </button>
                         </div>
                       </div>
@@ -2008,7 +1945,7 @@ function App() {
                                 sensorId: cam.id,
                                 sensorName: cam.name,
                                 sensorModality: cam.sensorType,
-                                targetClass: cam.id === '7' ? 'HUMAN_INFILTRATION' : cam.id === '8' ? 'CAMOUFLAGED_ASSET' : 'DRONE_UAV',
+                                targetClass: cam.id === '7' ? 'HUMAN_INFILTRATION' : cam.id === '8' ? 'VEHICLE_DETECTION' : 'DRONE_UAV',
                                 confidence: 'CONFIRMED',
                                 filterMode: forensicFilter,
                                 filterOptions: forensicOptions,

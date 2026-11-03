@@ -84,6 +84,7 @@ export type TargetClassification =
   | 'CAMOUFLAGED_ASSET'
   | 'STRUCTURAL_BREACH'
   | 'THERMAL_HOTSPOT'
+  | 'VEHICLE_DETECTION'
   | 'BENIGN_ACTIVITY';
 
 export type ForensicConfidence = 
@@ -526,6 +527,12 @@ export const TARGET_LABELS: Record<TargetClassification, { label: string; icon: 
     icon: '🔥',
     desc: 'Anomalous infrared heat signature, engine block, battery exhaust, or campfire.',
     badgeClass: 'bg-rose-950/80 border-rose-400 text-rose-300'
+  },
+  VEHICLE_DETECTION: {
+    label: 'GROUND VEHICLE / CAR PATROL',
+    icon: '🚗',
+    desc: 'Motor vehicle, car/sedan, 4x4 patrol, or transport detected via DOTA v1.5 multi-class aerial dataset.',
+    badgeClass: 'bg-cyan-950/80 border-cyan-400 text-cyan-300'
   },
   BENIGN_ACTIVITY: {
     label: 'BENIGN / AUTHORIZED ACTIVITY',
@@ -1742,26 +1749,52 @@ export function renderTacticalOverlay(
     }
 
     case 'VEHICLE_DETECTION': {
-      // Ground Vehicle Reticles
-      const vX = width * 0.28;
-      const vY = height * 0.52;
-      const vW = 110;
-      const vH = 55;
+      // DOTA v1.5 Ground Vehicle Reticles (small-vehicle [car] & large-vehicle [truck])
+      const vehicles = [
+        {
+          x: width * 0.22,
+          y: height * 0.48,
+          w: 120,
+          h: 56,
+          label: 'DOTA: small-vehicle [CAR]',
+          conf: '0.94',
+          color: '#00ff41'
+        },
+        {
+          x: width * 0.58,
+          y: height * 0.54,
+          w: 140,
+          h: 68,
+          label: 'DOTA: large-vehicle [TRUCK/4x4]',
+          conf: '0.91',
+          color: '#22d3ee'
+        }
+      ];
 
-      ctx.strokeStyle = '#ffb703';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(vX, vY, vW, vH);
+      vehicles.forEach(v => {
+        ctx.strokeStyle = v.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(v.x, v.y, v.w, v.h);
 
-      ctx.fillStyle = '#ffb703';
-      ctx.fillRect(vX, vY - 14, 115, 14);
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 9px monospace';
-      ctx.fillText(`VEHICLE: 4x4 (0.92)`, vX + 4, vY - 3);
+        // Corner tick marks
+        ctx.beginPath();
+        ctx.moveTo(v.x - 4, v.y); ctx.lineTo(v.x + 8, v.y);
+        ctx.moveTo(v.x, v.y - 4); ctx.lineTo(v.x, v.y + 8);
+        ctx.moveTo(v.x + v.w - 8, v.y); ctx.lineTo(v.x + v.w + 4, v.y);
+        ctx.moveTo(v.x + v.w, v.y - 4); ctx.lineTo(v.x + v.w, v.y + 8);
+        ctx.stroke();
 
-      ctx.strokeStyle = '#ffb703';
-      ctx.setLineDash([4, 4]);
-      ctx.strokeRect(vX - 10, vY + vH + 2, vW + 20, 10);
-      ctx.setLineDash([]);
+        ctx.fillStyle = v.color;
+        ctx.fillRect(v.x, v.y - 15, 160, 15);
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText(`🚗 ${v.label} (${v.conf})`, v.x + 2, v.y - 4);
+
+        ctx.strokeStyle = v.color;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(v.x - 6, v.y + v.h + 2, v.w + 12, 10);
+        ctx.setLineDash([]);
+      });
       break;
     }
 
