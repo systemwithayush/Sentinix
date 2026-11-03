@@ -62,6 +62,129 @@ export interface AlertReviewAudit {
   timestamp: string;
 }
 
+export interface SectorSecurityGuard {
+  camId: string;
+  name: string;
+  rank: string;
+  callSign: string;
+  sector: string;
+  walkieTalkie: string;
+  walkieChannel: string;
+  satellitePhone: string;
+  status: 'ON POST' | 'ON PATROL' | 'INTERCEPT READY';
+  distanceToCam: string;
+}
+
+export const SECTOR_GUARDS: Record<string, SectorSecurityGuard> = {
+  '1': {
+    camId: '1',
+    name: 'Havildar Rajesh Kumar',
+    rank: 'Havildar',
+    callSign: 'ALPHA-SENTRY-1',
+    sector: 'Sector 1 (Gate West)',
+    walkieTalkie: 'CH-01 VHF (156.800 MHz)',
+    walkieChannel: 'CH-01 VHF',
+    satellitePhone: '+8816-4392-1011',
+    status: 'ON POST',
+    distanceToCam: '25m'
+  },
+  '2': {
+    camId: '2',
+    name: 'Officer Viktor Ramos',
+    rank: 'Officer',
+    callSign: 'BRAVO-ROVER-2',
+    sector: 'Sector 2 (Perimeter North)',
+    walkieTalkie: 'CH-02 UHF (446.025 MHz)',
+    walkieChannel: 'CH-02 UHF',
+    satellitePhone: '+8816-4392-2042',
+    status: 'ON PATROL',
+    distanceToCam: '90m'
+  },
+  '3': {
+    camId: '3',
+    name: 'Sgt. David Chen',
+    rank: 'Sgt.',
+    callSign: 'SIERRA-LOOKOUT-3',
+    sector: 'Sector 3 (Ridge Overlook)',
+    walkieTalkie: 'CH-03 Tactical (462.562 MHz)',
+    walkieChannel: 'CH-03 TAC',
+    satellitePhone: '+8816-4392-3390',
+    status: 'ON POST',
+    distanceToCam: '40m'
+  },
+  '4': {
+    camId: '4',
+    name: 'Cpl. Marcus Vance',
+    rank: 'Cpl.',
+    callSign: 'TANGO-FOREST-4',
+    sector: 'Sector 4 (Tree Line South)',
+    walkieTalkie: 'CH-04 Tactical UHF (446.050 MHz)',
+    walkieChannel: 'CH-04 UHF',
+    satellitePhone: '+8816-4392-4419',
+    status: 'ON PATROL',
+    distanceToCam: '120m'
+  },
+  '5': {
+    camId: '5',
+    name: 'Capt. Elena Rostova',
+    rank: 'Capt. (Air Defense QRF)',
+    callSign: 'AIR-DEFENSE-5',
+    sector: 'Sector 5 (Echo Airspace)',
+    walkieTalkie: 'CH-05 AirGuard (121.500 MHz)',
+    walkieChannel: 'CH-05 AIR',
+    satellitePhone: '+8816-4392-5501',
+    status: 'INTERCEPT READY',
+    distanceToCam: '350m'
+  },
+  '6': {
+    camId: '6',
+    name: 'Officer Tariq Al-Mansoor',
+    rank: 'Officer',
+    callSign: 'DELTA-POST-6',
+    sector: 'Sector 6 (South Gate)',
+    walkieTalkie: 'CH-06 VHF (156.850 MHz)',
+    walkieChannel: 'CH-06 VHF',
+    satellitePhone: '+8816-4392-6623',
+    status: 'ON POST',
+    distanceToCam: '30m'
+  },
+  '7': {
+    camId: '7',
+    name: 'Inspector Arjun Mehra',
+    rank: 'Inspector (Border Patrol)',
+    callSign: 'ECHO-PATROL-7',
+    sector: 'Sector 7 (Demarcation Line)',
+    walkieTalkie: 'CH-07 Border TAC (446.100 MHz)',
+    walkieChannel: 'CH-07 TAC',
+    satellitePhone: '+8816-4392-7788',
+    status: 'INTERCEPT READY',
+    distanceToCam: '80m'
+  },
+  '8': {
+    camId: '8',
+    name: 'Lt. Sarah Connor',
+    rank: 'Lt. (Base Infrastructure)',
+    callSign: 'ZULU-INFRA-8',
+    sector: 'Sector 8 (Construction Complex)',
+    walkieTalkie: 'CH-08 SATCOM (467.587 MHz)',
+    walkieChannel: 'CH-08 SAT',
+    satellitePhone: '+8816-4392-8844',
+    status: 'ON POST',
+    distanceToCam: '65m'
+  }
+};
+
+export const CAM_THREAT_CONFIDENCE: Record<string, { label: string; confidence: number; icon: string }> = {
+  '2': { label: 'DRONE TRAJECTORY', confidence: 0.83, icon: '🛸' },
+  '4': { label: 'ROTARY AIRCRAFT (HELICOPTER)', confidence: 0.94, icon: '🚁' },
+  '5': { label: 'HIGH-SPEED IR TARGET', confidence: 0.96, icon: '🚀' },
+  '6': { label: 'RECON DRONE INGRESS', confidence: 0.89, icon: '🛸' },
+  '7': { label: 'BORDER MULTI-THREAT', confidence: 0.94, icon: '🛡️' },
+  '8': { label: 'INFRASTRUCTURE BREACH', confidence: 0.99, icon: '📐' }
+};
+
+export const isCamFlagged = (camId: string) => Boolean(CAM_THREAT_CONFIDENCE[camId]);
+
 export const INITIAL_FORENSIC_WRITEUPS: ForensicWriteup[] = [
   {
     id: 'wup-001',
@@ -262,6 +385,19 @@ const INITIAL_ALERTS: Alert[] = [
     engineVersion: 'ai-engine-1.2.0-m5'
   },
   {
+    id: 'alt-004-heli',
+    cam: 'CAM-4',
+    cameraId: '4',
+    module: 'M2 Aerial Threat (Rotary Wing / Helicopter)',
+    threatLevel: 4,
+    description: 'CRITICAL FLAGGED: Low-altitude rotary-wing aircraft (Helicopter) detected traversing Tree Line South airspace at ~120m AGL (Heading: 084° E, Velocity: ~160 km/h, Conf 0.94)',
+    time: '15:20:12',
+    timestamp: '2026-10-25T15:20:12',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
+    engineVersion: 'ai-engine-1.3.0-m2'
+  },
+  {
     id: 'alt-005',
     cam: 'CAM-5',
     cameraId: '5',
@@ -273,6 +409,19 @@ const INITIAL_ALERTS: Alert[] = [
     reviewStatus: 'NEW',
     disposition: 'NONE',
     engineVersion: 'ai-engine-1.3.0-m5'
+  },
+  {
+    id: 'alt-006-drone',
+    cam: 'CAM-6',
+    cameraId: '6',
+    module: 'M2 Aerial Threat (Drone / Multirotor UAV)',
+    threatLevel: 4,
+    description: 'CRITICAL FLAGGED: Unauthorized low-altitude reconnaissance drone approaching South Gate perimeter (Altitude: ~35m AGL, RF Link: 5.8 GHz, Conf 0.89)',
+    time: '15:21:40',
+    timestamp: '2026-10-25T15:21:40',
+    reviewStatus: 'NEW',
+    disposition: 'NONE',
+    engineVersion: 'ai-engine-1.3.0-m2'
   },
   {
     id: 'alt-007',
@@ -461,6 +610,29 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
   const [showDetectionOverlays, setShowDetectionOverlays] = useState<boolean>(true);
+
+  // Emergency Guard Direct Dispatch State
+  const [activeDispatchAlert, setActiveDispatchAlert] = useState<{
+    guard: SectorSecurityGuard;
+    threatLabel: string;
+    confidence: number;
+    channelType: 'SAT_PHONE' | 'WALKIE' | 'SECTOR_SIREN';
+    timestamp: string;
+  } | null>(null);
+
+  const handleDispatchGuard = (camId: string, channelType: 'SAT_PHONE' | 'WALKIE' | 'SECTOR_SIREN' = 'SAT_PHONE') => {
+    const guard = SECTOR_GUARDS[camId];
+    const threat = CAM_THREAT_CONFIDENCE[camId] || { label: 'TACTICAL ANOMALY', confidence: 0.85, icon: '⚠️' };
+    if (!guard) return;
+
+    setActiveDispatchAlert({
+      guard,
+      threatLabel: threat.label,
+      confidence: threat.confidence,
+      channelType,
+      timestamp: new Date().toLocaleTimeString()
+    });
+  };
 
   // Video Refs & Time formatting
 
@@ -1256,6 +1428,100 @@ function App() {
                       </div>
                     )}
 
+                    {/* Single Cam Expanded Overlays for CAM-4 (Helicopter Detection) */}
+                    {showDetectionOverlays && selectedCam.id === '4' && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* Top Critical Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                            <span className="font-bold text-status-red tracking-wider">
+                              CRITICAL AERIAL THREAT: ROTARY-WING AIRCRAFT (HELICOPTER) DETECTED
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 text-[11px]">
+                            <span className="text-yellow-300 font-bold">AIRFRAME: HELICOPTER</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="text-white">ALTITUDE: ~120m AGL</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">CONF: 0.94</span>
+                          </div>
+                        </div>
+
+                        {/* Helicopter Lock Reticle */}
+                        <div className="absolute top-[20%] left-[58%] w-[34%] h-[28%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
+                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
+                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
+                            <span>🚁 TGT-HELI-01</span>
+                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.94</span>
+                          </div>
+                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
+                            HEADING: 084° E | VEL: ~160 km/h | ROTOR: ~380 RPM
+                          </div>
+                        </div>
+
+                        {/* Telemetry Badge */}
+                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
+                          <div className="text-status-red font-bold flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
+                            ROTARY WING AIRSPACE VIOLATION
+                          </div>
+                          <div className="text-[10px] text-gray-300">Tree Line South Low-Alt Corridor (Bearing: 084° E)</div>
+                          <div className="text-[10px] text-yellow-300">Officer On-Duty: Cpl. Marcus Vance (CH-04 UHF / SAT-4419)</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Single Cam Expanded Overlays for CAM-6 (Drone Detection) */}
+                    {showDetectionOverlays && selectedCam.id === '6' && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* Top Critical Alert Banner */}
+                        <div className="absolute top-4 left-4 right-4 bg-red-950/95 border-2 border-status-red text-white p-2.5 font-mono text-xs flex justify-between items-center shadow-2xl">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-status-red animate-ping"></span>
+                            <span className="font-bold text-status-red tracking-wider">
+                              CRITICAL AERIAL THREAT: UNAUTHORIZED DRONE / UAV INTRUSION
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 text-[11px]">
+                            <span className="text-yellow-300 font-bold">RF LINK: 5.8 GHz</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="text-white">ALTITUDE: ~35m AGL</span>
+                            <span className="text-tactical-olive">|</span>
+                            <span className="bg-status-red text-black px-1.5 py-0.5 font-bold">CONF: 0.89</span>
+                          </div>
+                        </div>
+
+                        {/* Drone Lock Reticle */}
+                        <div className="absolute top-[32%] left-[42%] w-[20%] h-[20%] border-2 border-status-red bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-pulse">
+                          <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white"></div>
+                          <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white"></div>
+                          <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white"></div>
+                          <div className="absolute -top-5 left-0 bg-status-red text-black px-1.5 py-0.2 font-mono font-black text-[9px] whitespace-nowrap shadow-md flex items-center space-x-1">
+                            <span>🛸 TGT-DRONE-06</span>
+                            <span className="bg-black text-yellow-300 px-1 text-[8px]">CONF 0.89</span>
+                          </div>
+                          <div className="absolute -bottom-5 left-0 right-0 bg-black/90 border border-status-red/80 text-yellow-300 px-1 py-0.2 text-[8px] font-mono text-center whitespace-nowrap">
+                            HEADING: NORTHBOUND | VEL: ~45 km/h | 4-ROTOR
+                          </div>
+                        </div>
+
+                        {/* Telemetry Badge */}
+                        <div className="absolute bottom-16 right-6 bg-black/90 border border-status-red p-2.5 font-mono text-xs text-tactical-light space-y-1 shadow-lg">
+                          <div className="text-status-red font-bold flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-status-red mr-1.5 animate-ping"></span>
+                            AIRSPACE INGRESS // SOUTH GATE POST
+                          </div>
+                          <div className="text-[10px] text-gray-300">Approaching perimeter wall at 12 m/s</div>
+                          <div className="text-[10px] text-yellow-300">Officer On-Duty: Officer Tariq Al-Mansoor (CH-06 VHF / SAT-6623)</div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* AI Frame Inference Result Overlay */}
                     {activeFrameAIResult && (
                       <div className="absolute bottom-4 left-4 right-4 bg-black/95 border border-status-amber p-2.5 font-mono text-xs text-status-amber z-20 shadow-lg flex justify-between items-center">
@@ -1366,6 +1632,75 @@ function App() {
                       </label>
                     </div>
                   </div>
+
+                  {/* Dedicated Tactical Guard & Satellite Comms Dispatch Console (Single Cam Mode) */}
+                  {SECTOR_GUARDS[selectedCam.id] && (
+                    <div className="bg-black/95 border-t border-tactical-olive p-2.5 font-mono text-xs z-20 shrink-0">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-base">👮</span>
+                          <div>
+                            <span className="text-white font-bold">{SECTOR_GUARDS[selectedCam.id].name}</span>
+                            <span className="text-[10px] text-tactical-light ml-1.5 bg-tactical-olive/60 px-1.5 py-0.2 border border-tactical-olive">
+                              {SECTOR_GUARDS[selectedCam.id].callSign}
+                            </span>
+                            <span className="text-[10px] text-status-green ml-1.5 font-bold">
+                              ● {SECTOR_GUARDS[selectedCam.id].status} ({SECTOR_GUARDS[selectedCam.id].distanceToCam})
+                            </span>
+                          </div>
+                        </div>
+
+                        {CAM_THREAT_CONFIDENCE[selectedCam.id] && CAM_THREAT_CONFIDENCE[selectedCam.id].confidence >= 0.8 && (
+                          <div className="bg-red-950/90 border border-status-red text-status-red text-[10px] font-bold px-2 py-0.5 animate-pulse flex items-center space-x-1 shadow-md">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red animate-ping"></span>
+                            <span>{CAM_THREAT_CONFIDENCE[selectedCam.id].icon} {CAM_THREAT_CONFIDENCE[selectedCam.id].label} ({(CAM_THREAT_CONFIDENCE[selectedCam.id].confidence * 100).toFixed(0)}%) — THREAT &gt; 80%</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Comms & Direct Dispatch Trigger Buttons */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 bg-tactical-gray/60 p-2 border border-tactical-olive/80">
+                        <div className="flex flex-wrap items-center gap-2.5 text-[10px]">
+                          <div className="flex items-center space-x-1 text-cyan-300">
+                            <span>📻</span>
+                            <span>WALKIE: <strong className="text-white">{SECTOR_GUARDS[selectedCam.id].walkieChannel}</strong></span>
+                          </div>
+                          <span className="text-tactical-olive">|</span>
+                          <div className="flex items-center space-x-1 text-yellow-300">
+                            <span>🛰️</span>
+                            <span>SAT-PHONE: <strong className="text-white">{SECTOR_GUARDS[selectedCam.id].satellitePhone}</strong></span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-1.5">
+                          <button
+                            onClick={() => handleDispatchGuard(selectedCam.id, 'SAT_PHONE')}
+                            className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-400 text-yellow-300 hover:bg-yellow-400 hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1"
+                            title={`Call satellite phone ${SECTOR_GUARDS[selectedCam.id].satellitePhone}`}
+                          >
+                            <span>📞</span>
+                            <span>CALL SAT-PHONE</span>
+                          </button>
+                          <button
+                            onClick={() => handleDispatchGuard(selectedCam.id, 'WALKIE')}
+                            className="px-2 py-0.5 bg-cyan-500/20 border border-cyan-400 text-cyan-300 hover:bg-cyan-400 hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1"
+                            title={`Broadcast on walkie-talkie ${SECTOR_GUARDS[selectedCam.id].walkieTalkie}`}
+                          >
+                            <span>📻</span>
+                            <span>BROADCAST WALKIE</span>
+                          </button>
+                          <button
+                            onClick={() => handleDispatchGuard(selectedCam.id, 'SECTOR_SIREN')}
+                            className="px-2 py-0.5 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-[9px] transition-colors flex items-center space-x-1 animate-pulse"
+                            title="Sound sector alarm & order intercept"
+                          >
+                            <span>🚨</span>
+                            <span>ALARM / INTERCEPT</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* RIGHT HALF (Vertical Split): All Surveillance Tools & Forensic Deck */}
@@ -1415,10 +1750,9 @@ function App() {
                     <div
                       key={cam.id}
                       className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
-                        cam.id === '5' ? 'border-status-red shadow-[0_0_8px_rgba(255,0,51,0.4)] animate-[pulse_1s_ease-in-out_infinite]' :
-                        cam.id === '7' ? 'border-status-red shadow-[0_0_6px_rgba(255,0,51,0.2)]' :
-                        cam.id === '8' ? 'border-status-amber shadow-[0_0_6px_rgba(255,183,3,0.2)]' :
-                        'border-tactical-olive hover:border-tactical-green'
+                        isCamFlagged(cam.id)
+                          ? 'border-status-red shadow-[0_0_10px_rgba(255,0,51,0.5)] animate-[pulse_1s_ease-in-out_infinite]'
+                          : 'border-tactical-olive hover:border-tactical-green'
                       }`}
                     >
                       {/* Live Video Stream */}
@@ -1437,7 +1771,7 @@ function App() {
                       {/* Top HUD Overlay */}
                       <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
                         <div className="flex items-center space-x-1">
-                          <span className={`w-2 h-2 rounded-full ${cam.id === '5' || cam.id === '7' ? 'bg-status-red animate-ping' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
+                          <span className={`w-2 h-2 rounded-full ${isCamFlagged(cam.id) ? 'bg-status-red animate-ping' : 'bg-status-green animate-pulse'}`}></span>
                           <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
                             {cam.name}
                           </span>
@@ -1449,6 +1783,54 @@ function App() {
                           {cam.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'OPTICAL'} · {cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'LIVE'}
                         </div>
                       </div>
+
+                      {/* Tactical Detection Banner for CAM-4 (Helicopter) */}
+                      {showDetectionOverlays && cam.id === '4' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
+                          <span className="font-bold text-status-red flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                            ⚠ ROTARY TARGET: HELICOPTER
+                          </span>
+                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
+                            CONF 0.94
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Reticle over Helicopter on CAM-4 in Grid */}
+                      {showDetectionOverlays && cam.id === '4' && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          <div className="absolute top-[20%] left-[58%] w-[32%] h-[26%] border-2 border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse">
+                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🚁 HELICOPTER (0.94)
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tactical Detection Banner for CAM-6 (Drone) */}
+                      {showDetectionOverlays && cam.id === '6' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
+                          <span className="font-bold text-status-red flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
+                            ⚠ DRONE INTRUSION
+                          </span>
+                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
+                            CONF 0.89
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Tactical Reticle over Drone on CAM-6 in Grid */}
+                      {showDetectionOverlays && cam.id === '6' && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          <div className="absolute top-[32%] left-[42%] w-[18%] h-[18%] border-2 border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse">
+                            <span className="absolute -top-3 left-0 bg-status-red text-black text-[6px] font-bold px-0.5 whitespace-nowrap">
+                              🛸 DRONE-06 (0.89)
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Tactical Detection Banner for CAM-7 (Multi-Threat Border Security) */}
                       {showDetectionOverlays && cam.id === '7' && (
@@ -1557,6 +1939,32 @@ function App() {
                           <span>[ INSPECT & FILTERS ]</span>
                         </div>
                       </div>
+
+                      {/* Security Guard / Operator Badge & Quick Direct Dispatch (>80% Threat) */}
+                      {SECTOR_GUARDS[cam.id] && (
+                        <div className="absolute bottom-8 left-1.5 right-1.5 flex items-center justify-between pointer-events-auto z-20 font-mono">
+                          <div className="bg-black/95 border border-tactical-olive/80 text-[7px] px-1 py-0.5 text-gray-300 flex items-center space-x-1 shadow">
+                            <span>👮</span>
+                            <span className="text-white font-bold truncate max-w-[65px]">{SECTOR_GUARDS[cam.id].name.split(' ')[0]}</span>
+                            <span className="text-tactical-olive">·</span>
+                            <span className="text-cyan-400 font-bold">{SECTOR_GUARDS[cam.id].walkieChannel}</span>
+                          </div>
+
+                          {CAM_THREAT_CONFIDENCE[cam.id] && CAM_THREAT_CONFIDENCE[cam.id].confidence >= 0.8 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDispatchGuard(cam.id, 'SAT_PHONE');
+                              }}
+                              className="bg-red-950/95 border border-status-red text-status-red hover:bg-status-red hover:text-black text-[7px] font-bold px-1.5 py-0.5 animate-pulse flex items-center space-x-0.5 shadow-[0_0_6px_rgba(255,0,51,0.5)] transition-colors cursor-pointer"
+                              title={`Direct Comms: Call ${SECTOR_GUARDS[cam.id].name} on ${SECTOR_GUARDS[cam.id].satellitePhone} / ${SECTOR_GUARDS[cam.id].walkieChannel}`}
+                            >
+                              <span>📞</span>
+                              <span>CALL GUARD</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
 
                       {/* Bottom HUD & Action Controls - Compact, Zero Overlap, High Z-Index */}
                       <div className="absolute bottom-0 inset-x-0 px-2 py-1 bg-gradient-to-t from-black/95 via-black/85 to-transparent flex items-center justify-between z-30 pointer-events-auto font-mono text-[10px]">
@@ -2334,6 +2742,77 @@ function App() {
           dossier={activeReportDossier}
           onClose={() => setActiveReportDossier(null)}
         />
+      )}
+
+      {/* Emergency Guard Direct Dispatch & Satellite Comms Modal */}
+      {activeDispatchAlert && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-tactical-dark border-2 border-status-red max-w-lg w-full p-4 shadow-[0_0_35px_rgba(255,0,51,0.6)] font-mono animate-[pulse_1.5s_ease-in-out_infinite]">
+            <div className="flex justify-between items-start border-b border-status-red/60 pb-2 mb-3">
+              <div className="flex items-center space-x-2 text-status-red font-bold text-sm">
+                <span className="w-3 h-3 rounded-full bg-status-red animate-ping"></span>
+                <span>🚨 EMERGENCY DISPATCH TRANSMISSION ACTIVE</span>
+              </div>
+              <button
+                onClick={() => setActiveDispatchAlert(null)}
+                className="text-tactical-light hover:text-white px-2 py-0.5 border border-tactical-olive text-xs"
+              >
+                [ ✖ CLOSE ]
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="bg-red-950/90 border border-status-red/80 p-2.5 text-red-200">
+                <div className="font-bold text-yellow-300 text-sm flex items-center space-x-2 mb-1">
+                  <span>⚠ THREAT CONFIDENCE: {(activeDispatchAlert.confidence * 100).toFixed(0)}%</span>
+                  <span className="text-[10px] bg-status-red text-black px-1.5 py-0.2 font-bold">&gt;80% THRESHOLD MET</span>
+                </div>
+                <div className="text-white">
+                  Target: <strong className="text-yellow-300">{activeDispatchAlert.threatLabel}</strong> detected in <strong>{activeDispatchAlert.guard.sector}</strong>
+                </div>
+              </div>
+
+              <div className="bg-black/90 border border-tactical-olive p-2.5 space-y-1.5 text-tactical-light">
+                <div className="text-white font-bold flex items-center space-x-1.5 text-sm">
+                  <span>👮</span>
+                  <span>ASSIGNED OFFICER: {activeDispatchAlert.guard.name}</span>
+                </div>
+                <div className="text-[11px] text-gray-300">
+                  Call Sign: <strong>{activeDispatchAlert.guard.callSign}</strong> · Location: <strong>{activeDispatchAlert.guard.distanceToCam} from camera</strong> · Status: <strong>{activeDispatchAlert.guard.status}</strong>
+                </div>
+                <div className="border-t border-tactical-olive/60 pt-2 flex flex-col space-y-1 text-[11px]">
+                  <div className="text-cyan-300 flex items-center space-x-2">
+                    <span>📻</span>
+                    <span>Walkie-Talkie: <strong>{activeDispatchAlert.guard.walkieTalkie}</strong></span>
+                    <span className="text-status-green font-bold text-[9px] bg-green-950/80 border border-status-green px-1">[BROADCASTING]</span>
+                  </div>
+                  <div className="text-yellow-300 flex items-center space-x-2">
+                    <span>🛰️</span>
+                    <span>Satellite Phone: <strong>{activeDispatchAlert.guard.satellitePhone}</strong></span>
+                    <span className="text-status-amber font-bold text-[9px] bg-yellow-950/80 border border-status-amber px-1">[CONNECTED]</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-status-amber/10 border border-status-amber/40 p-2.5 text-status-amber text-[11px]">
+                <strong className="text-white block mb-0.5">DIRECT DISPATCH DIRECTIVE TRANSMITTED:</strong>
+                <p className="text-yellow-200">
+                  "Attention {activeDispatchAlert.guard.callSign}: High-confidence threat ({activeDispatchAlert.threatLabel}, {(activeDispatchAlert.confidence * 100).toFixed(0)}%) detected in your sector. Immediate visual intercept and perimeter confirmation required per Tactical Protocol ROE-4."
+                </p>
+              </div>
+
+              <div className="flex justify-between items-center pt-2 border-t border-tactical-olive/60">
+                <span className="text-[10px] text-tactical-light">Transmitted at {activeDispatchAlert.timestamp} UTC</span>
+                <button
+                  onClick={() => setActiveDispatchAlert(null)}
+                  className="px-4 py-1.5 bg-status-red text-black font-bold text-xs hover:bg-red-400 transition-colors shadow-lg"
+                >
+                  ✓ ACKNOWLEDGE &amp; LOG TRANSMISSION
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
