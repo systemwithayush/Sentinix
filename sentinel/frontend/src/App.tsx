@@ -266,7 +266,7 @@ const INITIAL_ALERTS: Alert[] = [
     cam: 'CAM-5',
     cameraId: '5',
     module: 'M2 Aerial Threat (High-Speed Thermal)',
-    threatLevel: 3,
+    threatLevel: 4,
     description: 'CRITICAL FLAGGED: High-speed aerial target with intense infrared thermal signature descending through Sector Echo (Velocity: ~140 m/s, Bearing 215° SW, Elevated FLIR Emission >650°C, Exhaust Plume Active)',
     time: '15:18:04',
     timestamp: '2026-10-25T15:18:04',
@@ -741,6 +741,23 @@ function App() {
   const closeReviewModal = () => {
     setActiveAlert(null);
     setActionSuccessMsg(null);
+  };
+
+  // Quick 2-state inbox actions (no modal needed)
+  const handleQuickConfirm = (e: React.MouseEvent, alertId: string) => {
+    e.stopPropagation();
+    setAlerts(prev => prev.map(a => a.id === alertId
+      ? { ...a, reviewStatus: 'REVIEWED' as ReviewStatus, disposition: 'RELEVANT' as Disposition, reviewedBy: reviewerId, reviewedAt: new Date().toISOString() }
+      : a
+    ));
+  };
+
+  const handleQuickDismiss = (e: React.MouseEvent, alertId: string) => {
+    e.stopPropagation();
+    setAlerts(prev => prev.map(a => a.id === alertId
+      ? { ...a, reviewStatus: 'REVIEWED' as ReviewStatus, disposition: 'NOT_RELEVANT' as Disposition, reviewedBy: reviewerId, reviewedAt: new Date().toISOString() }
+      : a
+    ));
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -1416,8 +1433,9 @@ function App() {
                     <div
                       key={cam.id}
                       className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
-                        cam.id === '7' ? 'border-status-red shadow-[0_0_12px_rgba(255,0,51,0.25)]' :
-                        cam.id === '8' ? 'border-status-amber shadow-[0_0_12px_rgba(255,183,3,0.25)]' :
+                        cam.id === '5' ? 'border-status-red shadow-[0_0_8px_rgba(255,0,51,0.4)] animate-[pulse_1s_ease-in-out_infinite]' :
+                        cam.id === '7' ? 'border-status-red shadow-[0_0_6px_rgba(255,0,51,0.2)]' :
+                        cam.id === '8' ? 'border-status-amber shadow-[0_0_6px_rgba(255,183,3,0.2)]' :
                         'border-tactical-olive hover:border-tactical-green'
                       }`}
                     >
@@ -1437,7 +1455,7 @@ function App() {
                       {/* Top HUD Overlay */}
                       <div className="absolute top-0 inset-x-0 p-1.5 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-between items-start pointer-events-none z-10 font-mono">
                         <div className="flex items-center space-x-1">
-                          <span className={`w-2 h-2 rounded-full ${cam.id === '7' ? 'bg-status-red' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
+                          <span className={`w-2 h-2 rounded-full ${cam.id === '5' || cam.id === '7' ? 'bg-status-red animate-ping' : cam.id === '8' ? 'bg-status-amber' : 'bg-status-green'} animate-pulse`}></span>
                           <span className="text-white bg-black/80 px-1 py-0.2 border border-tactical-olive text-[10px] font-bold truncate max-w-[120px]">
                             {cam.name}
                           </span>
@@ -1445,8 +1463,8 @@ function App() {
                             {cam.sensorType === 'IR_THERMAL' ? 'IR' : 'EO'}
                           </span>
                         </div>
-                        <div className="text-[9px] text-tactical-light bg-black/80 px-1 border border-tactical-olive">
-                          {cam.resolution}
+                        <div className="text-[8px] text-tactical-olive/80 bg-black/70 px-1 border border-tactical-olive/40 font-mono">
+                          {cam.sensorType === 'IR_THERMAL' ? 'THERMAL' : 'OPTICAL'} · {cam.status === 'CUSTOM_VIDEO' ? 'CUSTOM' : 'LIVE'}
                         </div>
                       </div>
 
@@ -1493,21 +1511,21 @@ function App() {
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-5 (High-Speed Thermal Target) */}
-                      {showDetectionOverlays && cam.id === '5' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
+                      {/* Tactical Detection Banner for CAM-5 (High-Speed Thermal Target) — ALWAYS VISIBLE: CRITICAL THREAT */}
+                      {cam.id === '5' && (
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/98 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_6px_rgba(239,68,68,0.5)]">
                           <span className="font-bold text-status-red flex items-center">
                             <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-ping"></span>
-                            CRITICAL: HIGH-SPEED THERMAL TARGET
+                            ⚠ CRITICAL: HIGH-SPEED IR TARGET
                           </span>
-                          <span className="bg-black/80 text-yellow-300 px-1 border border-status-red text-[7px] font-bold">
+                          <span className="bg-black/90 text-yellow-300 px-1 border border-status-red text-[7px] font-bold animate-pulse">
                             VEL: ~140 m/s
                           </span>
                         </div>
                       )}
 
-                      {/* Tactical Target Reticle & Plume Overlay on CAM-5 in Grid */}
-                      {showDetectionOverlays && cam.id === '5' && (
+                      {/* Tactical Target Reticle & Plume Overlay on CAM-5 in Grid — ALWAYS VISIBLE */}
+                      {cam.id === '5' && (
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
                           {/* Target Bounding Reticle */}
                           <div className="absolute top-[52%] left-[34%] w-[16%] h-[18%] border border-status-red bg-status-red/20 shadow-[0_0_8px_rgba(239,68,68,0.6)]">
@@ -1710,13 +1728,39 @@ function App() {
                       {alert.description}
                     </div>
 
-                    {/* Disposition & Provenance Footer */}
+                    {/* Quick Actions & Provenance Footer */}
                     <div className="pt-2 border-t border-tactical-olive/50 flex items-center justify-between font-mono text-[10px]">
                       <div>{getDispositionBadge(alert.disposition)}</div>
-                      <div className="text-tactical-light/60 group-hover:text-status-green transition-colors flex items-center">
-                        <span className="mr-1">[REVIEW]</span>
-                        <span>›</span>
-                      </div>
+                      {alert.reviewStatus === 'NEW' || alert.reviewStatus === 'UNDER_REVIEW' ? (
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={(e) => handleQuickConfirm(e, alert.id)}
+                            className="px-2 py-0.5 bg-status-red/20 border border-status-red text-status-red hover:bg-status-red hover:text-black font-bold text-[9px] transition-colors"
+                            title="Confirm as real threat"
+                          >
+                            ✓ THREAT
+                          </button>
+                          <button
+                            onClick={(e) => handleQuickDismiss(e, alert.id)}
+                            className="px-2 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-white hover:border-tactical-green font-bold text-[9px] transition-colors"
+                            title="Dismiss / mark as benign"
+                          >
+                            ✗ DISMISS
+                          </button>
+                          <button
+                            onClick={() => openReviewModal(alert)}
+                            className="px-1.5 py-0.5 bg-black/60 border border-tactical-olive text-tactical-light hover:text-status-green text-[9px] transition-colors"
+                            title="Full review"
+                          >
+                            ›
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-tactical-light/60 group-hover:text-status-green transition-colors flex items-center">
+                          <span className="mr-1">[REVIEWED]</span>
+                          <span>›</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

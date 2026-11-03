@@ -52,7 +52,7 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
   const activeFilterInfo = FILTER_DESCRIPTIONS[activeFilter];
 
   return (
-    <div className="bg-tactical-dark border border-tactical-green shadow-[0_0_15px_rgba(0,255,65,0.12)] p-2.5 flex flex-col space-y-2.5 font-mono text-xs select-none">
+    <div className="bg-tactical-dark border border-tactical-olive p-2.5 flex flex-col space-y-2.5 font-mono text-xs select-none">
       
       {/* SECTION 1: MISSION OPERATIONS & SCOPE SELECTOR */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-tactical-olive/60 pb-2">
@@ -75,7 +75,7 @@ export const SurveillanceFilterCommandBar: React.FC<SurveillanceFilterCommandBar
                 onClick={() => handleSelectMissionPreset(key)}
                 className={`px-2.5 py-1 text-[11px] font-bold border transition-all flex items-center space-x-1.5 ${
                   isActive
-                    ? 'bg-tactical-olive/90 text-status-green border-tactical-green shadow-[0_0_10px_rgba(0,255,65,0.3)]'
+                    ? 'bg-tactical-olive/90 text-status-green border-tactical-green shadow-[0_0_4px_rgba(0,255,65,0.2)]'
                     : 'bg-black/70 text-gray-300 border-tactical-olive hover:text-white hover:border-tactical-green'
                 }`}
                 title={preset.targetDescription}
