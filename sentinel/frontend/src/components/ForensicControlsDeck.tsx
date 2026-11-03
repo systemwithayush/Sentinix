@@ -35,6 +35,7 @@ export interface ForensicControlsDeckProps {
   onSaveWriteup: (writeup: ForensicWriteup) => void;
   onFlagFollowup: (writeup: ForensicWriteup) => void;
   existingWriteups: ForensicWriteup[];
+  onGenerateReport?: () => void;
 }
 
 // All 38 surveillance filters and operators
@@ -111,7 +112,8 @@ export const ForensicControlsDeck: React.FC<ForensicControlsDeckProps> = ({
   analystId,
   onSaveWriteup,
   onFlagFollowup,
-  existingWriteups
+  existingWriteups,
+  onGenerateReport
 }) => {
   const [activeTab, setActiveTab] = useState<'FILTERS' | 'WRITEUP' | 'HISTORY'>('FILTERS');
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('ALL');
@@ -232,7 +234,7 @@ export const ForensicControlsDeck: React.FC<ForensicControlsDeckProps> = ({
           </span>
         </div>
 
-        <div className="flex space-x-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => setActiveTab('FILTERS')}
             className={`px-2.5 py-1 text-[11px] font-bold border transition-colors ${
@@ -263,6 +265,17 @@ export const ForensicControlsDeck: React.FC<ForensicControlsDeckProps> = ({
           >
             INSPECTION LOGS ({camWriteups.length})
           </button>
+          {onGenerateReport && (
+            <button
+              type="button"
+              onClick={onGenerateReport}
+              className="px-3 py-1 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:brightness-125 text-white text-[11px] font-bold border border-status-green shadow-[0_0_12px_rgba(0,255,65,0.4)] transition-all flex items-center space-x-1.5 animate-pulse"
+              title="Generate certified ISO/IEC 27037 Digital Forensics Evidence Dossier"
+            >
+              <span>📑</span>
+              <span>GENERATE FORENSIC REPORT</span>
+            </button>
+          )}
         </div>
       </div>
 
