@@ -157,7 +157,7 @@ export const SECTOR_GUARDS: Record<string, SectorSecurityGuard> = {
     walkieTalkie: 'CH-07 Border TAC (446.100 MHz)',
     walkieChannel: 'CH-07 TAC',
     satellitePhone: '+8816-4392-7788',
-    status: 'INTERCEPT READY',
+    status: 'SECTOR SECURED',
     distanceToCam: '80m'
   },
   '8': {
@@ -179,7 +179,6 @@ export const CAM_THREAT_CONFIDENCE: Record<string, { label: string; confidence: 
   '4': { label: 'ROTARY AIRCRAFT (HELICOPTER)', confidence: 0.94, icon: '🚁' },
   '5': { label: 'HIGH-SPEED IR TARGET', confidence: 0.96, icon: '🚀' },
   '6': { label: 'RECON DRONE INGRESS', confidence: 0.89, icon: '🛸' },
-  '7': { label: 'BORDER MULTI-THREAT', confidence: 0.94, icon: '🛡️' },
   '8': { label: 'INFRASTRUCTURE BREACH', confidence: 0.99, icon: '📐' }
 };
 
@@ -306,8 +305,8 @@ const INITIAL_CAMERA_FEEDS: CameraFeed[] = [
   },
   {
     id: '7',
-    name: 'CAM-7 (Border Security // Multi-Threat)',
-    sensorType: 'IR_THERMAL',
+    name: 'CAM-7 (Border Security // Demarcation Line)',
+    sensorType: 'EO_OPTICAL',
     status: 'LIVE_STREAM',
     videoUrl: '/videos/cam7.mp4',
     resolution: '1920x1080',
@@ -427,13 +426,13 @@ const INITIAL_ALERTS: Alert[] = [
     id: 'alt-007',
     cam: 'CAM-7',
     cameraId: '7',
-    module: 'M5 Deep Learning (Multi-Threat Border Defense)',
-    threatLevel: 4,
-    description: 'MULTI-THREAT BORDER INTRUSION: Tri-vector intrusion detected across demarcation line. Dismounted personnel infiltration, ground transport vehicle (4x4), and low-altitude reconnaissance drone actively tracked.',
+    module: 'M5 Deep Learning (Border Security)',
+    threatLevel: 1,
+    description: 'SECTOR SECURED: Demarcation line perimeter verified clear. Zero human, vehicle, or aerial infiltration detected across demarcation line. Sector boundary intact and peaceful.',
     time: '15:10:22',
     timestamp: '2026-10-25T15:10:22',
-    reviewStatus: 'NEW',
-    disposition: 'NONE',
+    reviewStatus: 'REVIEWED',
+    disposition: 'NOT_RELEVANT',
     engineVersion: 'ai-engine-1.3.0'
   },
   {
@@ -1329,42 +1328,53 @@ function App() {
                       </div>
                     )}
 
-                    {/* Single Cam Expanded Overlays for CAM-7 (Multi-Threat Border Security) */}
+                    {/* Single Cam Expanded Overlays for CAM-7 (Border Security // Sector Secured) */}
                     {showDetectionOverlays && selectedCam.id === '7' && (
                       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Top Status Banner — no fake counts, real status */}
-                        <div className="absolute top-4 left-4 right-4 bg-black/90 border border-status-red text-white px-3 py-1.5 font-mono text-xs flex justify-between items-center">
+                        {/* Top Status Banner - All Clear / Border Secured in Tactical Green */}
+                        <div className="absolute top-4 left-4 right-4 bg-emerald-950/95 border-2 border-status-green text-white px-3 py-1.5 font-mono text-xs flex justify-between items-center shadow-[0_0_15px_rgba(0,255,65,0.3)]">
                           <div className="flex items-center space-x-2">
-                            <span className="w-2 h-2 rounded-full bg-status-red animate-pulse"></span>
-                            <span className="font-bold text-status-red tracking-wider">
-                              CAM-7 // BORDER SECURITY — MULTI-THREAT SCAN ACTIVE
+                            <span className="w-2.5 h-2.5 rounded-full bg-status-green animate-pulse shadow-[0_0_8px_#00ff41]"></span>
+                            <span className="font-bold text-status-green tracking-wider">
+                              CAM-7 // BORDER SECURITY — SECTOR SECURED &amp; VERIFIED
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2 text-[10px] text-tactical-light">
-                            <span className="border border-orange-500/60 text-orange-400 px-1">🚶 PERSONNEL</span>
-                            <span className="border border-cyan-500/60 text-cyan-400 px-1">🚗 VEHICLE</span>
-                            <span className="border border-status-red/60 text-red-400 px-1">🛸 DRONE</span>
-                            <span className="text-tactical-olive">— AWAITING DETECTION</span>
+                          <div className="flex items-center space-x-2 text-[10px] text-emerald-300">
+                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
+                              ✔ ZERO INFILTRATION DETECTED
+                            </span>
+                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
+                              ✔ DEMARCATION LINE CLEAR
+                            </span>
+                            <span className="border border-status-green/80 bg-emerald-900/60 text-status-green px-2 py-0.5 font-bold shadow">
+                              🛡️ PERIMETER SECURE
+                            </span>
                           </div>
                         </div>
 
-                        {/* Corner scope brackets */}
-                        <div className="absolute top-[13%] left-[2%] w-8 h-8 border-t-2 border-l-2 border-status-red/60"></div>
-                        <div className="absolute top-[13%] right-[2%] w-8 h-8 border-t-2 border-r-2 border-status-red/60"></div>
-                        <div className="absolute bottom-[10%] left-[2%] w-8 h-8 border-b-2 border-l-2 border-status-red/60"></div>
-                        <div className="absolute bottom-[10%] right-[2%] w-8 h-8 border-b-2 border-r-2 border-status-red/60"></div>
+                        {/* Corner scope brackets in green */}
+                        <div className="absolute top-[13%] left-[2%] w-8 h-8 border-t-2 border-l-2 border-status-green/70"></div>
+                        <div className="absolute top-[13%] right-[2%] w-8 h-8 border-t-2 border-r-2 border-status-green/70"></div>
+                        <div className="absolute bottom-[10%] left-[2%] w-8 h-8 border-b-2 border-l-2 border-status-green/70"></div>
+                        <div className="absolute bottom-[10%] right-[2%] w-8 h-8 border-b-2 border-r-2 border-status-green/70"></div>
 
-                        {/* Center scan crosshair */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 opacity-40">
-                          <div className="absolute top-1/2 left-0 right-0 h-px bg-status-red"></div>
-                          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-status-red"></div>
+                        {/* Center scan crosshair in green */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 opacity-60">
+                          <div className="absolute top-1/2 left-0 right-0 h-px bg-status-green"></div>
+                          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-status-green"></div>
                         </div>
 
-                        {/* Bottom telemetry bar */}
-                        <div className="absolute bottom-12 left-4 right-4 bg-black/80 border border-tactical-olive/50 px-3 py-1 font-mono text-[10px] text-tactical-light flex justify-between">
-                          <span>SECTOR: ECHO-7 DEMARCATION LINE</span>
-                          <span className="text-status-amber">M5 DEEP LEARNING ENGINE — SCANNING</span>
-                          <span>UPLOAD VIDEO TO ENABLE LIVE DETECTION</span>
+                        {/* Bottom telemetry bar in green */}
+                        <div className="absolute bottom-12 left-4 right-4 bg-black/90 border border-status-green/60 px-3 py-1 font-mono text-[10px] text-emerald-300 flex justify-between shadow-md">
+                          <span className="flex items-center space-x-1">
+                            <span className="text-status-green font-bold">SECTOR:</span>
+                            <span>ECHO-7 DEMARCATION LINE &amp; WATCHTOWER</span>
+                          </span>
+                          <span className="text-status-green font-bold flex items-center space-x-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-green inline-block animate-pulse"></span>
+                            <span>M5 DEEP LEARNING ENGINE — ALL CLEAR // REGULAR PATROL ACTIVE</span>
+                          </span>
+                          <span className="text-emerald-400 font-bold">STATUS: ZERO ANOMALIES</span>
                         </div>
                       </div>
                     )}
@@ -1650,12 +1660,17 @@ function App() {
                           </div>
                         </div>
 
-                        {CAM_THREAT_CONFIDENCE[selectedCam.id] && CAM_THREAT_CONFIDENCE[selectedCam.id].confidence >= 0.8 && (
+                        {selectedCam.id === '7' ? (
+                          <div className="bg-emerald-950/90 border border-status-green text-status-green text-[10px] font-bold px-2 py-0.5 flex items-center space-x-1 shadow-[0_0_8px_rgba(0,255,65,0.3)]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse"></span>
+                            <span>🛡️ SECTOR SECURED // BORDER PATROL INTACT (ALL-CLEAR)</span>
+                          </div>
+                        ) : CAM_THREAT_CONFIDENCE[selectedCam.id] && CAM_THREAT_CONFIDENCE[selectedCam.id].confidence >= 0.8 ? (
                           <div className="bg-red-950/90 border border-status-red text-status-red text-[10px] font-bold px-2 py-0.5 animate-pulse flex items-center space-x-1 shadow-md">
                             <span className="w-1.5 h-1.5 rounded-full bg-status-red animate-ping"></span>
                             <span>{CAM_THREAT_CONFIDENCE[selectedCam.id].icon} {CAM_THREAT_CONFIDENCE[selectedCam.id].label} ({(CAM_THREAT_CONFIDENCE[selectedCam.id].confidence * 100).toFixed(0)}%) — THREAT &gt; 80%</span>
                           </div>
-                        )}
+                        ) : null}
                       </div>
 
                       {/* Comms & Direct Dispatch Trigger Buttons */}
@@ -1752,6 +1767,8 @@ function App() {
                       className={`bg-black border relative group overflow-hidden flex flex-col transition-all shadow-md ${
                         isCamFlagged(cam.id)
                           ? 'border-status-red shadow-[0_0_10px_rgba(255,0,51,0.5)] animate-[pulse_1s_ease-in-out_infinite]'
+                          : cam.id === '7'
+                          ? 'border-status-green/70 shadow-[0_0_8px_rgba(0,255,65,0.25)] hover:border-status-green'
                           : 'border-tactical-olive hover:border-tactical-green'
                       }`}
                     >
@@ -1832,19 +1849,17 @@ function App() {
                         </div>
                       )}
 
-                      {/* Tactical Detection Banner for CAM-7 (Multi-Threat Border Security) */}
+                      {/* Tactical Detection Banner for CAM-7 (Border Secured // Zero Threats) */}
                       {showDetectionOverlays && cam.id === '7' && (
-                        <div className="absolute top-7 left-1.5 right-1.5 bg-red-950/95 border border-status-red text-white px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-md">
-                          <span className="font-bold flex items-center text-status-red">
-                            <span className="w-1.5 h-1.5 rounded-full bg-status-red mr-1 animate-pulse"></span>
-                            BORDER THREAT SCAN ACTIVE
+                        <div className="absolute top-7 left-1.5 right-1.5 bg-emerald-950/95 border border-status-green text-status-green px-1.5 py-0.5 text-[8px] font-mono z-10 pointer-events-none flex items-center justify-between shadow-[0_0_8px_rgba(0,255,65,0.3)]">
+                          <span className="font-bold flex items-center text-status-green">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-green mr-1 animate-pulse"></span>
+                            SECTOR SECURED // BORDER CLEAR
                           </span>
-                          <span className="bg-black/90 text-[7px] text-tactical-light px-1 border border-status-red flex items-center space-x-1">
-                            <span className="text-orange-400 font-bold">🚶</span>
+                          <span className="bg-black/90 text-[7px] text-emerald-400 px-1 border border-status-green flex items-center space-x-1">
+                            <span className="font-bold">✔ 0 THREATS</span>
                             <span>|</span>
-                            <span className="text-cyan-400 font-bold">🚗</span>
-                            <span>|</span>
-                            <span className="text-red-400 font-bold">🛸</span>
+                            <span>PERIMETER INTACT</span>
                           </span>
                         </div>
                       )}
@@ -1950,7 +1965,12 @@ function App() {
                             <span className="text-cyan-400 font-bold">{SECTOR_GUARDS[cam.id].walkieChannel}</span>
                           </div>
 
-                          {CAM_THREAT_CONFIDENCE[cam.id] && CAM_THREAT_CONFIDENCE[cam.id].confidence >= 0.8 && (
+                          {cam.id === '7' ? (
+                            <div className="bg-emerald-950/90 border border-status-green text-status-green text-[7px] font-bold px-1.5 py-0.5 flex items-center space-x-1 shadow">
+                              <span className="w-1 h-1 rounded-full bg-status-green animate-pulse"></span>
+                              <span>✔ SECURED</span>
+                            </div>
+                          ) : CAM_THREAT_CONFIDENCE[cam.id] && CAM_THREAT_CONFIDENCE[cam.id].confidence >= 0.8 ? (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1962,7 +1982,7 @@ function App() {
                               <span>📞</span>
                               <span>CALL GUARD</span>
                             </button>
-                          )}
+                          ) : null}
                         </div>
                       )}
 
